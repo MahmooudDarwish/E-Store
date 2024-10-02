@@ -58,6 +58,9 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
 
+    implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.compose.ui:ui:1.4.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
 
 
     implementation(libs.androidx.core.ktx)

@@ -9,8 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.landing.components.SplashLottie
+import com.example.e_store.features.main_home.view.MainHomeScreen
 import com.example.e_store.utils.navigation.Screen
 
 class LandingScreen : ComponentActivity() {
@@ -22,7 +22,7 @@ class LandingScreen : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
-                        composable(Screen.Home.route) { HomeScreen() }
+                        composable(Screen.Home.route) { MainHomeScreen() }
 
                     }
                 }
@@ -30,3 +30,5 @@ class LandingScreen : ComponentActivity() {
         }
     }
 }
+
+
