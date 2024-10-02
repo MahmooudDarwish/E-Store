@@ -1,4 +1,4 @@
-package com.example.e_store.features.home.view
+package com.example.e_store.features.categories.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,14 +11,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeScreen() {
+fun CategoriesScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
 
     ) {
         Text(
-            text = "HomeScreen",
+            text = "CategoriesScreen",
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             modifier = Modifier.padding(start = 16.dp)
