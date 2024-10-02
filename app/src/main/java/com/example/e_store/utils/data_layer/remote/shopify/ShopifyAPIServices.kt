@@ -8,6 +8,5 @@ import retrofit2.http.Headers
 
 interface ShopifyAPIServices {
     @GET(APIKeys.SMART_COLLECTION_ENDPOINT)
-    @Headers("${APIKeys.ACCESS_TOKEN_HEADER}: ${APIKeys.ADMIN_API_ACCESS_TOKEN}")
     suspend fun getBrands(): Response<SmartCollectionsResponse>
 }
