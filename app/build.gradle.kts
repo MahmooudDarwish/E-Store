@@ -51,6 +51,9 @@ android {
 
 dependencies {
 
+    //Coil for images
+    implementation("io.coil-kt:coil-compose:2.0.0")
+
     //Lottie
     implementation(libs.lottie)
 
