@@ -1,9 +1,6 @@
 package com.example.e_store.utils.data_layer
 
-import com.example.e_store.utils.shared_models.Brand
-import kotlinx.coroutines.flow.Flow
+import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
+import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 
-interface EStoreRepository {
-    suspend fun getBrands(): Flow<List<Brand>?>
-
-}
+interface EStoreRepository : EStoreRemoteDataSource, EStoreLocalDataSource

@@ -1,9 +1,9 @@
 package com.example.e_store.utils.data_layer
 
-import android.util.Log
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.shared_models.Brand
+import com.example.e_store.utils.shared_models.Product
 import kotlinx.coroutines.flow.Flow
 
 class EStoreRepositoryImpl private constructor(
@@ -29,7 +29,11 @@ class EStoreRepositoryImpl private constructor(
         }
     }
 
-    override suspend fun getBrands(): Flow<List<Brand>?> {
-        return eStoreRemoteDataSource.getBrands()
+    override suspend fun fetchBrands(): Flow<List<Brand>> {
+        return eStoreRemoteDataSource.fetchBrands()
+    }
+
+    override suspend fun fetchForUProducts(): Flow<List<Product>> {
+        return eStoreRemoteDataSource.fetchForUProducts()
     }
 }

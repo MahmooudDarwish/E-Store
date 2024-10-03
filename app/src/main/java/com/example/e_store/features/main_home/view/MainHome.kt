@@ -6,14 +6,17 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.e_store.R
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
 import com.example.e_store.ui.theme.PrimaryColor
@@ -36,10 +39,13 @@ fun MainHomeScreen(homeViewModelFactory: HomeViewModelFactory) {
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
     val bottomBarRoutes = items.map { it.route }
 
+    val context = LocalContext.current
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "E-Store", color = PrimaryColor, fontStyle = FontStyle.Italic ) }
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White),
+                title = { Text(text = getString(context , R.string.app_name), color = PrimaryColor, fontStyle = FontStyle.Italic ) }
             )
         },
         bottomBar = {
@@ -47,7 +53,7 @@ fun MainHomeScreen(homeViewModelFactory: HomeViewModelFactory) {
                 BottomNavigationBar(
                     items = items,
                     currentRoute = currentRoute,
-                    navController = navController
+                    navController = navController,
                 )
             }
         }
