@@ -12,7 +12,7 @@ interface ShopifyAPIServices {
     suspend fun fetchBrands(): SmartCollectionsResponse
 
     @GET(APIKeys.CUSTOM_COLLECTION_ENDPOINT)
-    suspend fun fetchCollections():CustomCollectionResponse
+    suspend fun fetchCustomCollections(): CustomCollectionResponse
 
     @GET(APIKeys.PRODUCTS_ENDPOINT)
     suspend fun fetchProducts(
