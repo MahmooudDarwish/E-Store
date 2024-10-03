@@ -15,7 +15,8 @@ object APIKeys {
 
     //Endpoints
     const val SMART_COLLECTION_ENDPOINT = "smart_collections.json"
-
+    const val CUSTOM_COLLECTION_ENDPOINT = "custom_collections.json"
+    const val PRODUCTS_ENDPOINT = "products.json"
 
 
 }

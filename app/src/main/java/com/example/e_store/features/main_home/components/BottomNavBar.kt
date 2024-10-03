@@ -2,12 +2,12 @@ package com.example.e_store.features.main_home.components
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults.containerColor
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.Screen
@@ -18,7 +18,7 @@ fun BottomNavigationBar(
     currentRoute: String,
     navController: NavHostController
 ) {
-    NavigationBar(containerColor = Color.White ) {
+    NavigationBar(containerColor = Color.White, tonalElevation = 10.dp) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = {
