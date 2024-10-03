@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
+import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
 
@@ -38,7 +39,7 @@ fun MainHomeScreen(homeViewModelFactory: HomeViewModelFactory) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "E-Store", color = Color(0xFF9c597d), fontStyle = FontStyle.Italic ) }
+                title = { Text(text = "E-Store", color = PrimaryColor, fontStyle = FontStyle.Italic ) }
             )
         },
         bottomBar = {

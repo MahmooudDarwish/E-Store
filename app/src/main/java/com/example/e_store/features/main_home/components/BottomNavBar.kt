@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
+import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.Screen
 
 @Composable
@@ -24,11 +25,11 @@ fun BottomNavigationBar(
                     Icon(
                         painter = painterResource(id = item.icon),
                         contentDescription = item.title,
-                        tint = if (currentRoute == item.route) Color(0xFF9c597d) else Color.Gray
+                        tint = if (currentRoute == item.route) PrimaryColor else Color.Gray
                     )
                 },
                 label = {
-                    Text(item.title, color = Color(0xFF9c597d))
+                    Text(item.title, color = PrimaryColor)
                 },
                 alwaysShowLabel = false,
                 selected = currentRoute == item.route,
