@@ -7,4 +7,96 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+
+
+    <!-- Primary color used for branding (e.g., toolbar, buttons) -->
+    <color name="colorPrimary">#a05a7f</color>
+
+    <!-- Darker version of the primary color, often used for the status bar -->
+    <color name="colorPrimaryDark">#FFFFFFFF</color>
+
+    <!-- Secondary color for accents like FABs, highlights -->
+    <color name="colorSecondary">#a05a7f</color>
+
+    <!-- Background color of the app (e.g., activity background) -->
+    <color name="colorBackground">#feffff</color>
+    <!-- Surface color used for cards, sheets, dialogs, etc. -->
+    <color name="colorSurface">#ffffff</color>
+    <!-- Text color that appears on primary-colored backgrounds -->
+    <color name="colorOnPrimary">#71a3c1</color>
+
+    <!-- Darker version of the secondary color -->
+    <color name="colorSecondaryVariant">#018786</color>
+
+    <!-- Color selection -->
+    <color name="colorAccent">#ece2ff</color>
+
+    <!-- color Pop Up -->
+    <color name="colorPopUp">#9d597e</color>
+
+    <!-- text color Background -->
+    <color name="colorTextBackground">#2f2750</color>
+
+    <!-- text color card header-->
+    <color name="colorTextCardHeader">#41649e</color>
+
+    <!-- text color card body-->
+    <color name="colorTextCardBody">#e0e0e0</color>
+
+    <!--  color card background-->
+    <color name="colorCardBackground">#f7f7f7</color>
+
+    <!--primary Button background color-->
+    <color name="colorPrimaryButton">#9d597e</color>
+
+    <!--primary Button text color-->
+    <color name="colorPrimaryButtonTextColor">#ffffff</color>
+
+    <!--secondary Button background color-->
+    <color name="colorSecondaryButton">#b7a9b8</color>
+
+   <!-- icon favorite fill color-->
+    <color name="colorIconFavoriteFill">#9d597e</color>
+
+    <!-- slider dot color-->
+    <color name="colorSliderDot">#9d597e</color>
+
+    <!-- Product Info text color-->
+    <!-- list from bigger to smaller -->
+    <color name="colorProductInfo">#ababab</color>
+    <color name="colorProductInfo1">#f3ebf0</color>
+    <color name="colorProductInfo2">#b6acaf</color>
+    <color name="colorProductInfo3">#e5e6cd</color>
+    <color name="colorProductInfo4">#d1d1d1</color>
+
+    <!--Product Info size available button color background-->
+    <color name="colorProductInfoSizeAvailableButton">#f2eaf9</color>
+    <!--Product Info size available button text color-->
+    <color name="colorProductInfoSizeAvailableButtonTextColor">#908c9a</color>
+
+    <!-- splash screen background color-->
+    <color name="backgroundColorSplashScreen">#9d597e</color>
+    <!-- splash screen text color-->
+    <color name="colorTextSplashScreen">#ffffff</color>
+
+    <!--Insignificant background color-->
+    <color name="colorInsignificantBackground">#9d597e</color>
+    <!--Insignificant text color-->
+    <color name="colorInsignificantText">#ffffff</color>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </resources>
