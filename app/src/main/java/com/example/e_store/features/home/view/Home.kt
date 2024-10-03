@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.e_store.features.home.component.AdsSlider
 import com.example.e_store.features.home.component.BrandsSection
 import com.example.e_store.features.home.component.ForUSection
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
@@ -27,6 +29,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
     val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
 
+    val adImages = listOf(
+        "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+    )
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -37,8 +43,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp).background(color = Color.White)
+            .padding(horizontal = 20.dp)
+            .background(color = Color.White)
     ) {
+
         item {
             SearchWithFavoriteSection(
                 onSearchClick = {
@@ -51,18 +59,29 @@ fun HomeScreen(viewModel: HomeViewModel) {
         }
 
         item {
-            Text(text = "Brands", modifier = Modifier.padding(vertical = 8.dp))
+            ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
+            AdsSlider(images = adImages)
         }
+        item { Gap(height = 16) }
+
+
+        item {
+            Text(text = "Brands", modifier = Modifier.padding(vertical = 8.dp), fontSize = 20.sp)
+        }
+
+
 
         item {
             when (brandsUiState) {
                 DataState.Loading -> {
                     EShopLoadingIndicator()
                 }
+
                 is DataState.Success -> {
                     val brands = (brandsUiState as DataState.Success).data
                     BrandsSection(onBrandClick = {}, brands = brands)
                 }
+
                 is DataState.Error -> {
                     val errorMsg = (brandsUiState as DataState.Error).message
                     LaunchedEffect(errorMsg) {
@@ -75,7 +94,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
 
         item {
-            Text(text = "For you", modifier = Modifier.padding(vertical = 8.dp))
+            Text(text = "For you", modifier = Modifier.padding(vertical = 8.dp), fontSize = 20.sp)
         }
 
         item {
@@ -87,6 +106,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 DataState.Loading -> {
                     EShopLoadingIndicator()
                 }
+
                 is DataState.Success -> {
                     val forUProducts = (forUProductsUiState as DataState.Success).data
                     ForUSection(
@@ -96,6 +116,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         products = forUProducts
                     )
                 }
+
                 is DataState.Error -> {
                     val errorMsg = (forUProductsUiState as DataState.Error).message
                     LaunchedEffect(errorMsg) {
