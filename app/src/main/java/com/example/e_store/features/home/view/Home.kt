@@ -15,11 +15,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.e_store.R
 import com.example.e_store.features.home.component.AdsSlider
 import com.example.e_store.features.home.component.BrandsSection
 import com.example.e_store.features.home.component.ForUSection
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.features.home.component.SearchWithFavoriteSection
+import com.example.e_store.features.home.component.SliderItem
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
@@ -29,15 +31,30 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
     val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
 
-    val adImages = listOf(
-        "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
-    )
+
+
+    val sliderImages: List<SliderItem> = listOf(
+        SliderItem(R.drawable.addsgifone, "New Collection of Clothes"),
+        SliderItem(R.drawable.fivepercentoff, "5PERCENTOFF"),
+        SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
+        SliderItem(R.drawable.freeship, "Free Shipping"),
+        SliderItem(R.drawable.adsgifthree, "New Collection of  Hoodie "),
+        SliderItem(R.drawable.tenpercentoff, "10PERCENTOFF"),
+        SliderItem(R.drawable.adsgiffour, "New Collection of  Shirts "),
+        SliderItem(R.drawable.fifteenpercentoff, "15PERCENTOFF"),
+        SliderItem(R.drawable.adsgiffive, "New Collection of  Hoodie "),
+        SliderItem(R.drawable.twentypercentoff, "20PERCENTOFF"),
+        SliderItem(R.drawable.adsgifsix, "New Collection of  Shoes "),
+
+        )
+
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getBrands()
         viewModel.getForUProducts()
+        viewModel.fetchDiscountCodes()
     }
 
     LazyColumn(
@@ -60,7 +77,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
         item {
             ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
-            AdsSlider(images = adImages)
+            AdsSlider(images = sliderImages){ clickedItem ->
+                // Handle click on the slider item
+                Toast.makeText(context, "Clicked on: ${clickedItem.title}", Toast.LENGTH_SHORT).show()
+            }
         }
         item { Gap(height = 16) }
 
