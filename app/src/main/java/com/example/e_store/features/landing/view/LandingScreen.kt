@@ -16,6 +16,9 @@ import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.features.authentication.Sign_in_Screen
+import com.example.e_store.features.authentication.Sign_up_Screen
+import com.example.e_store.features.home.view.HomeScreen
 
 class LandingScreen : ComponentActivity() {
 
@@ -42,6 +45,8 @@ class LandingScreen : ComponentActivity() {
                         composable(Screen.Home.route) { MainHomeScreen(
                             homeViewModelFactory
                         ) }
+                        composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
+                        composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
 
                     }
                 }

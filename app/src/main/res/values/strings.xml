@@ -13,7 +13,8 @@
     <string name="for_you">For you</string>
     <string name="brands">brands</string>
     <string name="search">Search</string>
-
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign in</string>
 
 
 </resources>

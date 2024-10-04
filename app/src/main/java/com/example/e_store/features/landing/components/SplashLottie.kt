@@ -23,7 +23,7 @@ fun SplashLottie(navController: NavController) {
     LaunchedEffect(composition) {
         if (composition != null) {
             delay(3000)
-            navController.navigate(Screen.Home.route) {
+            navController.navigate(Screen.Sign_in.route) {
                 popUpTo(Screen.Splash.route) { inclusive = true }
             }
         }
