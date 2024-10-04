@@ -1,7 +1,10 @@
 package com.example.e_store.features.home.component
 
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -10,7 +13,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -24,20 +27,42 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import kotlin.math.absoluteValue
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import kotlinx.coroutines.delay
 
 @Composable
 fun AdsSlider(
-    images: List<SliderItem>,
-    onItemClick: (SliderItem) -> Unit // Add a click callback
+    initialImages: List<SliderItem>, // Receive the initial list of images
+    onItemClick: (SliderItem) -> Unit,
 ) {
+    // Initialize images using remember with apply to avoid multiple recompositions
+    val images by rememberUpdatedState(newValue = initialImages)
+
+    // Pager state for controlling the current page
     val pagerState = rememberPagerState(pageCount = { images.size })
 
+    // Get the current context
+    val context = LocalContext.current
+
+    // Auto-slide effect that only runs when images are present
+    LaunchedEffect(images.isNotEmpty()) {
+        if (images.isNotEmpty()) {
+            while (true) {
+                delay(3000L) // Auto-slide every 3 seconds
+                val nextPage = (pagerState.currentPage + 1) % images.size
+                pagerState.animateScrollToPage(nextPage)
+                Log.d("AdsSlider", "Auto sliding to page: $nextPage")
+            }
+        }
+    }
+
+    // Horizontal pager for image sliding
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier.fillMaxWidth(), // Ensures full-width pager
-        pageSpacing = 0.dp, // No spacing between pages to ensure only one card per swipe
-        pageSize = PageSize.Fill, // Makes each page fill the width of the screen
-        snapPosition = SnapPosition.Center, // Snaps the page at the center
+        modifier = Modifier.fillMaxWidth(),
+        pageSpacing = 0.dp,
+        pageSize = PageSize.Fill,
+        snapPosition = SnapPosition.Center
     ) { page ->
         val pageOffset = (
                 (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
@@ -45,39 +70,47 @@ fun AdsSlider(
 
         Card(
             modifier = Modifier
-                .fillMaxSize() // Makes the card fill the available space
+                .fillMaxSize()
                 .graphicsLayer {
                     alpha = lerp(
                         start = 0.5f,
                         stop = 1f,
                         fraction = 1f - pageOffset.coerceIn(0f, 1f)
                     )
-
                 }
                 .clickable {
-                    // Handle click on slide
                     onItemClick(images[page])
-                }, // Make slide clickable
+                    copyToClipboard(context, images[page].title)
+                },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 10.dp
+                defaultElevation = 5.dp
             ),
         ) {
-            // Load the image into the card
             AsyncImage(
-                imageLoader = gifEnabledLoader(LocalContext.current), // Pass context to the loader
+                imageLoader = gifEnabledLoader(context),
                 model = images[page].image,
                 contentDescription = images[page].title,
-                contentScale = ContentScale.Crop, // Adjust the scaling of the image
-                modifier = Modifier.fillMaxSize(), // Ensures the image fills the card
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxSize(),
             )
         }
     }
 }
 
+// Helper function to update slider images from outside
+fun updateSliderImages(images: SnapshotStateList<SliderItem>, newImages: List<SliderItem>) {
+    Log.d("updateSliderImages", "newImages: $newImages")
+    Log.d("updateSliderImages", "images: $images")
+    images.addAll(newImages)
+}
+
+// Custom ImageLoader to handle GIFs
 @Composable
 fun gifEnabledLoader(context: Context): ImageLoader {
     return ImageLoader.Builder(context)
@@ -91,7 +124,16 @@ fun gifEnabledLoader(context: Context): ImageLoader {
         .build()
 }
 
+// Data class for Slider items
 data class SliderItem(
     val image: Int,
     val title: String,
 )
+
+// Function to copy text to clipboard and show a toast message
+private fun copyToClipboard(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = android.content.ClipData.newPlainText("Coupons", text)
+    clipboard.setPrimaryClip(clip)
+
+}

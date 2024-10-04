@@ -67,18 +67,14 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?> {
         return flow {
             try {
-                // Fetch all pricing rules
                 val priceRuleResponse = apiService.fetchPricingRules()
 
-                // Check for successful response
                 if (priceRuleResponse.isSuccessful) {
                     priceRuleResponse.body()?.let { body ->
                         val discountCodesList = mutableListOf<DiscountCodesResponse>()
 
-                        // Loop through each price rule and fetch discount codes
                         for (priceRule in body.price_rules) {
                             Log.d(TAG, "priceRuleID: ${priceRule.id}")
-                            // Fetch discount codes for the specific price rule
                             discountCodesList.addAll(listOf(apiService.fetchDiscountCodes(priceRule.id)))
                         }
                         Log.d(TAG, "fetchDiscountCodes: ${discountCodesList}")
