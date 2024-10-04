@@ -9,7 +9,6 @@ import android.util.Log
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import kotlinx.coroutines.flow.flow
 import com.example.e_store.utils.shared_models.Product
-import retrofit2.Response
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
 
@@ -60,6 +59,11 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     override suspend fun fetchCustomCollections(): Flow<List<CustomCollection>> {
         val response = apiService.fetchCustomCollections().customCollections
+        return flowOf(response)
+    }
+
+    override suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>> {
+        val response = apiService.fetchProducts(collectionId = brandId).products
         return flowOf(response)
     }
 

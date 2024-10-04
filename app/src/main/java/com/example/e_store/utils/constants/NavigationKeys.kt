@@ -1,7 +1,5 @@
 package com.example.e_store.utils.constants
 
-import com.example.e_store.R
-import com.example.e_store.utils.navigation.Screen
 
 object NavigationKeys {
     const val SPLASH_ROUTE = "splash"
@@ -9,6 +7,13 @@ object NavigationKeys {
     const val CATEGORIES_ROUTE = "categories"
     const val CART_ROUTE = "cart"
     const val PROFILE_ROUTE = "profile"
+    const val BRANDS_ROUTE = "home/brands"
+
+
+    // Passed Values
+    const val BRAND_ID = "brandId"
+
+
 
 }
 

@@ -6,9 +6,7 @@ import com.example.e_store.utils.shared_models.Brand
 import kotlinx.coroutines.flow.Flow
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
-import com.example.e_store.utils.shared_models.PriceRule
 import com.example.e_store.utils.shared_models.Product
-import android.util.Log
 
 class EStoreRepositoryImpl private constructor(
     private var eStoreRemoteDataSource: EStoreRemoteDataSource,
@@ -40,6 +38,9 @@ class EStoreRepositoryImpl private constructor(
         return eStoreRemoteDataSource.fetchCustomCollections()
     }
 
+    override suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>> {
+        return eStoreRemoteDataSource.fetchBrandProducts(brandId)
+    }
 
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return eStoreRemoteDataSource.fetchForUProducts()

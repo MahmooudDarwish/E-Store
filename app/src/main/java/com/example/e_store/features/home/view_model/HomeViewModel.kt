@@ -19,10 +19,13 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
 
 class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
+
     private val _brands = MutableStateFlow<DataState<List<Brand>>>(DataState.Loading)
     val brands = _brands.asStateFlow()
+
     private val _discountCodes = MutableStateFlow<DataState<List<DiscountCodesResponse>?>>(DataState.Loading)
     val discountCodes = _discountCodes.asStateFlow()
+
     private val _forUProducts = MutableStateFlow<DataState<List<Product>>>(DataState.Loading)
     val forUProducts = _forUProducts.asStateFlow()
 

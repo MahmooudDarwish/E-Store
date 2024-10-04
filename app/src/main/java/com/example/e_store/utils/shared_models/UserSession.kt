@@ -1,4 +1,4 @@
-package com.example.e_store.utils.data_layer.local
+package com.example.e_store.utils.shared_models
 
 object UserSession{
     var email : String? = null

@@ -7,7 +7,7 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.e_store.utils.data_layer.local.UserSession
+import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 
