@@ -1,0 +1,52 @@
+package com.example.e_store.features.main_home.components
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.core.content.ContextCompat.getString
+import androidx.navigation.NavHostController
+import com.example.e_store.ui.theme.PrimaryColor
+import com.example.e_store.utils.navigation.Screen
+
+@Composable
+fun BottomNavigationBar(
+    items: List<Screen>,
+    currentRoute: String,
+    navController: NavHostController
+) {
+    val context = LocalContext.current
+
+    NavigationBar(containerColor = Color.White, ) {
+        items.forEach { item ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = item.icon),
+                        contentDescription = getString(context, item.title),
+                        tint = if (currentRoute == item.route) PrimaryColor else Color.Gray
+                    )
+                },
+                label = {
+                    Text(getString(context, item.title), color = PrimaryColor)
+                },
+                alwaysShowLabel = false,
+                selected = currentRoute == item.route,
+                onClick = {
+                    if (currentRoute != item.route) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

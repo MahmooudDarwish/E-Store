@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
@@ -51,6 +52,13 @@ android {
 }
 
 dependencies {
+    //Exopplayer for GIF
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
+
+
+    //Coil for images
+    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("io.coil-kt:coil-gif:2.4.0")
 
     //Lottie
     implementation(libs.lottie)
@@ -80,5 +88,20 @@ dependencies {
     implementation ("androidx.compose.ui:ui:1.7.3")
     implementation ("androidx.compose.material3:material3:1.3.0")
     implementation ("androidx.compose.ui:ui-tooling-preview:1.7.3")
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.exoplayer)
+    //UI helpers
+    implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.compose.ui:ui:1.4.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
 
+    // Retrofit for API requests
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
+
+
+    // ViewModel and LiveData for MVVM architecture
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation ("androidx.lifecycle:lifecycle-livedata:2.3.1")
 }

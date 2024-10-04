@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.EStore" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.EStore" parent="android:Theme.Material.Light.NoActionBar">
+
+        <item name="android:statusBarColor">@android:color/white</item>
+        <!-- Enable light status bar to make icons and text dark -->
+        <item name="android:windowLightStatusBar">true</item>
+
+
+    </style>
 </resources>

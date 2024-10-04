@@ -9,13 +9,31 @@ import androidx.compose.material3.Surface
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.e_store.features.home.view_model.HomeViewModelFactory
+import com.example.e_store.features.landing.components.SplashLottie
+import com.example.e_store.features.main_home.view.MainHomeScreen
+import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
+import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
+import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
+import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.authentication.Sign_in_Screen
 import com.example.e_store.features.authentication.Sign_up_Screen
 import com.example.e_store.features.home.view.HomeScreen
-import com.example.e_store.features.landing.components.SplashLottie
-import com.example.e_store.utils.navigation.Screen
 
 class LandingScreen : ComponentActivity() {
+
+    private val repo by lazy {
+        EStoreRepositoryImpl.getInstance(
+            EStoreRemoteDataSourceImpl.getInstance(),
+            EStoreLocalDataSourceImpl()
+        )
+    }
+
+    val homeViewModelFactory by lazy {
+        HomeViewModelFactory(repo)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -24,7 +42,9 @@ class LandingScreen : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
-                        composable(Screen.Home.route) { HomeScreen() }
+                        composable(Screen.Home.route) { MainHomeScreen(
+                            homeViewModelFactory
+                        ) }
                         composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
                         composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
 
@@ -34,3 +54,5 @@ class LandingScreen : ComponentActivity() {
         }
     }
 }
+
+
