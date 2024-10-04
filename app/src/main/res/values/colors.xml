@@ -43,7 +43,7 @@
     <color name="colorTextCardHeader">#41649e</color>
 
     <!-- text color card body-->
-    <color name="colorTextCardBody">#e0e0e0</color>
+    <color name="colorTextCardBody">#C3C3C3</color>
 
     <!--  color card background-->
     <color name="colorCardBackground">#f7f7f7</color>

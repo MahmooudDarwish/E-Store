@@ -52,6 +52,9 @@ android {
 }
 
 dependencies {
+
+
+
     //Exopplayer for GIF
     implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
 
