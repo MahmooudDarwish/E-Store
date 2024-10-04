@@ -1,6 +1,5 @@
 package com.example.e_store.features.home.view
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.e_store.R
 import com.example.e_store.features.home.component.AdsSlider
 import com.example.e_store.features.home.component.BrandsSection
@@ -25,71 +25,35 @@ import com.example.e_store.features.home.component.ForUSection
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.features.home.component.SearchWithFavoriteSection
 import com.example.e_store.features.home.component.SliderItem
-import com.example.e_store.features.home.component.updateSliderImages
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
-import com.google.common.collect.Iterables.addAll
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
     val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
 
     val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
 
     // Initialize the slider images
-    val sliderImages = remember { mutableStateListOf<SliderItem>().apply {
-        addAll(
-            listOf(
-                SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
-                SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
-                SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
-                SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
-                SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
-                SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
+    val sliderImages = remember {
+        mutableStateListOf<SliderItem>().apply {
+            addAll(
+                listOf(
+                    SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
+                    SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
+                    SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
+                    SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
+                    SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
+                    SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
+                )
             )
-        )
-    }}
-
-    val context = LocalContext.current
-    when (discountCodesUiState) {
-        DataState.Loading -> {
-            EShopLoadingIndicator()
-        }
-
-        is DataState.Success -> {
-            (discountCodesUiState as DataState.Success).data?.let { data ->
-                val codesToProcess = data.flatMap { it.discount_codes }.take(5)
-                val newSliderItems = codesToProcess.map { discountCode ->
-                    val codeLower = discountCode.code.lowercase()
-                    val imageId = when (codeLower) {
-                        "fivepercentoff" -> R.drawable.fivepercentoff
-                        "tenpercentoff" -> R.drawable.tenpercentoff
-                        "fifteenpercentoff" -> R.drawable.fifteenpercentoff
-                        "twentypercentoff" -> R.drawable.twentypercentoff
-                        "twentyfivepercentoff" -> R.drawable.twentyfivepercentoff
-                        "thirtypercentoff" -> R.drawable.thirtypercentoff
-                        "freeship" -> R.drawable.freeship
-                        else -> 0
-                    }
-                    SliderItem(imageId, discountCode.code)
-                }
-                Log.d("HomeScreen", "newSliderItems: $newSliderItems")
-                updateSliderImages(sliderImages, newSliderItems)
-            }
-
-        }
-
-        is DataState.Error -> {
-            val errorMsg = (discountCodesUiState as DataState.Error).message
-            Log.e("HomeScreen", "Error fetching discount codes: $errorMsg")
-            LaunchedEffect(errorMsg) {
-                Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getBrands()
@@ -118,13 +82,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
         item {
             ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
             AdsSlider(initialImages = sliderImages) { clickedItem ->
-
                 // Handle click on the slider item
-                Toast.makeText(
-                    context,
-                    "Coupons: ${clickedItem.title} Copied!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "Clicked on: ${clickedItem.title}", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
         item { Gap(height = 16) }
@@ -148,7 +108,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
                 is DataState.Success -> {
                     val brands = (brandsUiState as DataState.Success).data
-                    BrandsSection(onBrandClick = {}, brands = brands)
+                    BrandsSection(navController = navController, brands = brands)
                 }
 
                 is DataState.Error -> {
@@ -183,9 +143,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 is DataState.Success -> {
                     val forUProducts = (forUProductsUiState as DataState.Success).data
                     ForUSection(
-                        onProductClick = {
-                            ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
-                        },
+                        navController = navController,
                         products = forUProducts
                     )
                 }

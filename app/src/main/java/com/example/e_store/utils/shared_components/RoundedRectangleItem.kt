@@ -48,6 +48,7 @@ fun RoundedRectangleItem(
 
         // Product price
         Text(
+            ///TODO: Change the currency using the same method @mohamed-abdelrehim142000
             text = "${product.variants[0].price} USD",
             color = PrimaryColor
         )

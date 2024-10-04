@@ -18,7 +18,8 @@ import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.authentication.Sign_in_Screen
 import com.example.e_store.features.authentication.Sign_up_Screen
-import com.example.e_store.features.home.view.HomeScreen
+import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
+
 
 class LandingScreen : ComponentActivity() {
 
@@ -29,8 +30,11 @@ class LandingScreen : ComponentActivity() {
         )
     }
 
-    val homeViewModelFactory by lazy {
+    private val homeViewModelFactory by lazy {
         HomeViewModelFactory(repo)
+    }
+    private val brandProductsViewModelFactory by lazy {
+        BrandProductsViewModelFactory(repo)
     }
 
 
@@ -43,7 +47,7 @@ class LandingScreen : ComponentActivity() {
                     NavHost(navController, startDestination = Screen.Home.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
                         composable(Screen.Home.route) { MainHomeScreen(
-                            homeViewModelFactory
+                            homeViewModelFactory, brandProductsViewModelFactory
                         ) }
                         composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
                         composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }

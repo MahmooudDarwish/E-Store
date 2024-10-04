@@ -6,14 +6,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 
@@ -23,11 +26,12 @@ fun CircularItem(title: String, imageUrl: String, onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(8.dp)
+            .width(80.dp)
             .clickable(onClick = onClick)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(60.dp)
                 .clip(CircleShape)
         ) {
             AsyncImage(
@@ -37,6 +41,12 @@ fun CircularItem(title: String, imageUrl: String, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop
             )
         }
-        Text(text = title)
+        Text(
+            text = title,
+            modifier = Modifier.padding(top = 4.dp),
+            fontSize = 12.sp,
+            color = Color.Gray,
+            maxLines = 1
+        )
     }
 }

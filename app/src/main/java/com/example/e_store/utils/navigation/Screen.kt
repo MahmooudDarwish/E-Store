@@ -1,12 +1,16 @@
 package com.example.e_store.utils.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.e_store.R
+import com.example.e_store.features.brand_products.view.BrandProducts
+import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
+import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.categories.view.CategoriesScreen
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.home.view_model.HomeViewModel
@@ -19,8 +23,12 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Splash : Screen(NavigationKeys.SPLASH_ROUTE, R.string.splash_title, 0)
     object Home : Screen(NavigationKeys.HOME_ROUTE, R.string.home_title, R.drawable.ic_home)
-    object Sign_up : Screen("sign_up", R.string.sign_up,0)
-    object Sign_in : Screen("sign_in", R.string.sign_in,0)
+    object BrandProducts : Screen(NavigationKeys.BRANDS_ROUTE, R.string.brand_products, 0) {
+        fun createRoute(brand: String) = "$route/$brand"
+    }
+
+    object Sign_up : Screen("sign_up", R.string.sign_up, 0)
+    object Sign_in : Screen("sign_in", R.string.sign_in, 0)
     object Categories :
         Screen(NavigationKeys.CATEGORIES_ROUTE, R.string.categories_title, R.drawable.ic_categories)
 
@@ -32,15 +40,25 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 }
 
 @Composable
-fun AppNavigation(navController: NavHostController, homeViewModelFactory: HomeViewModelFactory) {
+fun AppNavigation(navController: NavHostController, homeViewModelFactory: HomeViewModelFactory, brandProductsViewModelFactory: BrandProductsViewModelFactory) {
     NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) {
+        composable(route = Screen.Home.route) {
             val viewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
-            HomeScreen(viewModel)
+            HomeScreen(viewModel, navController)
         }
-        composable(Screen.Categories.route) { CategoriesScreen() }
-        composable(Screen.Cart.route) { ShoppingCartScreen() }
-        composable(Screen.Profile.route) { ProfileScreen() }
-    }
+        composable(route = Screen.Categories.route) { CategoriesScreen() }
+        composable(route = Screen.Cart.route) { ShoppingCartScreen() }
+        composable(route = Screen.Profile.route) { ProfileScreen() }
 
+        composable(
+            route = "${NavigationKeys.BRANDS_ROUTE}/{${NavigationKeys.BRAND_ID}}",
+            arguments = listOf(navArgument(NavigationKeys.BRAND_ID) { type = NavType.StringType })
+        ) { backStackEntry ->
+            val viewModel: BrandProductsViewModel = viewModel(factory = brandProductsViewModelFactory)
+            val brand = backStackEntry.arguments?.getString(NavigationKeys.BRAND_ID)
+            BrandProducts(brandID = brand, navController = navController, viewModel = viewModel)
+        }
+    }
 }
+
+
