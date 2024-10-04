@@ -9,6 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.e_store.features.authentication.Sign_in_Screen
+import com.example.e_store.features.authentication.Sign_up_Screen
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.landing.components.SplashLottie
 import com.example.e_store.utils.navigation.Screen
@@ -23,6 +25,8 @@ class LandingScreen : ComponentActivity() {
                     NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
                         composable(Screen.Home.route) { HomeScreen() }
+                        composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
+                        composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
 
                     }
                 }
