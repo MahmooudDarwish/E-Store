@@ -19,8 +19,8 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Splash : Screen(NavigationKeys.SPLASH_ROUTE, R.string.splash_title, 0)
     object Home : Screen(NavigationKeys.HOME_ROUTE, R.string.home_title, R.drawable.ic_home)
-    object Sign_up : Screen("sign_up")
-    object Sign_in : Screen("sign_in")
+    object Sign_up : Screen("sign_up", R.string.sign_up,0)
+    object Sign_in : Screen("sign_in", R.string.sign_in,0)
     object Categories :
         Screen(NavigationKeys.CATEGORIES_ROUTE, R.string.categories_title, R.drawable.ic_categories)
 
