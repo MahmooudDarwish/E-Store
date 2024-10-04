@@ -7,7 +7,6 @@ import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.DataState
-import com.example.e_store.utils.shared_models.Product
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +15,18 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeoutException
+import com.example.e_store.utils.shared_models.DiscountCodesResponse
+import com.example.e_store.utils.shared_models.Product
 
 class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     private val _brands = MutableStateFlow<DataState<List<Brand>>>(DataState.Loading)
     val brands = _brands.asStateFlow()
-
+    private val _discountCodes = MutableStateFlow<DataState<List<DiscountCodesResponse>?>>(DataState.Loading)
+    val discountCodes = _discountCodes.asStateFlow()
     private val _forUProducts = MutableStateFlow<DataState<List<Product>>>(DataState.Loading)
     val forUProducts = _forUProducts.asStateFlow()
+
+
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         val errorMessage = when (exception) {
@@ -33,6 +37,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
         }
         _brands.value = DataState.Error(errorMessage)
     }
+
     fun getBrands() {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             try {
@@ -49,7 +54,6 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
             }
         }
     }
-
     fun getForUProducts() {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             try {
@@ -66,4 +70,26 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
             }
         }
     }
+
+    fun fetchDiscountCodes() {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            try {
+                _discountCodes.value = DataState.Loading
+                val discountCodes = repository.fetchDiscountCodes()
+                discountCodes
+                    .collect {
+                        Log.i("HomeViewModel", "get all discountCodes : $it")
+                        _discountCodes.value = DataState.Success(it)
+                    }
+
+            } catch (ex: Exception) {
+                _discountCodes.value = DataState.Error(R.string.unexpected_error)
+            }
+
+
+        }
+    }
+
+
+
 }

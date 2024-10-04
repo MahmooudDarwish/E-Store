@@ -51,8 +51,13 @@ android {
 
 dependencies {
 
+    //Exopplayer for GIF
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
+
+
     //Coil for images
     implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("io.coil-kt:coil-gif:2.4.0")
 
     //Lottie
     implementation(libs.lottie)
@@ -84,6 +89,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.exoplayer)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

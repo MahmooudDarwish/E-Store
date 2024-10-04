@@ -18,6 +18,14 @@ object APIKeys {
     const val CUSTOM_COLLECTION_ENDPOINT = "custom_collections.json"
     const val PRODUCTS_ENDPOINT = "products.json"
 
+    const val PRICING_RULES_ENDPOINT ="price_rules.json"
+    const val DISCOUNT_CODES_ENDPOINT ="price_rules/{price_rule_id}/discount_codes.json"
+
+
+    //EndPoints Params
+    const val PRICE_RULE_ID_PARAM = "price_rule_id" //{price_rule_id} for DISCOUNT_CODES_ENDPOINT
+
+
 
     //Values
 
