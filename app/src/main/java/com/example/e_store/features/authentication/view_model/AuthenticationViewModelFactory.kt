@@ -1,4 +1,4 @@
-package com.example.e_store.features.authentication
+package com.example.e_store.features.authentication.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

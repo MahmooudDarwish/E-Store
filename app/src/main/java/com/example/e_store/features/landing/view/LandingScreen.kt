@@ -16,10 +16,9 @@ import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
-import com.example.e_store.features.authentication.Sign_in_Screen
-import com.example.e_store.features.authentication.Sign_up_Screen
+import com.example.e_store.features.authentication.view.Sign_in_Screen
+import com.example.e_store.features.authentication.view.Sign_up_Screen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
-
 
 class LandingScreen : ComponentActivity() {
 
