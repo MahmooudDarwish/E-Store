@@ -28,6 +28,11 @@ import com.example.e_store.features.home.component.SliderItem
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
+import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import com.example.e_store.features.home.component.updateSliderImages
+import com.google.common.collect.Iterables.addAll
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
@@ -37,23 +42,56 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
 
     // Initialize the slider images
-    val sliderImages = remember {
-        mutableStateListOf<SliderItem>().apply {
-            addAll(
-                listOf(
-                    SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
-                    SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
-                    SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
-                    SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
-                    SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
-                    SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
-                )
+    val sliderImages = remember { mutableStateListOf<SliderItem>().apply {
+        addAll(
+            listOf(
+                SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
+                SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
+                SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
+                SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
+                SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
+                SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
             )
-        }
-    }
-
+        )
+    }}
 
     val context = LocalContext.current
+    when (discountCodesUiState) {
+        DataState.Loading -> {
+            EShopLoadingIndicator()
+        }
+
+        is DataState.Success -> {
+            (discountCodesUiState as DataState.Success).data?.let { data ->
+                val codesToProcess = data.flatMap { it.discount_codes }.take(5)
+                val newSliderItems = codesToProcess.map { discountCode ->
+                    val codeLower = discountCode.code.lowercase()
+                    val imageId = when (codeLower) {
+                        "fivepercentoff" -> R.drawable.fivepercentoff
+                        "tenpercentoff" -> R.drawable.tenpercentoff
+                        "fifteenpercentoff" -> R.drawable.fifteenpercentoff
+                        "twentypercentoff" -> R.drawable.twentypercentoff
+                        "twentyfivepercentoff" -> R.drawable.twentyfivepercentoff
+                        "thirtypercentoff" -> R.drawable.thirtypercentoff
+                        "freeship" -> R.drawable.freeship
+                        else -> 0
+                    }
+                    SliderItem(imageId, discountCode.code)
+                }
+                Log.d("HomeScreen", "newSliderItems: $newSliderItems")
+                updateSliderImages(sliderImages, newSliderItems)
+            }
+
+        }
+
+        is DataState.Error -> {
+            val errorMsg = (discountCodesUiState as DataState.Error).message
+            Log.e("HomeScreen", "Error fetching discount codes: $errorMsg")
+            LaunchedEffect(errorMsg) {
+                Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getBrands()
@@ -82,9 +120,13 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
         item {
             ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
             AdsSlider(initialImages = sliderImages) { clickedItem ->
+
                 // Handle click on the slider item
-                Toast.makeText(context, "Clicked on: ${clickedItem.title}", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    context,
+                    "Coupons: ${clickedItem.title} Copied!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         item { Gap(height = 16) }

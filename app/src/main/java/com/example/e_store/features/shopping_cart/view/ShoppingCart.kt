@@ -67,7 +67,7 @@ fun ShoppingCartScreen() {
         Column(
             modifier = Modifier.padding(16.dp).fillMaxSize()
         ) {
-            val displayedItems = if (showAllItems) cartItems else cartItems.take(3)
+            val displayedItems = if (showAllItems) cartItems else cartItems.take(2)
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -96,7 +96,6 @@ fun ShoppingCartScreen() {
             Text(
                 text = "Total: $100.00",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
             )
             Button(
                 onClick = { /* Handle click */ },
