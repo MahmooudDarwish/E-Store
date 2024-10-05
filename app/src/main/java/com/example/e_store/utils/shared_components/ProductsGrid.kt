@@ -1,7 +1,8 @@
-package com.example.e_store.features.brand_products.components
+package com.example.e_store.utils.shared_components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,12 +17,12 @@ import com.example.e_store.utils.shared_models.Product
 
 @Composable
 fun ProductsGrid(
-    navController: NavHostController, products: List<Product>
+    navController: NavHostController, route: String, products: List<Product>
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxHeight()
+        modifier = Modifier.height(700.dp)
+
             .padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)

@@ -4,6 +4,7 @@ import com.example.e_store.R
 import com.example.e_store.utils.navigation.Screen
 
 object NavigationKeys {
+
     val PRODUCT_INFO_CATEGORIES_ROUTE = "categories/product_info"
     const val SPLASH_ROUTE = "splash"
     const val HOME_ROUTE = "home"

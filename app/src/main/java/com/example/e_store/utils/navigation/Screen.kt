@@ -12,6 +12,8 @@ import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.categories.view.CategoriesScreen
+import com.example.e_store.features.categories.view_model.CategoriesViewModel
+import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
@@ -42,13 +44,21 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 }
 
 @Composable
-fun AppNavigation(navController: NavHostController, homeViewModelFactory: HomeViewModelFactory, brandProductsViewModelFactory: BrandProductsViewModelFactory) {
+fun AppNavigation(
+    navController: NavHostController,
+    homeViewModelFactory: HomeViewModelFactory,
+    brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    categoriesViewModelFactory: CategoriesViewModelFactory
+) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             val viewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
             HomeScreen(viewModel, navController)
         }
-        composable(route = Screen.Categories.route) { CategoriesScreen() }
+        composable(route = Screen.Categories.route) {
+            val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
+            CategoriesScreen(viewModel = viewModel, navController = navController)
+        }
         composable(route = Screen.Cart.route) { ShoppingCartScreen() }
         composable(route = Screen.Profile.route) { ProfileScreen() }
 
@@ -56,7 +66,8 @@ fun AppNavigation(navController: NavHostController, homeViewModelFactory: HomeVi
             route = "${NavigationKeys.BRANDS_ROUTE}/{${NavigationKeys.BRAND_ID}}",
             arguments = listOf(navArgument(NavigationKeys.BRAND_ID) { type = NavType.StringType })
         ) { backStackEntry ->
-            val viewModel: BrandProductsViewModel = viewModel(factory = brandProductsViewModelFactory)
+            val viewModel: BrandProductsViewModel =
+                viewModel(factory = brandProductsViewModelFactory)
             val brand = backStackEntry.arguments?.getString(NavigationKeys.BRAND_ID)
             BrandProducts(brandID = brand, navController = navController, viewModel = viewModel)
         }

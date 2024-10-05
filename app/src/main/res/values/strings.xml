@@ -16,6 +16,11 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign in</string>
     <string name="brand_products">Brand Products</string>
+
+    <string name="category_men">Men</string>
+    <string name="category_women">Women</string>
+    <string name="category_kid">Kid</string>
+    <string name="category_sale">Sale</string>
     <string name="see_less">See Less</string>
     <string name="see_more">See More</string>
     <string name="total">Total:</string>

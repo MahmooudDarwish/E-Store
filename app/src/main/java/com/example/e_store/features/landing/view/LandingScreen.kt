@@ -19,6 +19,8 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.authentication.view.Sign_in_Screen
 import com.example.e_store.features.authentication.view.Sign_up_Screen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
+import com.example.e_store.features.categories.view_model.CategoriesViewModel
+import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 
 class LandingScreen : ComponentActivity() {
 
@@ -35,6 +37,9 @@ class LandingScreen : ComponentActivity() {
     private val brandProductsViewModelFactory by lazy {
         BrandProductsViewModelFactory(repo)
     }
+    private val categoriesViewModelFactory by lazy {
+        CategoriesViewModelFactory(repo)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +50,13 @@ class LandingScreen : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = Screen.Home.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
-                        composable(Screen.Home.route) { MainHomeScreen(
-                            homeViewModelFactory, brandProductsViewModelFactory
-                        ) }
+                        composable(Screen.Home.route) {
+                            MainHomeScreen(
+                                homeViewModelFactory = homeViewModelFactory,
+                                brandProductsViewModelFactory = brandProductsViewModelFactory,
+                                categoriesViewModelFactory = categoriesViewModelFactory
+                            )
+                        }
                         composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
                         composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
 

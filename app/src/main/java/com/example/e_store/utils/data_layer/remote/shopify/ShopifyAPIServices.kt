@@ -22,22 +22,16 @@ interface ShopifyAPIServices {
     @GET(APIKeys.SMART_COLLECTION_ENDPOINT)
     suspend fun fetchBrands(): SmartCollectionsResponse
 
-    @GET(APIKeys.CUSTOM_COLLECTION_ENDPOINT)
-    suspend fun fetchCollections(): CustomCollectionResponse
-
     @GET(APIKeys.PRODUCTS_ENDPOINT)
     suspend fun fetchProducts(
-        @Query("limit") limit: Int? = null,
-        @Query("product_type") productType: String? = null,
-        @Query("collection_id") collectionId: String? = null,
+        @Query(APIKeys.LIMIT_PARAM) limit: Int? = null,
+        @Query(APIKeys.PRODUCT_TYPE_PARAM) productType: String? = null,
+        @Query(APIKeys.COLLECTION_ID_PARAM) collectionId: String? = null,
     ): ProductResponse
 
     @GET(APIKeys.CUSTOM_COLLECTION_ENDPOINT)
     suspend fun fetchCustomCollections(): CustomCollectionResponse
 
-
-
-    // Price Rules and Discount Codes
     @GET(APIKeys.PRICING_RULES_ENDPOINT)
     suspend fun fetchPricingRules(): Response<PriceRuleResponse>
 
@@ -69,8 +63,6 @@ interface ShopifyAPIServices {
     suspend fun fetchAllShoppingCartDraftDraftOrdersByCustomerId(
         @Query(APIKeys.CUSTOMER_ID_PARAM) customerId: String
     ): List<ShoppingCartDraftOrderDetails>
-
-
 
 
 }
