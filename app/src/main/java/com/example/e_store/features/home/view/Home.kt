@@ -28,6 +28,8 @@ import com.example.e_store.features.home.component.SliderItem
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.ProductDetails
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -40,6 +42,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
 
     val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
+
 
     // Initialize the slider images
     val sliderImages = remember { mutableStateListOf<SliderItem>().apply {
@@ -160,8 +163,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                     }
                 }
             }
-
         }
+
 
 
         item {
@@ -186,7 +189,13 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                     val forUProducts = (forUProductsUiState as DataState.Success).data
                     ForUSection(
                         navController = navController,
-                        products = forUProducts
+                        products = forUProducts,
+//                        onProductClick = {
+//                                product ->
+//                            initializeProductDetails(product)
+//                            ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
+//
+//                        }
                     )
                 }
 
@@ -200,3 +209,4 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
         }
     }
 }
+

@@ -28,6 +28,6 @@
     <string name="price">Price:</string>
     <string name="increase_quantity">Increase quantity</string>
     <string name="decrease_quantity">Decrease quantity</string>
-
+    <string name="product_info">Product_info\n</string>
 
 </resources>
