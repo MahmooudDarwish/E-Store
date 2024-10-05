@@ -16,12 +16,11 @@ import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
-import com.example.e_store.features.authentication.Sign_in_Screen
-import com.example.e_store.features.authentication.Sign_up_Screen
+import com.example.e_store.features.authentication.view.Sign_in_Screen
+import com.example.e_store.features.authentication.view.Sign_up_Screen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
-
 
 class LandingScreen : ComponentActivity() {
 
@@ -49,7 +48,7 @@ class LandingScreen : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     val navController = rememberNavController()
-                    NavHost(navController, startDestination = Screen.Splash.route) {
+                    NavHost(navController, startDestination = Screen.Home.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
                         composable(Screen.Home.route) {
                             MainHomeScreen(

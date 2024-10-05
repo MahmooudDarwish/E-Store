@@ -17,6 +17,7 @@ import com.example.e_store.features.categories.view_model.CategoriesViewModelFac
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
+import com.example.e_store.features.product_info.view.ProductInfoScreen
 import com.example.e_store.features.profile.view.ProfileScreen
 import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.utils.constants.NavigationKeys
@@ -28,9 +29,8 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
     object BrandProducts : Screen(NavigationKeys.BRANDS_ROUTE, R.string.brand_products, 0) {
         fun createRoute(brand: String) = "$route/$brand"
     }
-
-    object Sign_up : Screen("sign_up", R.string.sign_up, 0)
-    object Sign_in : Screen("sign_in", R.string.sign_in, 0)
+    object Sign_up : Screen(NavigationKeys.SIGN_UP_ROUTE, R.string.sign_up,0)
+    object Sign_in : Screen(NavigationKeys.SIGN_IN_ROUTE, R.string.sign_in,0)
     object Categories :
         Screen(NavigationKeys.CATEGORIES_ROUTE, R.string.categories_title, R.drawable.ic_categories)
 
@@ -39,6 +39,8 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Profile :
         Screen(NavigationKeys.PROFILE_ROUTE, R.string.profile_title, R.drawable.ic_person)
+    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_ROUTE, R.string.product_info, 0)
+    object ProductInfoFromCategories : Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
 }
 
 @Composable
@@ -69,7 +71,8 @@ fun AppNavigation(
             val brand = backStackEntry.arguments?.getString(NavigationKeys.BRAND_ID)
             BrandProducts(brandID = brand, navController = navController, viewModel = viewModel)
         }
+        composable(route = Screen.ProductInfoFromHome.route ) { ProductInfoScreen(navController) }
+        composable(route = Screen.ProductInfoFromCategories.route) { ProductInfoScreen(navController) }
+
     }
 }
-
-

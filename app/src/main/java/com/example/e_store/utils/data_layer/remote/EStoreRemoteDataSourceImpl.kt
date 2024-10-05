@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.flow
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
+import com.example.e_store.utils.shared_models.ShoppingCartDraftOrder
+import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderDetails
+import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderResponse
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
@@ -46,7 +49,8 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                 }
             }
             homeCollection?.let {
-                val response = apiService.fetchProducts(limit = 4, collectionId = it.id.toString()).products
+                val response =
+                    apiService.fetchProducts(limit = 4, collectionId = it.id.toString()).products
                 flowOf(response)
             } ?: flowOf(emptyList())
 
@@ -101,7 +105,6 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         return flowOf(response)
     }
 
-
     override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?> {
         return flow {
             try {
@@ -123,7 +126,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                         emit(emptyList())
                     }
                 } else {
-                    Log.e(TAG, "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}")
+                    Log.e(
+                        TAG,
+                        "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}"
+                    )
                     emit(emptyList()) // Emit an empty list in case of failure
                 }
             } catch (e: Exception) {
@@ -133,6 +139,33 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
     }
 
+
+
+
+    override suspend fun createShoppingCartDraftOrder(shoppingCartDraftOrder: ShoppingCartDraftOrder) {
+         apiService.createShoppingCartDraftOrder(shoppingCartDraftOrder)
+    }
+
+    override suspend fun updateShoppingCartDraftOrder(
+        draftOrderId: Long,
+        shoppingCartDraftOrder: ShoppingCartDraftOrder
+    ) {
+         apiService.updateShoppingCartDraftOrder(draftOrderId, shoppingCartDraftOrder)
+    }
+    override suspend fun removeShoppingCartDraftDraftOrder(draftOrderId: Long) {
+        apiService.removeShoppingCartDraftDraftOrder(draftOrderId)
+    }
+
+    override suspend fun fetchShoppingCartDraftOrderByID(draftOrderId: Long): ShoppingCartDraftOrderResponse {
+        return apiService.fetchShoppingCartDraftOrderByID(draftOrderId)
+    }
+
+    override suspend fun fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId: String): Flow<List<ShoppingCartDraftOrderDetails>> {
+        return flow {
+            val response = apiService.fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId)
+            emit(response)
+        }
+    }
 
 
 }

@@ -16,11 +16,23 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign in</string>
     <string name="brand_products">Brand Products</string>
+
     <string name="category_men">Men</string>
     <string name="category_women">Women</string>
     <string name="category_kid">Kid</string>
     <string name="category_sale">Sale</string>
-
-
+    <string name="see_less">See Less</string>
+    <string name="see_more">See More</string>
+    <string name="total">Total:</string>
+    <string name="checkout">Checkout</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete %1$s?</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="product_image">Product image</string>
+    <string name="price">Price:</string>
+    <string name="increase_quantity">Increase quantity</string>
+    <string name="decrease_quantity">Decrease quantity</string>
+    <string name="product_info">Product_info\n</string>
 
 </resources>

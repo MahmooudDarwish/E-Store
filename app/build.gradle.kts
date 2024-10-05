@@ -52,6 +52,9 @@ android {
 }
 
 dependencies {
+
+
+
     //Exopplayer for GIF
     implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
 
@@ -104,4 +107,9 @@ dependencies {
     // ViewModel and LiveData for MVVM architecture
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation ("androidx.lifecycle:lifecycle-livedata:2.3.1")
+
+    //Pager for images
+    implementation ("com.google.accompanist:accompanist-pager:0.32.0")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.32.0")
+
 }
