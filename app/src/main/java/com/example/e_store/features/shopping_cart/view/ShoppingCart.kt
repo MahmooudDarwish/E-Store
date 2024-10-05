@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -37,11 +38,14 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.e_store.R
+import com.example.e_store.utils.shared_components.ElevationCard
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+
 @Composable
 fun ShoppingCartScreen() {
-    val cartItems = remember { mutableStateListOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") }
+    val cartItems =
+        remember { mutableStateListOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") }
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.addtocart))
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -52,7 +56,9 @@ fun ShoppingCartScreen() {
 
     if (cartItems.isEmpty()) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
             LottieAnimation(
@@ -65,13 +71,16 @@ fun ShoppingCartScreen() {
         }
     } else {
         Column(
-            modifier = Modifier.padding(16.dp).fillMaxSize()
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .background(Color.White),
         ) {
             val displayedItems = if (showAllItems) cartItems else cartItems.take(2)
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(displayedItems) { item ->
                     SwipeableItem(item) { deletedItem ->
@@ -82,7 +91,9 @@ fun ShoppingCartScreen() {
                 if (cartItems.size > 3) {
                     item {
                         Text(
-                            text = if (showAllItems) "See Less" else "See More",
+                            text = if (showAllItems) stringResource(R.string.see_less) else stringResource(
+                                R.string.see_more
+                            ),
                             modifier = Modifier
                                 .clickable { showAllItems = !showAllItems }
                                 .padding(vertical = 8.dp),
@@ -94,7 +105,7 @@ fun ShoppingCartScreen() {
             }
 
             Text(
-                text = "Total: $100.00",
+                text = stringResource(R.string.total),
                 style = MaterialTheme.typography.titleLarge,
             )
             Button(
@@ -108,7 +119,7 @@ fun ShoppingCartScreen() {
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = "Checkout",
+                    text = stringResource(R.string.checkout),
                     color = Color.White,
                     fontSize = 18.sp
                 )
@@ -119,6 +130,8 @@ fun ShoppingCartScreen() {
 
 @Composable
 fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.ic_delete))
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -128,40 +141,67 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
     val offsetX = remember { Animatable(0f) }
     val deleteIconVisible by remember { derivedStateOf { offsetX.value < -100 } }
     val coroutineScope = rememberCoroutineScope() // Create a coroutine scope
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-            .padding(8.dp)
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount ->
-                    val newOffset = (offsetX.value + dragAmount).coerceIn(-300f, 0f)
-                    change.consume()
-
-                    coroutineScope.launch {
-                    // Animate swipe effect with a smooth transition
-                    offsetX.snapTo(newOffset)
-                        }
-                }
-            }
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-    ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+    if (showDialog) {
+        AnimatedVisibility(
+            visible = showDialog,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut()
         ) {
+            AlertDialog(
+                containerColor = Color.White,
+
+                onDismissRequest = { showDialog = false },
+                title = { Text(stringResource(R.string.confirm_delete)) },
+                text = { Text(stringResource(R.string.are_you_sure_you_want_to_delete, item)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        coroutineScope.launch { offsetX.snapTo(0f) } // Reset swipe
+                        onItemDeleted(item)
+                        showDialog = false
+                    }) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text(stringResource(R.string.dismiss))
+                    }
+                }
+
+            )
+        }
+    }
+
+    ElevationCard {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        val newOffset = (offsetX.value + dragAmount).coerceIn(-300f, 0f)
+                        change.consume()
+
+                        coroutineScope.launch {
+                            offsetX.snapTo(newOffset)
+                        }
+                    }
+                }
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
+        ) {
+
+
             Row(
                 modifier = Modifier
+                    .background(Color.White)
                     .fillMaxSize()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
                     model = "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-                    contentDescription = "Product image",
+                    contentDescription = stringResource(R.string.product_image),
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(8.dp))
@@ -180,7 +220,7 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     )
 
                     Text(
-                        text = "$10.00",
+                        text = stringResource(R.string.price),
                         style = MaterialTheme.typography.bodyLarge,
                         color = colorResource(id = R.color.colorTextCardBody)
                     )
@@ -190,11 +230,10 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Increase and Decrease Quantity Buttons
                         IconButton(onClick = { /* Handle click */ }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_add_square),
-                                contentDescription = "Increase quantity",
+                                contentDescription = stringResource(R.string.increase_quantity),
                                 modifier = Modifier.size(30.dp)
                             )
                         }
@@ -204,17 +243,16 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                         IconButton(onClick = { /* Handle click */ }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_minus_square),
-                                contentDescription = "Decrease quantity",
+                                contentDescription = stringResource(R.string.decrease_quantity),
                                 modifier = Modifier.size(30.dp)
                             )
                         }
                     }
                 }
 
-                // Display delete icon with fade animation
                 AnimatedVisibility(
                     visible = deleteIconVisible,
-                    enter = fadeIn() + scaleIn(), // Add scale effect when icon appears
+                    enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                 ) {
                     LottieAnimation(
@@ -223,12 +261,10 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                         modifier = Modifier
                             .size(50.dp)
                             .align(Alignment.CenterVertically)
-                                .padding(start = 16.dp)
+                            .padding(start = 16.dp)
                             .clickable {
-                                coroutineScope.launch {
-                                    offsetX.snapTo(0f) // Reset swipe when delete is clicked
-                                }
-                                onItemDeleted(item)
+                                showDialog = true
+
                             }
                     )
 

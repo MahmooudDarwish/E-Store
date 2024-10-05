@@ -21,9 +21,18 @@ object APIKeys {
     const val PRICING_RULES_ENDPOINT ="price_rules.json"
     const val DISCOUNT_CODES_ENDPOINT ="price_rules/{price_rule_id}/discount_codes.json"
 
+    const val SHOP_CART_DRAFT_ORDERS_ENDPOINT = "draft_orders.json"
+
+
+    const val SHOP_CART_DRAFT_ORDERS_DRAFT_ORDER_ID_ENDPOINT = "draft_orders/{draft_order_id}.json"
+
+
+
 
     //EndPoints Params
     const val PRICE_RULE_ID_PARAM = "price_rule_id" //{price_rule_id} for DISCOUNT_CODES_ENDPOINT
+    const val CUSTOMER_ID_PARAM = "customer_id" //{customer_id} for SHOP_CART_DRAFT_ORDERS_CUSTOMER_ID_ENDPOINT
+    const val DRAFT_ORDER_ID_PARAM = "draft_order_id" //{draft_order_id} for SHOP_CART_DRAFT_ORDERS_ENDPOINT
 
 
 
