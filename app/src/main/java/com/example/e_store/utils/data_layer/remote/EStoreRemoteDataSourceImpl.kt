@@ -56,6 +56,40 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
     }
 
+    override suspend fun fetchCategoriesProducts(): Flow<List<Product>> {
+        return try {
+            val customCollections = fetchCustomCollections()
+            val allProducts = mutableListOf<Product>()
+            val productIdsSet = mutableSetOf<Long>()
+
+            customCollections.collect { response ->
+                val filteredCollections = response.filter { collection ->
+                    !collection.title.equals(APIKeys.HOME, ignoreCase = true)
+                }
+
+                for (collection in filteredCollections) {
+                    val products = apiService.fetchProducts(collectionId = collection.id.toString()).products
+
+                    val uniqueProducts = products.filter { product ->
+                        product.id !in productIdsSet
+                    }
+
+                    uniqueProducts.forEach { product ->
+                        productIdsSet.add(product.id)
+                        allProducts.add(product)
+                    }
+                }
+            }
+
+            flowOf(allProducts)
+
+        } catch (e: Exception) {
+            Log.d(TAG, "customCollections error: ${e.message}")
+            flowOf(emptyList())
+        }
+    }
+
+
 
     override suspend fun fetchCustomCollections(): Flow<List<CustomCollection>> {
         val response = apiService.fetchCustomCollections().customCollections

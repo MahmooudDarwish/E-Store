@@ -17,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.e_store.R
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
+import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
 import com.example.e_store.ui.theme.PrimaryColor
@@ -25,7 +26,11 @@ import com.example.e_store.utils.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainHomeScreen(homeViewModelFactory: HomeViewModelFactory, brandProductsViewModelFactory: BrandProductsViewModelFactory) {
+fun MainHomeScreen(
+    homeViewModelFactory: HomeViewModelFactory,
+    brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    categoriesViewModelFactory: CategoriesViewModelFactory
+) {
     val items = listOf(
         Screen.Home,
         Screen.Categories,
@@ -75,7 +80,12 @@ fun MainHomeScreen(homeViewModelFactory: HomeViewModelFactory, brandProductsView
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            AppNavigation(navController, homeViewModelFactory,brandProductsViewModelFactory )
+            AppNavigation(
+                navController = navController,
+                homeViewModelFactory = homeViewModelFactory,
+                brandProductsViewModelFactory = brandProductsViewModelFactory,
+                categoriesViewModelFactory = categoriesViewModelFactory
+            )
         }
     }
 }

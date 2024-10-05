@@ -28,7 +28,7 @@ fun PriceSlider(
             valueRange = 0f..sliderMaxValue,
             colors = SliderDefaults.colors(
                 thumbColor = PrimaryColor,
-                activeTrackColor = PrimaryColor
+                activeTrackColor = PrimaryColor,
             )
         )
         Text(

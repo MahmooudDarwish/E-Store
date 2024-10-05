@@ -12,6 +12,6 @@ interface EStoreRemoteDataSource {
     suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?>
     suspend fun fetchCustomCollections(): Flow<List<CustomCollection>>
     suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>>
-
+    suspend fun fetchCategoriesProducts(): Flow<List<Product>>
 
 }

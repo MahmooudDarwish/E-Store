@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.e_store.R
 import com.example.e_store.features.brand_products.components.BrandProductsHeader
-import com.example.e_store.features.brand_products.components.BrandProductsStateHandler
+import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.ui.theme.PrimaryColor
@@ -31,6 +31,7 @@ fun BrandProducts(
     var maxPrice by remember { mutableFloatStateOf(0f) }
     var showSliderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.getBrandProducts(brandID = brandID!!)
     }
@@ -70,9 +71,10 @@ fun BrandProducts(
 
         Gap(height = 20)
 
-        BrandProductsStateHandler(
-            brandProductsUiState = brandProductsUiState,
+        ProductsStateHandler(
+            productsUiState = brandProductsUiState,
             navController = navController,
+            route = "",   /// TODO: add route to product info @MahmoudDariwsh @kk98989898
             filterProducts = ::filterProducts
         )
     }

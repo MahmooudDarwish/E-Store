@@ -42,6 +42,10 @@ class EStoreRepositoryImpl private constructor(
         return eStoreRemoteDataSource.fetchBrandProducts(brandId)
     }
 
+    override suspend fun fetchCategoriesProducts(): Flow<List<Product>> {
+        return eStoreRemoteDataSource.fetchCategoriesProducts()
+    }
+
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return eStoreRemoteDataSource.fetchForUProducts()
     }
