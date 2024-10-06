@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.e_store.R
+import com.example.e_store.features.authentication.view.SignInScreen
+import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
@@ -82,6 +84,9 @@ fun AppNavigation(
         }
         composable(route = Screen.ProductInfoFromHome.route) { ProductInfoScreen(navController) }
         composable(route = Screen.ProductInfoFromCategories.route) { ProductInfoScreen(navController) }
+
+        composable(route = Screen.SignIn.route) { SignInScreen(navController) }
+        composable(route = Screen.SignUp.route) { SignUpScreen(navController) }
 
     }
 }
