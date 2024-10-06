@@ -20,6 +20,7 @@ import com.example.e_store.features.brand_products.view_model.BrandProductsViewM
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
+import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
@@ -31,8 +32,8 @@ fun MainHomeScreen(
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
-    categoriesViewModelFactory: CategoriesViewModelFactory
-
+    categoriesViewModelFactory: CategoriesViewModelFactory,
+    profileViewModelFactory: ProfileViewModelFactory
 ) {
     val items = listOf(
         Screen.Home,
@@ -84,11 +85,12 @@ fun MainHomeScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             AppNavigation(
-                navController,
-                homeViewModelFactory,
-                brandProductsViewModelFactory,
-                searchViewModelFactory,
-                categoriesViewModelFactory
+                navController = navController,
+                homeViewModelFactory = homeViewModelFactory,
+                brandProductsViewModelFactory = brandProductsViewModelFactory,
+                categoriesViewModelFactory = categoriesViewModelFactory,
+                searchViewModelFactory = searchViewModelFactory
+                profileViewModelFactory = profileViewModelFactory.
             )
         }
     }

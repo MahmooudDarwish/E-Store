@@ -22,7 +22,7 @@ fun CategoryCard(category: String, onClick: () -> Unit) {
     ElevationCard(
         modifier = Modifier
             .width(100.dp)
-            .height(80.dp)
+            .height(60.dp)
             .clickable { onClick() }
             .padding(8.dp),
     ) {

@@ -32,19 +32,15 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun AdsSlider(
-    initialImages: List<SliderItem>, // Receive the initial list of images
+    initialImages: List<SliderItem>,
     onItemClick: (SliderItem) -> Unit,
 ) {
-    // Initialize images using remember with apply to avoid multiple recompositions
     val images by rememberUpdatedState(newValue = initialImages)
 
-    // Pager state for controlling the current page
     val pagerState = rememberPagerState(pageCount = { images.size })
 
-    // Get the current context
     val context = LocalContext.current
 
-    // Auto-slide effect that only runs when images are present
     LaunchedEffect(images.isNotEmpty()) {
         if (images.isNotEmpty()) {
             while (true) {
@@ -56,10 +52,9 @@ fun AdsSlider(
         }
     }
 
-    // Horizontal pager for image sliding
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
         pageSpacing = 0.dp,
         pageSize = PageSize.Fill,
         snapPosition = SnapPosition.Center
@@ -103,14 +98,12 @@ fun AdsSlider(
     }
 }
 
-// Helper function to update slider images from outside
 fun updateSliderImages(images: SnapshotStateList<SliderItem>, newImages: List<SliderItem>) {
     Log.d("updateSliderImages", "newImages: $newImages")
     Log.d("updateSliderImages", "images: $images")
     images.addAll(newImages)
 }
 
-// Custom ImageLoader to handle GIFs
 @Composable
 fun gifEnabledLoader(context: Context): ImageLoader {
     return ImageLoader.Builder(context)
@@ -124,13 +117,11 @@ fun gifEnabledLoader(context: Context): ImageLoader {
         .build()
 }
 
-// Data class for Slider items
 data class SliderItem(
     val image: Int,
     val title: String,
 )
 
-// Function to copy text to clipboard and show a toast message
 private fun copyToClipboard(context: Context, text: String) {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = android.content.ClipData.newPlainText("Coupons", text)

@@ -5,6 +5,6 @@ object UserSession{
     var name : String? = null
     var phone : String? = null
     var Uid : String? = null
-    var isGuest : Boolean = false
+    var isGuest : Boolean = true
 
 }
