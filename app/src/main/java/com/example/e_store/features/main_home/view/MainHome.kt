@@ -89,8 +89,8 @@ fun MainHomeScreen(
                 homeViewModelFactory = homeViewModelFactory,
                 brandProductsViewModelFactory = brandProductsViewModelFactory,
                 categoriesViewModelFactory = categoriesViewModelFactory,
-                searchViewModelFactory = searchViewModelFactory
-                profileViewModelFactory = profileViewModelFactory.
+                searchViewModelFactory = searchViewModelFactory,
+                profileViewModelFactory = profileViewModelFactory
             )
         }
     }

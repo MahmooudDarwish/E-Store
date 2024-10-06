@@ -65,7 +65,7 @@ class LandingScreen : ComponentActivity() {
                                 homeViewModelFactory = homeViewModelFactory,
                                 brandProductsViewModelFactory = brandProductsViewModelFactory,
                                 categoriesViewModelFactory = categoriesViewModelFactory,
-                                searchViewModelFactory = searchViewModelFactory
+                                searchViewModelFactory = searchViewModelFactory,
                                 profileViewModelFactory = profileViewModelFactory,
                             )
                         }
