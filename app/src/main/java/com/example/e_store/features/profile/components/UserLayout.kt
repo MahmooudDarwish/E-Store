@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.e_store.R
+import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.UserSession
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun UserLayout(navHostController: NavHostController) {
@@ -88,6 +90,12 @@ fun UserLayout(navHostController: NavHostController) {
         textColor = Color.Red,
         onClick = {
             ///TODO: Log out from Firebase @kk98989898 @MahmoudDarwish
-        },
+            FirebaseAuth.getInstance().signOut()
+            navHostController.navigate(Screen.SignIn.route) {
+                popUpTo(Screen.Profile.route) {
+                    inclusive = true
+                }
+            }
+        }
     )
 }

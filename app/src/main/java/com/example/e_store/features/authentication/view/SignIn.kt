@@ -1,5 +1,6 @@
 package com.example.e_store.features.authentication.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -50,16 +51,22 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import com.example.e_store.features.authentication.view_model.AuthenticationViewModel
 import com.example.e_store.features.authentication.view_model.AuthenticationViewModelFactory
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 
 
 
 @Composable
 fun SignInScreen(navController: NavHostController) {
+
+    val context = LocalContext.current
     val viewModel: AuthenticationViewModel =
         viewModel(factory = AuthenticationViewModelFactory(FirebaseAuth.getInstance()))
+
     val isProgressing = viewModel.isProgressing // Managed via ViewModel
-    val context = LocalContext.current
 
     var rotationAngle by remember { mutableStateOf(0f) }
     var imageSize by remember { mutableStateOf(150.dp) }
@@ -125,18 +132,36 @@ fun SignInScreen(navController: NavHostController) {
 
         Button(
             onClick = {
-                viewModel.checkIfEmailVerified(context, onAuthSuccess = {
-
-                    navController.navigate(Screen.Home.route)
-                    viewModel.initializeUserSession(context, viewModel.email.value, false)
-                    Toast.makeText(context, "Sign In Successful", Toast.LENGTH_SHORT).show()
-                }, onError = {
-                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                })
-            }, modifier = Modifier
-                .fillMaxWidth()
+                Log.d("Navigation", "Attempting to navigate to home")
+                viewModel.signInAndCheckEmailVerification(
+                    context,
+                    onAuthSuccess = {
+                        Log.d("Navigation", "Attempting to navigate to home")
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.SignIn.route) {
+                                inclusive = true
+                            }
+                        }
+                        Log.d("Navigation", "Navigation command executed")
+                        viewModel.initializeUserSession(context, viewModel.email.value, false)
+                        Log.d("Navigation", "User session initialized")
+                    },
+                    onError = { errorMessage ->
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                )
+            },
+            enabled = !viewModel.isProgressing.value,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Sign In")
+            if (viewModel.isProgressing.value) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text("Sign In")
+            }
         }
 
         TextButton(
@@ -188,4 +213,7 @@ fun WelcomeLabel() {
         )
     }
 }
+
+
+
 
