@@ -5,8 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,25 +37,11 @@ class LandingScreen : ComponentActivity() {
     private val categoriesViewModelFactory by lazy { CategoriesViewModelFactory(repo) }
     private val profileViewModelFactory by lazy { ProfileViewModelFactory(repo) }
 
-  //  private lateinit var internetChecker: InternetChecker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val context = LocalContext.current
-      //      internetChecker = InternetChecker(context)
-     //       internetChecker.startMonitoring()
-
-     //       var isConnected by remember { mutableStateOf(true) }
-
-            LaunchedEffect(Unit) {
-      //          internetChecker.networkStateFlow.collect { connectionState ->
-     //               isConnected = connectionState
-     //           }
-            }
-
-         //   if (isConnected) {
-                MaterialTheme {
+            MaterialTheme {
                     Surface {
                         val navController = rememberNavController()
                         NavHost(navController, startDestination = Screen.Splash.route) {
@@ -76,15 +60,6 @@ class LandingScreen : ComponentActivity() {
                         }
                     }
                 }
-          //  } else {
-        //        // Show no internet UI (e.g., a dialog or some message)
-        //        NoInternetScreen()
-       //     }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-      //  internetChecker.stopMonitoring() // Stop monitoring when the activity is destroyed
     }
 }
