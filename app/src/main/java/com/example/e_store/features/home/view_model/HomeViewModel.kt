@@ -17,18 +17,48 @@ import java.io.IOException
 import java.util.concurrent.TimeoutException
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
+import kotlinx.coroutines.coroutineScope
 
 class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
     private val _brands = MutableStateFlow<DataState<List<Brand>>>(DataState.Loading)
     val brands = _brands.asStateFlow()
 
-    private val _discountCodes = MutableStateFlow<DataState<List<DiscountCodesResponse>?>>(DataState.Loading)
+    private val _discountCodes =
+        MutableStateFlow<DataState<List<DiscountCodesResponse>?>>(DataState.Loading)
     val discountCodes = _discountCodes.asStateFlow()
 
     private val _forUProducts = MutableStateFlow<DataState<List<Product>>>(DataState.Loading)
     val forUProducts = _forUProducts.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
+    private val MIN_REFRESH_INTERVAL_MS = 5000
+    private var lastRefreshTime = 0L
+
+    fun refreshAllData() {
+        val currentTime = System.currentTimeMillis()
+
+        if (_isRefreshing.value || (currentTime - lastRefreshTime < MIN_REFRESH_INTERVAL_MS)) return
+
+        _isRefreshing.value = true
+        lastRefreshTime = currentTime
+
+        viewModelScope.launch {
+            try {
+                coroutineScope {
+                    launch { getBrands() }
+                    launch { getForUProducts() }
+                    launch { fetchDiscountCodes() }
+                }
+            } catch (ex: Exception) {
+                Log.e("TAG", "Error refreshing data: ${ex.message}")
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
+    }
 
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
@@ -39,6 +69,8 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
             else -> R.string.unexpected_error
         }
         _brands.value = DataState.Error(errorMessage)
+        _isRefreshing.value = false // Ensure refreshing is turned off after an error
+
     }
 
     fun getBrands() {
@@ -57,6 +89,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
             }
         }
     }
+
     fun getForUProducts() {
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             try {
@@ -92,7 +125,6 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
         }
     }
-
 
 
 }
