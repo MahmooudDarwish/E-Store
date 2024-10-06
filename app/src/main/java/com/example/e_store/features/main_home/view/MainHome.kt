@@ -21,6 +21,7 @@ import com.example.e_store.features.categories.view_model.CategoriesViewModelFac
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
@@ -30,6 +31,7 @@ import com.example.e_store.utils.navigation.Screen
 fun MainHomeScreen(
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory
 ) {
@@ -72,7 +74,7 @@ fun MainHomeScreen(
 
         },
         bottomBar = {
-            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route)) {
+            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route) || currentRoute.startsWith(Screen.Categories.route)) {
                 BottomNavigationBar(
                     items = items,
                     currentRoute = selectedRoute,
@@ -87,7 +89,8 @@ fun MainHomeScreen(
                 homeViewModelFactory = homeViewModelFactory,
                 brandProductsViewModelFactory = brandProductsViewModelFactory,
                 categoriesViewModelFactory = categoriesViewModelFactory,
-                profileViewModelFactory = profileViewModelFactory
+                searchViewModelFactory = searchViewModelFactory
+                profileViewModelFactory = profileViewModelFactory.
             )
         }
     }

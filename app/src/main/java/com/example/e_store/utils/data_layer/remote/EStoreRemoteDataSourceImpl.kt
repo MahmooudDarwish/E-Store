@@ -37,6 +37,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         return flowOf(response)
     }
 
+    override suspend fun fetchProducts(): Flow<List<Product>> {
+        val response = apiService.fetchProducts().products
+        return flowOf(response)
+    }
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return try {
             val customCollections = fetchCustomCollections()

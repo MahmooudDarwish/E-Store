@@ -52,6 +52,10 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return eStoreRemoteDataSource.fetchForUProducts()
     }
+    override suspend fun fetchProducts(): Flow<List<Product>> {
+        return eStoreRemoteDataSource.fetchProducts()
+    }
+
     override suspend fun fetchDiscountCodes( ): Flow<List<DiscountCodesResponse>?> {
         return eStoreRemoteDataSource.fetchDiscountCodes()
     }

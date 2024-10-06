@@ -23,6 +23,9 @@ import com.example.e_store.features.product_info.view.ProductInfoScreen
 import com.example.e_store.features.profile.view.ProfileScreen
 import com.example.e_store.features.profile.view_model.ProfileViewModel
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
+import com.example.e_store.features.search.SearchScreen
+import com.example.e_store.features.search.view_model.SearchViewModel
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.utils.constants.NavigationKeys
 
@@ -44,10 +47,10 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Profile :
         Screen(NavigationKeys.PROFILE_ROUTE, R.string.profile_title, R.drawable.ic_person)
+    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
+    object ProductInfoFromCategories : Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
+    object Search_From_Home : Screen(NavigationKeys.SEARCH_HOME_ROUTE, R.string.search, 0)
 
-    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_ROUTE, R.string.product_info, 0)
-    object ProductInfoFromCategories :
-        Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
 }
 
 @Composable
@@ -55,8 +58,9 @@ fun AppNavigation(
     navController: NavHostController,
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
-    profileViewModelFactory: ProfileViewModelFactory
+    profileViewModelFactory: ProfileViewModelFactory   
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -84,6 +88,11 @@ fun AppNavigation(
         }
         composable(route = Screen.ProductInfoFromHome.route) { ProductInfoScreen(navController) }
         composable(route = Screen.ProductInfoFromCategories.route) { ProductInfoScreen(navController) }
+        composable(route = Screen.Search_From_Home.route) {
+            val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
+            SearchScreen(viewModel, navController)
+
+        }
 
         composable(route = Screen.SignIn.route) { SignInScreen(navController) }
         composable(route = Screen.SignUp.route) { SignUpScreen(navController) }
