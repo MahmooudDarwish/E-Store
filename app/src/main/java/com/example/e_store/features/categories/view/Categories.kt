@@ -99,6 +99,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                 SearchWithFavoriteWithFilterSection(
                     onSearchClick = {
                         /// TODO: navigate to Search screen @MahmoudDariwsh @kk98989898
+                        navController.navigate(NavigationKeys.SEARCH_CATEGORIES_ROUTE)
                     },
                     onFavoriteClick = {
                         /// TODO: navigate to favorite screen @MahmoudDariwsh @kk98989898
