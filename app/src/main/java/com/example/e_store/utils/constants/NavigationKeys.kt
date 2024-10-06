@@ -2,6 +2,7 @@ package com.example.e_store.utils.constants
 
 object NavigationKeys {
 
+    const val SEARCH_CATEGORIES_ROUTE = "categories/search"
     const val SEARCH_HOME_ROUTE: String = "home/search"
     const val PRODUCT_INFO_CATEGORIES_ROUTE = "categories/product_info"
     const val SPLASH_ROUTE = "splash"
