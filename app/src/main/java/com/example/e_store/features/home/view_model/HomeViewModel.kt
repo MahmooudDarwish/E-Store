@@ -17,7 +17,6 @@ import java.io.IOException
 import java.util.concurrent.TimeoutException
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
-import kotlinx.coroutines.coroutineScope
 
 class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
@@ -45,13 +44,12 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
         _isRefreshing.value = true
         lastRefreshTime = currentTime
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                coroutineScope {
-                    launch { getBrands() }
-                    launch { getForUProducts() }
-                    launch { fetchDiscountCodes() }
-                }
+                launch(Dispatchers.IO) { getBrands() }
+                launch(Dispatchers.IO) { getForUProducts() }
+                launch(Dispatchers.IO) { fetchDiscountCodes() }
+
             } catch (ex: Exception) {
                 Log.e("TAG", "Error refreshing data: ${ex.message}")
             } finally {
