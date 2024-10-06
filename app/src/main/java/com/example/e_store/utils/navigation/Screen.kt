@@ -10,8 +10,6 @@ import androidx.navigation.navArgument
 import com.example.e_store.R
 import com.example.e_store.features.authentication.view.SignInScreen
 import com.example.e_store.features.authentication.view.SignUpScreen
-import com.example.e_store.features.authentication.view.SignInScreen
-import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
@@ -25,8 +23,6 @@ import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.features.search.view.SearchScreen
 import com.example.e_store.features.search.view_model.SearchViewModel
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
-import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
-import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModel
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
@@ -34,7 +30,6 @@ import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewMod
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
-import com.example.e_store.features.search.view.SearchScreen
 import com.example.e_store.features.profile.view_model.ProfileViewModel
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 

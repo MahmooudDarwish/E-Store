@@ -11,15 +11,12 @@ import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
-import com.example.e_store.utils.shared_models.Property
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
