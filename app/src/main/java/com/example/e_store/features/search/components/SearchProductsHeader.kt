@@ -1,15 +1,16 @@
-package com.example.e_store.features.brand_products.components
+package com.example.e_store.features.search.components
 
-
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -19,29 +20,31 @@ import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.CustomIconButton
 import com.example.e_store.utils.shared_components.ElevationCard
 
-
 @Composable
-fun BrandProductsHeader(
+fun SearchProductsHeader(
     navController: NavHostController,
-    brandName: String?,
     onFilterClick: () -> Unit,
+    searchQuery: String = "",
+    onSearchQueryChange: (String) -> Unit = {},
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BackButton(onBackClick = { navController.popBackStack() })
 
-
-        Text(
-            modifier = Modifier.padding(top = 20.dp),
-            text = brandName ?: "Brands",
-            style = MaterialTheme.typography.titleMedium
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = onSearchQueryChange,
+            modifier = Modifier
+                .fillMaxWidth(.8f)
+                .height(70.dp)
+                .padding(top = 20.dp, end = 8.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
         )
-
 
         ElevationCard(modifier = Modifier.padding(top = 20.dp)) {
             CustomIconButton(
@@ -51,7 +54,3 @@ fun BrandProductsHeader(
         }
     }
 }
-
-
-
-

@@ -52,6 +52,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.draw.shadow
+import com.example.e_store.features.search.components.SearchProductsHeader
+import com.example.e_store.features.search.components.SuggestionItem
 
 @Composable
 fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
@@ -99,12 +101,9 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
                 fontStyle = FontStyle.Italic
             )
 
-            BrandProductsHeader(
+            SearchProductsHeader(
                 navController = navController,
-                brandName = if (productsUiState is DataState.Success)
-                    (productsUiState as DataState.Success).data[0].vendor else null,
                 onFilterClick = { showSliderDialog = !showSliderDialog },
-                isSearchEnabled = true,
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
             )
@@ -163,41 +162,7 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
 
 
 }
-@Composable
-fun SuggestionItem(
-    suggestion: Product,
-    onSuggestionClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onSuggestionClick),
-        color = Color.Transparent
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                Text(
-                    text = suggestion.title,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = suggestion.vendor,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
 
 
 
