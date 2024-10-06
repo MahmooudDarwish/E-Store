@@ -1,15 +1,15 @@
 package com.example.e_store.utils.data_layer
 
+import android.util.Log
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.shared_models.Brand
 import kotlinx.coroutines.flow.Flow
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrder
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderDetails
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderResponse
+import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
+import com.example.e_store.utils.shared_models.DraftOrderRequest
 
 class EStoreRepositoryImpl private constructor(
     private var eStoreRemoteDataSource: EStoreRemoteDataSource,
@@ -60,27 +60,28 @@ class EStoreRepositoryImpl private constructor(
         return eStoreRemoteDataSource.fetchDiscountCodes()
     }
 
-    override suspend fun createShoppingCartDraftOrder(shoppingCartDraftOrder: ShoppingCartDraftOrder) {
-        eStoreRemoteDataSource.createShoppingCartDraftOrder(shoppingCartDraftOrder)
+    override suspend fun createDraftOrder(shoppingCartDraftOrder: DraftOrderRequest) {
+        Log.d(TAG, "createShoppingCartDraftOrder: $shoppingCartDraftOrder")
+        eStoreRemoteDataSource.createDraftOrder(shoppingCartDraftOrder)
     }
 
-    override suspend fun updateShoppingCartDraftOrder(
+    override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        shoppingCartDraftOrder: ShoppingCartDraftOrder
+        shoppingCartDraftOrder: DraftOrderRequest
     ) {
-        eStoreRemoteDataSource.updateShoppingCartDraftOrder(draftOrderId, shoppingCartDraftOrder)
+        eStoreRemoteDataSource.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
 
-    override suspend fun fetchShoppingCartDraftOrderByID(draftOrderId: Long): ShoppingCartDraftOrderResponse {
-        return eStoreRemoteDataSource.fetchShoppingCartDraftOrderByID(draftOrderId)
+    override suspend fun fetchDraftOrderByID(draftOrderId: Long): DraftOrderResponse {
+        return eStoreRemoteDataSource.fetchDraftOrderByID(draftOrderId)
     }
 
-    override suspend fun removeShoppingCartDraftDraftOrder(draftOrderId: Long) {
-        eStoreRemoteDataSource.removeShoppingCartDraftDraftOrder(draftOrderId)
+    override suspend fun removeDraftOrder(draftOrderId: Long) {
+        eStoreRemoteDataSource.removeDraftOrder(draftOrderId)
     }
 
-    override suspend fun fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId: String): Flow<List<ShoppingCartDraftOrderDetails>> {
-        return eStoreRemoteDataSource.fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId)
+    override suspend fun fetchAllDraftOrders(): Flow<DraftOrderResponse> {
+        return eStoreRemoteDataSource.fetchAllDraftOrders()
     }
 
 

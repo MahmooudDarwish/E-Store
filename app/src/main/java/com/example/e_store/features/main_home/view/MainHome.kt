@@ -13,14 +13,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.e_store.R
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
-import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
-import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
+import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.utils.shared_components.NoInternetScreen
 import com.example.weather.utils.managers.InternetChecker
 
@@ -29,6 +31,8 @@ import com.example.weather.utils.managers.InternetChecker
 fun MainHomeScreen(
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
+    productInfoViewModelFactory: ProductInfoViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory
@@ -44,6 +48,7 @@ fun MainHomeScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
+    // Use startsWith for checking and avoid multiple conditions
     val selectedRoute = when {
         currentRoute.startsWith(Screen.Home.route) -> Screen.Home.route
         currentRoute.startsWith(Screen.Categories.route) -> Screen.Categories.route
@@ -84,30 +89,38 @@ fun MainHomeScreen(
                     }
                 )
             }
+
         },
         bottomBar = {
-            if (isInternetAvailable && currentRoute in items.map { it.route }) {
-                BottomNavigationBar(
-                    items = items,
-                    currentRoute = selectedRoute,
-                    navController = navController,
-                )
+            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route)) {
+                if (isInternetAvailable && currentRoute in items.map { it.route }) {
+                    BottomNavigationBar(
+                        items = items,
+                        currentRoute = selectedRoute,
+                        navController = navController,
+                    )
+                }
             }
         }
     ) { paddingValues ->
-        if (isInternetAvailable) {
-            Box(modifier = Modifier.padding(paddingValues)) {
-                AppNavigation(
-                    navController = navController,
-                    homeViewModelFactory = homeViewModelFactory,
-                    brandProductsViewModelFactory = brandProductsViewModelFactory,
-                    categoriesViewModelFactory = categoriesViewModelFactory,
-                    searchViewModelFactory = searchViewModelFactory,
-                    profileViewModelFactory = profileViewModelFactory
-                )
-            }
-        } else {
-            NoInternetScreen()
+                if (isInternetAvailable) {
+                    Box(modifier = Modifier.padding(paddingValues)) {
+                        AppNavigation(
+                            navController = navController,
+                            homeViewModelFactory = homeViewModelFactory,
+                            brandProductsViewModelFactory = brandProductsViewModelFactory,
+                            categoriesViewModelFactory = categoriesViewModelFactory,
+                            searchViewModelFactory = searchViewModelFactory,
+                            profileViewModelFactory = profileViewModelFactory,
+                            productInfoViewModelFactory = productInfoViewModelFactory,
+                            shoppingCartViewModelFactory = shoppingCartViewModelFactory
+                        )
+                    }
+                } else {
+                    NoInternetScreen()
+                }
+
         }
-    }
+
+
 }

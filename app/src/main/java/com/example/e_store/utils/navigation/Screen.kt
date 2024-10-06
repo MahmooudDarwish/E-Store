@@ -14,20 +14,24 @@ import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.categories.view.CategoriesScreen
-import com.example.e_store.features.categories.view_model.CategoriesViewModel
-import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.product_info.view.ProductInfoScreen
 import com.example.e_store.features.profile.view.ProfileScreen
+import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.features.search.view.SearchScreen
-import com.example.e_store.features.profile.view_model.ProfileViewModel
-import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModel
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
-import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
 import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModel
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
+import com.example.e_store.features.categories.view_model.CategoriesViewModel
+import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.profile.view_model.ProfileViewModel
+import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 
 sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
@@ -36,6 +40,7 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
     object BrandProducts : Screen(NavigationKeys.BRANDS_ROUTE, R.string.brand_products, 0) {
         fun createRoute(brand: String) = "$route/$brand"
     }
+
 
     object SignUp : Screen(NavigationKeys.SIGN_UP_ROUTE, R.string.sign_up, 0)
     object SignIn : Screen(NavigationKeys.SIGN_IN_ROUTE, R.string.sign_in, 0)
@@ -47,10 +52,16 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Profile :
         Screen(NavigationKeys.PROFILE_ROUTE, R.string.profile_title, R.drawable.ic_person)
-    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
-    object ProductInfoFromCategories : Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromCategories :
+        Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromHome :
+        Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
+
     object Search_From_Home : Screen(NavigationKeys.SEARCH_HOME_ROUTE, R.string.search, 0)
-    object Search_From_Categories : Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
+    object Search_From_Categories :
+        Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
 
 }
 
@@ -61,6 +72,8 @@ fun AppNavigation(
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
+    productInfoViewModelFactory: ProductInfoViewModelFactory,
+    shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
@@ -72,11 +85,13 @@ fun AppNavigation(
             val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
             CategoriesScreen(viewModel = viewModel, navController = navController)
         }
-        composable(route = Screen.Cart.route) { ShoppingCartScreen() }
+
+
         composable(route = Screen.Profile.route) {
             val viewModel: ProfileViewModel = viewModel(factory = profileViewModelFactory)
             ProfileScreen(viewModel = viewModel, navController = navController)
         }
+
 
         composable(
             route = "${NavigationKeys.BRANDS_ROUTE}/{${NavigationKeys.BRAND_ID}}",
@@ -87,8 +102,19 @@ fun AppNavigation(
             val brand = backStackEntry.arguments?.getString(NavigationKeys.BRAND_ID)
             BrandProducts(brandID = brand, navController = navController, viewModel = viewModel)
         }
-        composable(route = Screen.ProductInfoFromHome.route) { ProductInfoScreen(navController) }
-        composable(route = Screen.ProductInfoFromCategories.route) { ProductInfoScreen(navController) }
+
+        composable(route = Screen.ProductInfoFromHome.route) {
+            val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+
+            ProductInfoScreen(navController, viewModel)
+        }
+        composable(route = Screen.ProductInfoFromCategories.route) {
+            val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+            ProductInfoScreen(navController, viewModel)
+        }
+
+
+
         composable(route = Screen.Search_From_Home.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             SearchScreen(viewModel, navController)
@@ -101,5 +127,9 @@ fun AppNavigation(
         composable(route = Screen.SignIn.route) { SignInScreen(navController) }
         composable(route = Screen.SignUp.route) { SignUpScreen(navController) }
 
+        composable(route = Screen.Cart.route) {
+            val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
+            ShoppingCartScreen(viewModel)
+        }
     }
 }

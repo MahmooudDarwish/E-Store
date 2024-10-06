@@ -9,10 +9,9 @@ import retrofit2.Response
 import retrofit2.http.Path
 import com.example.e_store.utils.shared_models.CustomCollectionResponse
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrder
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderDetails
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderResponse
+import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.PriceRuleResponse
+import com.example.e_store.utils.shared_models.DraftOrderRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
@@ -44,25 +43,24 @@ interface ShopifyAPIServices {
 
 
     //shop cart draft order
-    @POST(APIKeys.SHOP_CART_DRAFT_ORDERS_ENDPOINT)
-    suspend fun createShoppingCartDraftOrder(@Body shoppingCartDraftOrder: ShoppingCartDraftOrder)
+    @POST(APIKeys.DRAFT_ORDERS_ENDPOINT)
+    suspend fun createDraftOrder(@Body shoppingCartDraftOrder: DraftOrderRequest)
 
-    @PUT(APIKeys.SHOP_CART_DRAFT_ORDERS_DRAFT_ORDER_ID_ENDPOINT)
-    suspend fun updateShoppingCartDraftOrder(
+    @PUT(APIKeys.ORDERS_DRAFT_ORDER_ID_ENDPOINT)
+    suspend fun updateDraftOrder(
         @Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long,
-        @Body shoppingCartDraftOrder: ShoppingCartDraftOrder
+        @Body shoppingCartDraftOrder: DraftOrderRequest
     )
 
-    @GET(APIKeys.SHOP_CART_DRAFT_ORDERS_DRAFT_ORDER_ID_ENDPOINT)
-    suspend fun fetchShoppingCartDraftOrderByID(@Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long): ShoppingCartDraftOrderResponse
+    @GET(APIKeys.ORDERS_DRAFT_ORDER_ID_ENDPOINT)
+    suspend fun fetchDraftOrderByID(@Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long): DraftOrderResponse
 
-    @DELETE(APIKeys.SHOP_CART_DRAFT_ORDERS_DRAFT_ORDER_ID_ENDPOINT)
-    suspend fun removeShoppingCartDraftDraftOrder(@Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long)
+    @DELETE(APIKeys.ORDERS_DRAFT_ORDER_ID_ENDPOINT)
+    suspend fun removeDraftDraftOrder(@Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long)
 
-    @GET(APIKeys.SHOP_CART_DRAFT_ORDERS_ENDPOINT)
-    suspend fun fetchAllShoppingCartDraftDraftOrdersByCustomerId(
-        @Query(APIKeys.CUSTOMER_ID_PARAM) customerId: String
-    ): List<ShoppingCartDraftOrderDetails>
+    @GET(APIKeys.DRAFT_ORDERS_ENDPOINT)
+    suspend fun fetchAllDraftOrders(
+    ): DraftOrderResponse
 
 
 }

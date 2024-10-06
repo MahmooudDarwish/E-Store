@@ -11,9 +11,8 @@ import kotlinx.coroutines.flow.flow
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrder
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderDetails
-import com.example.e_store.utils.shared_models.ShoppingCartDraftOrderResponse
+import com.example.e_store.utils.shared_models.DraftOrderRequest
+import com.example.e_store.utils.shared_models.DraftOrderResponse
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
@@ -146,27 +145,28 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
 
 
-    override suspend fun createShoppingCartDraftOrder(shoppingCartDraftOrder: ShoppingCartDraftOrder) {
-         apiService.createShoppingCartDraftOrder(shoppingCartDraftOrder)
+    override suspend fun createDraftOrder(shoppingCartDraftOrder: DraftOrderRequest) {
+        Log.d(TAG, "createShoppingCartDraftOrder: $shoppingCartDraftOrder")
+         apiService.createDraftOrder(shoppingCartDraftOrder)
     }
 
-    override suspend fun updateShoppingCartDraftOrder(
+    override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        shoppingCartDraftOrder: ShoppingCartDraftOrder
+        shoppingCartDraftOrder: DraftOrderRequest
     ) {
-         apiService.updateShoppingCartDraftOrder(draftOrderId, shoppingCartDraftOrder)
+         apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
-    override suspend fun removeShoppingCartDraftDraftOrder(draftOrderId: Long) {
-        apiService.removeShoppingCartDraftDraftOrder(draftOrderId)
-    }
-
-    override suspend fun fetchShoppingCartDraftOrderByID(draftOrderId: Long): ShoppingCartDraftOrderResponse {
-        return apiService.fetchShoppingCartDraftOrderByID(draftOrderId)
+    override suspend fun removeDraftOrder(draftOrderId: Long) {
+        apiService.removeDraftDraftOrder(draftOrderId)
     }
 
-    override suspend fun fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId: String): Flow<List<ShoppingCartDraftOrderDetails>> {
+    override suspend fun fetchDraftOrderByID(draftOrderId: Long): DraftOrderResponse {
+        return apiService.fetchDraftOrderByID(draftOrderId)
+    }
+
+    override suspend fun fetchAllDraftOrders(): Flow<DraftOrderResponse> {
         return flow {
-            val response = apiService.fetchAllShoppingCartDraftDraftOrdersByCustomerId(customerId)
+            val response = apiService.fetchAllDraftOrders()
             emit(response)
         }
     }
