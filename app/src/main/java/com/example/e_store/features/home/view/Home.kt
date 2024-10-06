@@ -1,5 +1,6 @@
 package com.example.e_store.features.home.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,19 +23,15 @@ import com.example.e_store.R
 import com.example.e_store.features.home.component.AdsSlider
 import com.example.e_store.features.home.component.BrandsSection
 import com.example.e_store.features.home.component.ForUSection
-import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.features.home.component.SearchWithFavoriteSection
 import com.example.e_store.features.home.component.SliderItem
+import com.example.e_store.features.home.component.updateSliderImages
 import com.example.e_store.features.home.view_model.HomeViewModel
+import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
-import com.example.e_store.utils.shared_models.Product
-import com.example.e_store.utils.shared_models.ProductDetails
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import com.example.e_store.features.home.component.updateSliderImages
-import com.google.common.collect.Iterables.addAll
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
@@ -45,18 +42,20 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
 
 
     // Initialize the slider images
-    val sliderImages = remember { mutableStateListOf<SliderItem>().apply {
-        addAll(
-            listOf(
-                SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
-                SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
-                SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
-                SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
-                SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
-                SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
+    val sliderImages = remember {
+        mutableStateListOf<SliderItem>().apply {
+            addAll(
+                listOf(
+                    SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
+                    SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
+                    SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
+                    SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
+                    SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
+                    SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
+                )
             )
-        )
-    }}
+        }
+    }
 
     val context = LocalContext.current
     when (discountCodesUiState) {
@@ -113,6 +112,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             SearchWithFavoriteSection(
                 onSearchClick = {
                     ///TODO: Navigation to search screen  @kk98989898
+                    navController.navigate(Screen.Search_From_Home.route)
                 },
                 onFavoriteClick = {
                     ///TODO: Navigation to Favorite screen @kk98989898
@@ -190,12 +190,10 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                     ForUSection(
                         navController = navController,
                         products = forUProducts,
-//                        onProductClick = {
-//                                product ->
-//                            initializeProductDetails(product)
-//                            ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
-//
-//                        }
+
+                        ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
+
+
                     )
                 }
 

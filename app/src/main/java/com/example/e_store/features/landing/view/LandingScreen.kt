@@ -19,8 +19,10 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.authentication.view.Sign_in_Screen
 import com.example.e_store.features.authentication.view.Sign_up_Screen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+
 
 class LandingScreen : ComponentActivity() {
 
@@ -37,9 +39,13 @@ class LandingScreen : ComponentActivity() {
     private val brandProductsViewModelFactory by lazy {
         BrandProductsViewModelFactory(repo)
     }
+    private val searchViewModelFactory by lazy {
+        SearchViewModelFactory(repo)
+    }
     private val categoriesViewModelFactory by lazy {
         CategoriesViewModelFactory(repo)
     }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,15 +54,14 @@ class LandingScreen : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     val navController = rememberNavController()
-                    NavHost(navController, startDestination = Screen.Home.route) {
+                    NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
-                        composable(Screen.Home.route) {
-                            MainHomeScreen(
-                                homeViewModelFactory = homeViewModelFactory,
-                                brandProductsViewModelFactory = brandProductsViewModelFactory,
-                                categoriesViewModelFactory = categoriesViewModelFactory
-                            )
-                        }
+                        composable(Screen.Home.route) { MainHomeScreen(
+                            homeViewModelFactory,
+                            brandProductsViewModelFactory,
+                            searchViewModelFactory,
+                            categoriesViewModelFactory
+                        ) }
                         composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
                         composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
 
