@@ -2,14 +2,14 @@ package com.example.e_store.features.authentication.view_model
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.e_store.R
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
 
 class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
 
@@ -18,11 +18,11 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     private val _email = mutableStateOf("")
     private val _password = mutableStateOf("")
     private val _confirmPassword = mutableStateOf("")
-    val name = _name
-    val phone = _phone
-    val email = _email
-    val password = _password
-    val confirmPassword = _confirmPassword
+    val name :State<String> = _name
+    val phone: State<String> = _phone
+    val email: State<String> = _email
+    val password: State<String> = _password
+    val confirmPassword: State<String> = _confirmPassword
     val isProgressing = mutableStateOf(false)
 
     private val _nameError = mutableStateOf(true)
@@ -30,7 +30,6 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     private val _emailError = mutableStateOf(true)
     private val _passwordError = mutableStateOf(true)
     private val _confirmPasswordError = mutableStateOf(true)
-
 
     fun onNameChanged(newValue: String) {
         _name.value = newValue
@@ -50,66 +49,52 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     fun onPasswordChanged(newValue: String) {
         _password.value = removeWhiteSpaces(newValue)
         _passwordError.value = _password.value.isEmpty() || !isValidPassword(_password.value)
-        Log.d("passwordLog", "Password: ${_password.value}")
-        Log.d("passwordLog", "Password Error: ${_passwordError.value}")
     }
 
     fun onConfirmPasswordChanged(newValue: String) {
         _confirmPassword.value = removeWhiteSpaces(newValue)
-        _confirmPasswordError.value =
-            _confirmPassword.value.isEmpty() || _confirmPassword.value != _password.value
+        _confirmPasswordError.value = _confirmPassword.value.isEmpty() || _confirmPassword.value != _password.value
     }
-
-
 
     private fun checkSignUpTextValues(context: Context): Boolean {
         if (_nameError.value) {
-            Toast.makeText(context, "Name can't be empty", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.name_empty_error), Toast.LENGTH_SHORT).show()
             return false
         }
 
         if (_phoneError.value) {
             if (_phone.value.isEmpty()) {
-                Toast.makeText(context, "Phone can't be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.phone_empty_error), Toast.LENGTH_SHORT).show()
             } else if (_phone.value.length != 11) {
-                Toast.makeText(context, "Phone is not valid", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.phone_invalid_error), Toast.LENGTH_SHORT).show()
             }
             return false
         }
 
         if (_emailError.value) {
             if (_email.value.isEmpty()) {
-                Toast.makeText(context, "Email can't be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.email_empty_error), Toast.LENGTH_SHORT).show()
             } else if (!isValidEmail(_email.value)) {
-                Toast.makeText(context, "Email is not valid", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.email_invalid_error), Toast.LENGTH_SHORT).show()
             }
             return false
         }
 
         if (_passwordError.value) {
             if (_password.value.isEmpty()) {
-                Toast.makeText(context, "Password can't be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.password_empty_error), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    context,
-                    "Password is not valid, must contain at least 8 characters",
-                    Toast.LENGTH_LONG
-                ).show()
-                Toast.makeText(
-                    context,
-                    "One uppercase, 1 lowercase, 1 number, 1 special character",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(context, context.getString(R.string.password_invalid_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.password_requirements_error), Toast.LENGTH_LONG).show()
             }
             return false
         }
 
         if (_confirmPasswordError.value) {
             if (_confirmPassword.value.isEmpty()) {
-                Toast.makeText(context, "Confirm Password can't be empty", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, context.getString(R.string.confirm_password_empty_error), Toast.LENGTH_SHORT).show()
             } else if (_confirmPassword.value != _password.value) {
-                Toast.makeText(context, "Passwords don't match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.password_mismatch_error), Toast.LENGTH_SHORT).show()
             }
             return false
         }
@@ -119,44 +104,26 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
 
     private fun checkSignInTextValues(context: Context): Boolean {
         return when {
-
             _emailError.value -> {
                 if (email.value.isEmpty()) {
-                    Toast.makeText(context, "Email can't be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.email_empty_error), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Email is not valid", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.email_invalid_error), Toast.LENGTH_SHORT).show()
                 }
                 false
-
             }
-
             _passwordError.value -> {
                 if (_password.value.isEmpty()) {
-                    Toast.makeText(context, "Password can't be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.password_empty_error), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(
-                        context,
-                        "Password is not valid, must contain at least 8 characters",
-                        Toast.LENGTH_LONG
-                    ).show()
-
-                    Toast.makeText(
-                        context,
-                        "One uppercase, 1 lowercase, 1 number, 1 special character",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(context, context.getString(R.string.password_invalid_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.password_requirements_error), Toast.LENGTH_LONG).show()
                 }
                 false
             }
-
             else -> true
-
-
         }
     }
-
-
-
 
     private fun removeWhiteSpaces(input: String): String {
         return input.replace(" ", "")
@@ -167,36 +134,12 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     }
 
     private fun isValidPassword(password: String): Boolean {
-        if (password.length < 8) {
-            Log.d("passwordLog", "Password is too short, it must be at least 8 characters.")
-            return false
-        }
-        if (!password.contains(Regex("[0-9]"))) {
-            Log.d("passwordLog", "Password must contain at least one digit.")
-            return false
-        }
-        if (!password.contains(Regex("[a-z]"))) {
-            Log.d("passwordLog", "Password must contain at least one lowercase letter.")
-            return false
-        }
-        if (!password.contains(Regex("[A-Z]"))) {
-            Log.d("passwordLog", "Password must contain at least one uppercase letter.")
-            return false
-        }
-        if (!password.contains(Regex("[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]"))) {
-            Log.d(
-                "passwordLog",
-                "Password must contain at least one special character (e.g. !, @, #, etc.)."
-            )
-            return false
-        }
-        if (password.contains(Regex("\\s"))) {
-            Log.d("passwordLog", "Password must not contain any spaces.")
-            return false
-        }
-
-        Log.d("passwordLog", "Password is valid.")
-        return true
+        return password.length >= 8 &&
+                password.contains(Regex("[0-9]")) &&
+                password.contains(Regex("[a-z]")) &&
+                password.contains(Regex("[A-Z]")) &&
+                password.contains(Regex("[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]")) &&
+                !password.contains(Regex("\\s"))
     }
 
     fun saveNameToSharedPref(context: Context, email: String, name: String, phone: String) {
@@ -219,9 +162,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                     if (task.isSuccessful) {
                         onAuthSuccess()
                         sendEmailVerification(context)
-
                     } else {
-                        onError(task.exception?.localizedMessage ?: "Registration failed")
+                        onError(task.exception?.localizedMessage ?: context.getString(R.string.registration_failed_error))
                     }
                 }
         } else {
@@ -229,47 +171,13 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
         }
     }
 
-
     private fun sendEmailVerification(context: Context) {
         auth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
             if (it.isSuccessful) {
-                Toast.makeText(
-                    context,
-                    "An email has been sent to your email address, please verify it",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.email_verification_sent), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    context,
-                    "Failed to send email verification",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.email_verification_failed), Toast.LENGTH_SHORT).show()
                 isProgressing.value = false
-                val exception = it.exception
-                if (exception is FirebaseAuthException) {
-                    val errorCode = exception.errorCode
-                    when (errorCode) {
-                        "ERROR_USER_DISABLED" -> {
-                            // The user account has been disabled by an administrator
-                            Toast.makeText(context, "User account is disabled.", Toast.LENGTH_SHORT).show()
-                        }
-                        "ERROR_INVALID_USER_TOKEN" -> {
-                            // The user's credential is no longer valid (user deleted or password changed)
-                            Toast.makeText(context, "Invalid user token. Please sign in again.", Toast.LENGTH_SHORT).show()
-                        }
-                        "ERROR_TOO_MANY_REQUESTS" -> {
-                            // The request was blocked due to too many email verification attempts
-                            Toast.makeText(context, "Too many requests. Try again later.", Toast.LENGTH_SHORT).show()
-                        }
-                        else -> {
-                            // Other errors
-                            Toast.makeText(context, "Failed to send verification email: ${exception.localizedMessage}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    // Handle unknown errors
-                    Toast.makeText(context, "Failed to send verification email. Try again later.", Toast.LENGTH_SHORT).show()
-                }
             }
         }
     }
@@ -281,57 +189,38 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
         }
 
         isProgressing.value = true
-        Log.d("signInAndCheckEmailVerification", "Signing in user")
 
-        // Sign in the user first
         auth.signInWithEmailAndPassword(_email.value, _password.value)
             .addOnCompleteListener { task ->
-                isProgressing.value = false  // Always reset the loading state
+                isProgressing.value = false
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    Log.d("signInAndCheckEmailVerification", "Sign-in successful, checking email verification")
-
-                    // Now check if the email is verified
                     user?.reload()?.addOnCompleteListener { reloadTask ->
                         if (reloadTask.isSuccessful) {
                             if (user.isEmailVerified) {
-                                Log.d("signInAndCheckEmailVerification", "Email is verified")
                                 onAuthSuccess()
                             } else {
-                                Log.d("signInAndCheckEmailVerification", "Email not verified")
-                                Toast.makeText(context, "Email not verified. Please check your inbox.", Toast.LENGTH_SHORT).show()
-                                onError("Email not verified")
+                                Toast.makeText(context, context.getString(R.string.email_not_verified_error), Toast.LENGTH_SHORT).show()
+                                onError(context.getString(R.string.email_not_verified_error))
                             }
                         } else {
-                            Log.e("signInAndCheckEmailVerification", "Failed to reload user: ${reloadTask.exception?.message}")
-                            onError(reloadTask.exception?.localizedMessage ?: "Failed to reload user")
+                            onError(reloadTask.exception?.localizedMessage ?: context.getString(R.string.failed_to_reload_user_error))
                         }
-                    }?.addOnFailureListener { exception ->
-                        isProgressing.value = false
-                        onError(exception.localizedMessage ?: "Failed to reload user")
                     }
                 } else {
-                    Log.e("signInAndCheckEmailVerification", "Sign-in failed: ${task.exception?.message}")
-                    onError(task.exception?.localizedMessage ?: "Login failed")
+                    onError(task.exception?.localizedMessage ?: context.getString(R.string.login_failed_error))
                 }
             }
-            .addOnFailureListener { exception ->
-                isProgressing.value = false
-                onError(exception.localizedMessage ?: "Login failed")
-            }
     }
-
 
     fun handleGuestModeSignIn(context: Context) {
         isProgressing.value = true
         initializeUserSession(context, "", true)
     }
 
-
     fun initializeUserSession(context: Context, email: String, isGuest: Boolean) {
-
         if (isGuest) {
-            UserSession.name = "Guest"
+            UserSession.name = context.getString(R.string.guest_user)
             UserSession.email = email
             UserSession.phone = ""
             UserSession.Uid = ""
@@ -347,15 +236,6 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
             UserSession.phone = sharedPref.getString("phone", "") ?: ""
             UserSession.Uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             UserSession.isGuest = false
-
-
         }
-        Log.d("userSession", "Name: ${UserSession.name}")
-        Log.d("userSession", "Email: ${UserSession.email}")
-        Log.d("userSession", "Phone: ${UserSession.phone}")
-        Log.d("userSession", "Uid: ${UserSession.Uid}")
-        Log.d("userSession", "isGuest: ${UserSession.isGuest}")
     }
-
-
 }
