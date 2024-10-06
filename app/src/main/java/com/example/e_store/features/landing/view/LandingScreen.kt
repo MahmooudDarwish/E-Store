@@ -16,11 +16,11 @@ import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
-import com.example.e_store.features.authentication.view.Sign_in_Screen
-import com.example.e_store.features.authentication.view.Sign_up_Screen
+import com.example.e_store.features.authentication.view.SignInScreen
+import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
-import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 
 class LandingScreen : ComponentActivity() {
 
@@ -41,6 +41,9 @@ class LandingScreen : ComponentActivity() {
         CategoriesViewModelFactory(repo)
     }
 
+    private val profileViewModelFactory by lazy {
+        ProfileViewModelFactory(repo)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +57,12 @@ class LandingScreen : ComponentActivity() {
                             MainHomeScreen(
                                 homeViewModelFactory = homeViewModelFactory,
                                 brandProductsViewModelFactory = brandProductsViewModelFactory,
-                                categoriesViewModelFactory = categoriesViewModelFactory
+                                categoriesViewModelFactory = categoriesViewModelFactory,
+                                profileViewModelFactory = profileViewModelFactory,
                             )
                         }
-                        composable(Screen.Sign_up.route) { Sign_up_Screen(navController = navController) }
-                        composable(Screen.Sign_in.route) { Sign_in_Screen(navController = navController) }
+                        composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
+                        composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
 
                     }
                 }

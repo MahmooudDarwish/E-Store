@@ -21,7 +21,7 @@ fun SearchWithFavoriteSection(onSearchClick: () -> Unit, onFavoriteClick: () -> 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 16.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

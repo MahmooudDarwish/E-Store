@@ -20,6 +20,7 @@ import com.example.e_store.features.brand_products.view_model.BrandProductsViewM
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
+import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
@@ -29,7 +30,8 @@ import com.example.e_store.utils.navigation.Screen
 fun MainHomeScreen(
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
-    categoriesViewModelFactory: CategoriesViewModelFactory
+    categoriesViewModelFactory: CategoriesViewModelFactory,
+    profileViewModelFactory: ProfileViewModelFactory
 ) {
     val items = listOf(
         Screen.Home,
@@ -84,7 +86,8 @@ fun MainHomeScreen(
                 navController = navController,
                 homeViewModelFactory = homeViewModelFactory,
                 brandProductsViewModelFactory = brandProductsViewModelFactory,
-                categoriesViewModelFactory = categoriesViewModelFactory
+                categoriesViewModelFactory = categoriesViewModelFactory,
+                profileViewModelFactory = profileViewModelFactory
             )
         }
     }

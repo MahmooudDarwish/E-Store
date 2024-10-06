@@ -33,6 +33,7 @@ import com.example.e_store.utils.shared_models.ProductDetails
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import com.example.e_store.features.home.component.updateSliderImages
 import com.google.common.collect.Iterables.addAll
 
@@ -105,7 +106,6 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
             .background(color = Color.White)
     ) {
 
@@ -137,8 +137,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
 
         item {
             Text(
-                text = "Brands",
-                modifier = Modifier.padding(vertical = 8.dp),
+                text = stringResource(id = R.string.brands),
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                 fontSize = 20.sp
             )
         }
@@ -169,8 +169,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
 
         item {
             Text(
-                text = "For you",
-                modifier = Modifier.padding(vertical = 8.dp),
+                text = stringResource(id = R.string.for_you),
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                 fontSize = 20.sp
             )
         }

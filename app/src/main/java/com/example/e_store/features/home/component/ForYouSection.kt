@@ -23,7 +23,7 @@ fun ForUSection(
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 500.dp),
+            .heightIn(max = 500.dp).padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
