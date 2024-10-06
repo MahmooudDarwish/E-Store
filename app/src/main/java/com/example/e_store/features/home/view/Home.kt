@@ -1,5 +1,6 @@
 package com.example.e_store.features.home.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,192 +27,185 @@ import com.example.e_store.features.home.component.SearchWithFavoriteSection
 import com.example.e_store.features.home.component.SliderItem
 import com.example.e_store.features.home.component.updateSliderImages
 import com.example.e_store.features.home.view_model.HomeViewModel
-import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
-import com.example.e_store.utils.shared_models.Product
-import com.example.e_store.utils.shared_models.ProductDetails
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
-import com.example.e_store.features.home.component.updateSliderImages
-import com.google.common.collect.Iterables.addAll
 
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
-    val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
-    val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
-
-    val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
-
-
-    // Initialize the slider images
-    val sliderImages = remember {
-        mutableStateListOf<SliderItem>().apply {
-            addAll(
-                listOf(
-                    SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
-                    SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
-                    SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
-                    SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
-                    SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
-                    SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
-                )
-            )
-        }
-    }
-
     val context = LocalContext.current
-    when (discountCodesUiState) {
-        DataState.Loading -> {
-            EShopLoadingIndicator()
-        }
-
-        is DataState.Success -> {
-            (discountCodesUiState as DataState.Success).data?.let { data ->
-                val codesToProcess = data.flatMap { it.discount_codes }.take(5)
-                val newSliderItems = codesToProcess.map { discountCode ->
-                    val codeLower = discountCode.code.lowercase()
-                    val imageId = when (codeLower) {
-                        "fivepercentoff" -> R.drawable.fivepercentoff
-                        "tenpercentoff" -> R.drawable.tenpercentoff
-                        "fifteenpercentoff" -> R.drawable.fifteenpercentoff
-                        "twentypercentoff" -> R.drawable.twentypercentoff
-                        "twentyfivepercentoff" -> R.drawable.twentyfivepercentoff
-                        "thirtypercentoff" -> R.drawable.thirtypercentoff
-                        "freeship" -> R.drawable.freeship
-                        else -> 0
-                    }
-                    SliderItem(imageId, discountCode.code)
-                }
-                Log.d("HomeScreen", "newSliderItems: $newSliderItems")
-                updateSliderImages(sliderImages, newSliderItems)
-            }
-
-        }
-
-        is DataState.Error -> {
-            val errorMsg = (discountCodesUiState as DataState.Error).message
-            Log.e("HomeScreen", "Error fetching discount codes: $errorMsg")
-            LaunchedEffect(errorMsg) {
-                Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.getBrands()
-        viewModel.getForUProducts()
-        viewModel.fetchDiscountCodes()
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White)
-    ) {
-
-        item {
-            SearchWithFavoriteSection(
-                onSearchClick = {
-                    ///TODO: Navigation to search screen  @kk98989898
-                    navController.navigate(Screen.Search_From_Home.route)
-                },
-                onFavoriteClick = {
-                    ///TODO: Navigation to Favorite screen @kk98989898
-                },
-            )
-        }
-
-        item {
-            ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
-            AdsSlider(initialImages = sliderImages) { clickedItem ->
-
-                // Handle click on the slider item
-                Toast.makeText(
-                    context,
-                    "Coupons: ${clickedItem.title} Copied!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-        item { Gap(height = 16) }
 
 
-        item {
-            Text(
-                text = stringResource(id = R.string.brands),
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
-                fontSize = 20.sp
-            )
-        }
+        val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
+        val forUProductsUiState by viewModel.forUProducts.collectAsStateWithLifecycle()
+
+        val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
 
 
-
-        item {
-            when (brandsUiState) {
-                DataState.Loading -> {
-                    EShopLoadingIndicator()
-                }
-
-                is DataState.Success -> {
-                    val brands = (brandsUiState as DataState.Success).data
-                    BrandsSection(navController = navController, brands = brands)
-                }
-
-                is DataState.Error -> {
-                    val errorMsg = (brandsUiState as DataState.Error).message
-                    LaunchedEffect(errorMsg) {
-                        Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-
-
-
-        item {
-            Text(
-                text = stringResource(id = R.string.for_you),
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
-                fontSize = 20.sp
-            )
-        }
-
-        item {
-            Gap(height = 16)
-        }
-
-        item {
-            when (forUProductsUiState) {
-                DataState.Loading -> {
-                    EShopLoadingIndicator()
-                }
-
-                is DataState.Success -> {
-                    val forUProducts = (forUProductsUiState as DataState.Success).data
-                    ForUSection(
-                        navController = navController,
-                        products = forUProducts,
-
-                        ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
-
-
+        val sliderImages = remember {
+            mutableStateListOf<SliderItem>().apply {
+                addAll(
+                    listOf(
+                        SliderItem(R.drawable.addsgifone, "New Collection of Shirts"),
+                        SliderItem(R.drawable.adsgiftwo, "New Collection of Shoes"),
+                        SliderItem(R.drawable.adsgifthree, "New Collection of Hoodies"),
+                        SliderItem(R.drawable.adsgiffour, "New Collection of Shirts"),
+                        SliderItem(R.drawable.adsgiffive, "New Collection of Hoodies"),
+                        SliderItem(R.drawable.adsgifsix, "New Collection of Shoes")
                     )
+                )
+            }
+        }
+
+
+
+        when (discountCodesUiState) {
+            DataState.Loading -> {
+                EShopLoadingIndicator()
+            }
+
+            is DataState.Success -> {
+                (discountCodesUiState as DataState.Success).data?.let { data ->
+                    val codesToProcess = data.flatMap { it.discount_codes }.take(5)
+                    val newSliderItems = codesToProcess.map { discountCode ->
+                        val codeLower = discountCode.code.lowercase()
+                        val imageId = when (codeLower) {
+                            "fivepercentoff" -> R.drawable.fivepercentoff
+                            "tenpercentoff" -> R.drawable.tenpercentoff
+                            "fifteenpercentoff" -> R.drawable.fifteenpercentoff
+                            "twentypercentoff" -> R.drawable.twentypercentoff
+                            "twentyfivepercentoff" -> R.drawable.twentyfivepercentoff
+                            "thirtypercentoff" -> R.drawable.thirtypercentoff
+                            "freeship" -> R.drawable.freeship
+                            else -> 0
+                        }
+                        SliderItem(imageId, discountCode.code)
+                    }
+                    Log.d("HomeScreen", "newSliderItems: $newSliderItems")
+                    updateSliderImages(sliderImages, newSliderItems)
                 }
 
-                is DataState.Error -> {
-                    val errorMsg = (forUProductsUiState as DataState.Error).message
-                    LaunchedEffect(errorMsg) {
-                        Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+            }
+
+            is DataState.Error -> {
+                val errorMsg = (discountCodesUiState as DataState.Error).message
+                Log.e("HomeScreen", "Error fetching discount codes: $errorMsg")
+                LaunchedEffect(errorMsg) {
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.getBrands()
+            viewModel.getForUProducts()
+            viewModel.fetchDiscountCodes()
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.White)
+        ) {
+
+            item {
+                SearchWithFavoriteSection(
+                    onSearchClick = {
+                        ///TODO: Navigation to search screen  @kk98989898
+                        navController.navigate(Screen.Search_From_Home.route)
+                    },
+                    onFavoriteClick = {
+                        ///TODO: Navigation to Favorite screen @kk98989898
+                    },
+                )
+            }
+
+            item {
+                ///TODO: Integrate your slider Here @mohamed-abdelrehim142000
+                AdsSlider(initialImages = sliderImages) { clickedItem ->
+
+                    // Handle click on the slider item
+                    Toast.makeText(
+                        context,
+                        "Coupons: ${clickedItem.title} Copied!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            item { Gap(height = 16) }
+
+
+            item {
+                Text(
+                    text = stringResource(id = R.string.brands),
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
+                    fontSize = 20.sp
+                )
+            }
+
+
+
+            item {
+                when (brandsUiState) {
+                    DataState.Loading -> {
+                        EShopLoadingIndicator()
+                    }
+
+                    is DataState.Success -> {
+                        val brands = (brandsUiState as DataState.Success).data
+                        BrandsSection(navController = navController, brands = brands)
+                    }
+
+                    is DataState.Error -> {
+                        val errorMsg = (brandsUiState as DataState.Error).message
+                        LaunchedEffect(errorMsg) {
+                            Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+
+
+            item {
+                Text(
+                    text = stringResource(id = R.string.for_you),
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
+                    fontSize = 20.sp
+                )
+            }
+
+            item {
+                Gap(height = 16)
+            }
+
+            item {
+                when (forUProductsUiState) {
+                    DataState.Loading -> {
+                        EShopLoadingIndicator()
+                    }
+
+                    is DataState.Success -> {
+                        val forUProducts = (forUProductsUiState as DataState.Success).data
+                        ForUSection(
+                            navController = navController,
+                            products = forUProducts,
+                            ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898
+                        )
+                    }
+
+                    is DataState.Error -> {
+                        val errorMsg = (forUProductsUiState as DataState.Error).message
+                        LaunchedEffect(errorMsg) {
+                            Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
         }
     }
-}
+
 

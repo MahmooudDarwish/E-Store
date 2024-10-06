@@ -1,11 +1,12 @@
 package com.example.e_store.features.landing.view
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,10 +21,8 @@ import com.example.e_store.features.authentication.view.SignInScreen
 import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
-import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
-
 
 class LandingScreen : ComponentActivity() {
 
@@ -34,48 +33,58 @@ class LandingScreen : ComponentActivity() {
         )
     }
 
-    private val homeViewModelFactory by lazy {
-        HomeViewModelFactory(repo)
-    }
-    private val brandProductsViewModelFactory by lazy {
-        BrandProductsViewModelFactory(repo)
-    }
-    private val searchViewModelFactory by lazy {
-        SearchViewModelFactory(repo)
-    }
-    private val categoriesViewModelFactory by lazy {
-        CategoriesViewModelFactory(repo)
-    }
+    private val homeViewModelFactory by lazy { HomeViewModelFactory(repo) }
+    private val brandProductsViewModelFactory by lazy { BrandProductsViewModelFactory(repo) }
+    private val searchViewModelFactory by lazy { SearchViewModelFactory(repo) }
+    private val categoriesViewModelFactory by lazy { CategoriesViewModelFactory(repo) }
+    private val profileViewModelFactory by lazy { ProfileViewModelFactory(repo) }
 
-    private val profileViewModelFactory by lazy {
-        ProfileViewModelFactory(repo)
-    }
-
+  //  private lateinit var internetChecker: InternetChecker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                Surface {
-                    val navController = rememberNavController()
-                    NavHost(navController, startDestination = Screen.Splash.route) {
-                        composable(Screen.Splash.route) { SplashLottie(navController) }
-                        composable(Screen.Home.route) {
-                            MainHomeScreen(
-                                homeViewModelFactory = homeViewModelFactory,
-                                brandProductsViewModelFactory = brandProductsViewModelFactory,
-                                categoriesViewModelFactory = categoriesViewModelFactory,
-                                searchViewModelFactory = searchViewModelFactory,
-                                profileViewModelFactory = profileViewModelFactory,
-                            )
+            val context = LocalContext.current
+      //      internetChecker = InternetChecker(context)
+     //       internetChecker.startMonitoring()
+
+     //       var isConnected by remember { mutableStateOf(true) }
+
+            LaunchedEffect(Unit) {
+      //          internetChecker.networkStateFlow.collect { connectionState ->
+     //               isConnected = connectionState
+     //           }
+            }
+
+         //   if (isConnected) {
+                MaterialTheme {
+                    Surface {
+                        val navController = rememberNavController()
+                        NavHost(navController, startDestination = Screen.Splash.route) {
+                            composable(Screen.Splash.route) { SplashLottie(navController) }
+                            composable(Screen.Home.route) {
+                                MainHomeScreen(
+                                    homeViewModelFactory = homeViewModelFactory,
+                                    brandProductsViewModelFactory = brandProductsViewModelFactory,
+                                    categoriesViewModelFactory = categoriesViewModelFactory,
+                                    searchViewModelFactory = searchViewModelFactory,
+                                    profileViewModelFactory = profileViewModelFactory,
+                                )
+                            }
+                            composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
+                            composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
                         }
-                        composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
-                        composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
                     }
                 }
-            }
+          //  } else {
+        //        // Show no internet UI (e.g., a dialog or some message)
+        //        NoInternetScreen()
+       //     }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+      //  internetChecker.stopMonitoring() // Stop monitoring when the activity is destroyed
+    }
 }
-
-

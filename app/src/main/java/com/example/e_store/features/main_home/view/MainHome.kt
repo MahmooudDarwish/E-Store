@@ -1,14 +1,10 @@
 package com.example.e_store.features.main_home.view
 
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +21,8 @@ import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.utils.shared_components.NoInternetScreen
+import com.example.weather.utils.managers.InternetChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +44,6 @@ fun MainHomeScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
-    // Use startsWith for checking and avoid multiple conditions
     val selectedRoute = when {
         currentRoute.startsWith(Screen.Home.route) -> Screen.Home.route
         currentRoute.startsWith(Screen.Categories.route) -> Screen.Categories.route
@@ -56,6 +53,22 @@ fun MainHomeScreen(
     }
 
     val context = LocalContext.current
+    val internetChecker = remember { InternetChecker(context) }
+    var isInternetAvailable by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        internetChecker.startMonitoring()
+        internetChecker.networkStateFlow.collect { isConnected ->
+            isInternetAvailable = isConnected
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            internetChecker.stopMonitoring()
+        }
+    }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -71,10 +84,9 @@ fun MainHomeScreen(
                     }
                 )
             }
-
         },
         bottomBar = {
-            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route) || currentRoute.startsWith(Screen.Categories.route)) {
+            if (isInternetAvailable && currentRoute in items.map { it.route }) {
                 BottomNavigationBar(
                     items = items,
                     currentRoute = selectedRoute,
@@ -83,15 +95,19 @@ fun MainHomeScreen(
             }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            AppNavigation(
-                navController = navController,
-                homeViewModelFactory = homeViewModelFactory,
-                brandProductsViewModelFactory = brandProductsViewModelFactory,
-                categoriesViewModelFactory = categoriesViewModelFactory,
-                searchViewModelFactory = searchViewModelFactory,
-                profileViewModelFactory = profileViewModelFactory
-            )
+        if (isInternetAvailable) {
+            Box(modifier = Modifier.padding(paddingValues)) {
+                AppNavigation(
+                    navController = navController,
+                    homeViewModelFactory = homeViewModelFactory,
+                    brandProductsViewModelFactory = brandProductsViewModelFactory,
+                    categoriesViewModelFactory = categoriesViewModelFactory,
+                    searchViewModelFactory = searchViewModelFactory,
+                    profileViewModelFactory = profileViewModelFactory
+                )
+            }
+        } else {
+            NoInternetScreen()
         }
     }
 }
