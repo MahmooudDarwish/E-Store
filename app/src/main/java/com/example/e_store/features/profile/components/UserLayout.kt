@@ -29,15 +29,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun UserLayout(navHostController: NavHostController) {
-    Image(
-        painter = painterResource(id = R.drawable.logo),
-        contentDescription = "Profile Avatar",
-        modifier = Modifier
-            .size(100.dp)
-            .clip(CircleShape)
-    )
-    Gap(height = 10)
-
     Text(
         text = stringResource(
             id = R.string.hello_user,
