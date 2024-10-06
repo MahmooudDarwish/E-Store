@@ -25,21 +25,12 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     val confirmPassword = _confirmPassword
     val isProgressing = mutableStateOf(false)
 
-    //    var nameError: Boolean = true
-//    var phoneError: Boolean = true
-//    var emailError: Boolean = true
-//    var passwordError: Boolean = true
-//    var confirmPasswordError: Boolean = true
     private val _nameError = mutableStateOf(true)
     private val _phoneError = mutableStateOf(true)
     private val _emailError = mutableStateOf(true)
     private val _passwordError = mutableStateOf(true)
     private val _confirmPasswordError = mutableStateOf(true)
-//    val nameError = _nameError
-//    val phoneError = _phoneError
-//    val emailError = _emailError
-//    val passwordError = _passwordError
-//    val confirmPasswordError = _confirmPasswordError
+
 
     fun onNameChanged(newValue: String) {
         _name.value = newValue
@@ -158,9 +149,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                 false
             }
 
-            else -> {
-                true
-            }
+            else -> true
+
 
         }
     }
@@ -284,43 +274,53 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
         }
     }
 
-    fun checkIfEmailVerified(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit) {
-        isProgressing.value = true
-        val user = auth.currentUser
-        user?.reload()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                if (user.isEmailVerified) {
-                    Toast.makeText(context, "Email is verified", Toast.LENGTH_SHORT).show()
-                    signInUser(context, onAuthSuccess, onError)
-                } else {
-                    Toast.makeText(context, "Email not verified. Please check your inbox.", Toast.LENGTH_SHORT).show()
-                    isProgressing.value = false
-                }
-            } else {
-                isProgressing.value = false
-            }
-        }
-    }
-    private fun signInUser(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit) {
-
-        if (checkSignInTextValues(context)) {
-            Log.d("passwordLog", "Password1: ${_password.value}")
-            auth.signInWithEmailAndPassword(_email.value, _password.value)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d("passwordLog", "Password2: ${_password.value}")
-                        isProgressing.value = false
-                        onAuthSuccess()
-                    } else {
-                        Log.d("passwordLog", "Password3: ${_password.value}")
-                        onError(task.exception?.localizedMessage ?: "Login failed")
-                        isProgressing.value = false
-                    }
-                }
-        } else {
+    fun signInAndCheckEmailVerification(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit) {
+        if (!checkSignInTextValues(context)) {
             isProgressing.value = false
+            return
         }
+
+        isProgressing.value = true
+        Log.d("signInAndCheckEmailVerification", "Signing in user")
+
+        // Sign in the user first
+        auth.signInWithEmailAndPassword(_email.value, _password.value)
+            .addOnCompleteListener { task ->
+                isProgressing.value = false  // Always reset the loading state
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    Log.d("signInAndCheckEmailVerification", "Sign-in successful, checking email verification")
+
+                    // Now check if the email is verified
+                    user?.reload()?.addOnCompleteListener { reloadTask ->
+                        if (reloadTask.isSuccessful) {
+                            if (user.isEmailVerified) {
+                                Log.d("signInAndCheckEmailVerification", "Email is verified")
+                                onAuthSuccess()
+                            } else {
+                                Log.d("signInAndCheckEmailVerification", "Email not verified")
+                                Toast.makeText(context, "Email not verified. Please check your inbox.", Toast.LENGTH_SHORT).show()
+                                onError("Email not verified")
+                            }
+                        } else {
+                            Log.e("signInAndCheckEmailVerification", "Failed to reload user: ${reloadTask.exception?.message}")
+                            onError(reloadTask.exception?.localizedMessage ?: "Failed to reload user")
+                        }
+                    }?.addOnFailureListener { exception ->
+                        isProgressing.value = false
+                        onError(exception.localizedMessage ?: "Failed to reload user")
+                    }
+                } else {
+                    Log.e("signInAndCheckEmailVerification", "Sign-in failed: ${task.exception?.message}")
+                    onError(task.exception?.localizedMessage ?: "Login failed")
+                }
+            }
+            .addOnFailureListener { exception ->
+                isProgressing.value = false
+                onError(exception.localizedMessage ?: "Login failed")
+            }
     }
+
 
     fun handleGuestModeSignIn(context: Context) {
         isProgressing.value = true
