@@ -19,4 +19,5 @@ object ProductDetails {
     var sizes: List<String> = listOf("S", "M", "L", "XL")
     var variants: List<Variant> = listOf()
 
+
 }

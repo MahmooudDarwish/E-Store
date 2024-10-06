@@ -20,7 +20,9 @@ import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 
 class LandingScreen : ComponentActivity() {
 
@@ -36,30 +38,34 @@ class LandingScreen : ComponentActivity() {
     private val searchViewModelFactory by lazy { SearchViewModelFactory(repo) }
     private val categoriesViewModelFactory by lazy { CategoriesViewModelFactory(repo) }
     private val profileViewModelFactory by lazy { ProfileViewModelFactory(repo) }
+    private val productInfoViewModelFactory by lazy { ProductInfoViewModelFactory(repo) }
+    private val shoppingCartViewModelFactory by lazy { ShoppingCartViewModelFactory(repo) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                    Surface {
-                        val navController = rememberNavController()
-                        NavHost(navController, startDestination = Screen.Splash.route) {
-                            composable(Screen.Splash.route) { SplashLottie(navController) }
-                            composable(Screen.Home.route) {
-                                MainHomeScreen(
-                                    homeViewModelFactory = homeViewModelFactory,
-                                    brandProductsViewModelFactory = brandProductsViewModelFactory,
-                                    categoriesViewModelFactory = categoriesViewModelFactory,
-                                    searchViewModelFactory = searchViewModelFactory,
-                                    profileViewModelFactory = profileViewModelFactory,
-                                )
-                            }
-                            composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
-                            composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
+                Surface {
+                    val navController = rememberNavController()
+                    NavHost(navController, startDestination = Screen.Splash.route) {
+                        composable(Screen.Splash.route) { SplashLottie(navController) }
+                        composable(Screen.Home.route) {
+                            MainHomeScreen(
+                                homeViewModelFactory = homeViewModelFactory,
+                                brandProductsViewModelFactory = brandProductsViewModelFactory,
+                                categoriesViewModelFactory = categoriesViewModelFactory,
+                                searchViewModelFactory = searchViewModelFactory,
+                                profileViewModelFactory = profileViewModelFactory,
+                                productInfoViewModelFactory = productInfoViewModelFactory,
+                                shoppingCartViewModelFactory = shoppingCartViewModelFactory
+                            )
                         }
+                        composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
+                        composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
                     }
                 }
+            }
         }
     }
 }

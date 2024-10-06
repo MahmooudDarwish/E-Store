@@ -38,12 +38,13 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.e_store.R
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
 import com.example.e_store.utils.shared_components.ElevationCard
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun ShoppingCartScreen() {
+fun ShoppingCartScreen ( viewModel: ShoppingCartViewModel) {
     val cartItems =
         remember { mutableStateListOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") }
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.addtocart))
@@ -275,8 +276,4 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewCardItemRow() {
-    ShoppingCartScreen()
-}
+
