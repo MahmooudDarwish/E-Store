@@ -24,6 +24,7 @@ import com.example.e_store.features.categories.components.SelectedChipsSection
 import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.utils.constants.Keys
+import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
@@ -130,7 +131,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                 ProductsStateHandler(
                     productsUiState = categoriesProductsUiState,
                     navController = navController,
-                    route = "", /// TODO: add route to product info @MahmoudDariwsh @kk98989898
+                    route = NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, /// TODO: add route to product info @MahmoudDariwsh @kk98989898
                     filterProducts = ::filterProducts
                 )
             }

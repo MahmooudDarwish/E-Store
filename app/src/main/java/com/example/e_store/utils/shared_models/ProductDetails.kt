@@ -2,6 +2,9 @@ package com.example.e_store.utils.shared_models
 
 object ProductDetails {
 
+
+
+    var id :Long = 0L
     var title: String = "Product Name"
     var vendor: String = "Vendor Name"
     var price: String = "Price"

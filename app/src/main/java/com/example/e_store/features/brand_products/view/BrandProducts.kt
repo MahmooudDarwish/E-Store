@@ -16,6 +16,7 @@ import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.ui.theme.PrimaryColor
+import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
@@ -74,7 +75,7 @@ fun BrandProducts(
         ProductsStateHandler(
             productsUiState = brandProductsUiState,
             navController = navController,
-            route = "",   /// TODO: add route to product info @MahmoudDariwsh @kk98989898
+            route = NavigationKeys.PRODUCT_INFO_HOME_ROUTE,   /// TODO: add route to product info @MahmoudDariwsh @kk98989898
             filterProducts = ::filterProducts
         )
     }

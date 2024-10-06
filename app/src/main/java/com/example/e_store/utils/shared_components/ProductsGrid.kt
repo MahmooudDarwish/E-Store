@@ -11,8 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_components.RoundedRectangleItem
+import com.example.e_store.utils.shared_methods.initializeProductDetails
 import com.example.e_store.utils.shared_models.Product
 
 @Composable
@@ -32,7 +34,9 @@ fun ProductsGrid(
                 modifier = Modifier.padding(bottom = 10.dp)
             ) {
                 RoundedRectangleItem(product = product, onClick = {
-                    ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898})
+                    initializeProductDetails(product)
+                    navController.navigate(route)
+
                 })
             }
         }

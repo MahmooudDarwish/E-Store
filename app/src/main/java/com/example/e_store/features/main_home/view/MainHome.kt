@@ -20,6 +20,7 @@ import com.example.e_store.features.brand_products.view_model.BrandProductsViewM
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.AppNavigation
 import com.example.e_store.utils.navigation.Screen
@@ -29,7 +30,9 @@ import com.example.e_store.utils.navigation.Screen
 fun MainHomeScreen(
     homeViewModelFactory: HomeViewModelFactory,
     brandProductsViewModelFactory: BrandProductsViewModelFactory,
+    searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory
+
 ) {
     val items = listOf(
         Screen.Home,
@@ -70,7 +73,7 @@ fun MainHomeScreen(
 
         },
         bottomBar = {
-            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route)) {
+            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route) || currentRoute.startsWith(Screen.Categories.route)) {
                 BottomNavigationBar(
                     items = items,
                     currentRoute = selectedRoute,
@@ -81,10 +84,11 @@ fun MainHomeScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             AppNavigation(
-                navController = navController,
-                homeViewModelFactory = homeViewModelFactory,
-                brandProductsViewModelFactory = brandProductsViewModelFactory,
-                categoriesViewModelFactory = categoriesViewModelFactory
+                navController,
+                homeViewModelFactory,
+                brandProductsViewModelFactory,
+                searchViewModelFactory,
+                categoriesViewModelFactory
             )
         }
     }
