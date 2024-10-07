@@ -14,6 +14,7 @@ object NavigationKeys {
     const val SIGN_IN_ROUTE = "sign_in"
     const val BRANDS_ROUTE = "home/brands"
     const val PRODUCT_INFO_HOME_ROUTE = "home/product_info"
+    const val ORDERS_ROUTE = "profile/orders"
 
 
     // Passed Values

@@ -1,11 +1,9 @@
 package com.example.e_store.utils.shared_components
 
 import android.widget.Toast
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
@@ -17,8 +15,6 @@ fun ProductsStateHandler(
     route: String,
     filterProducts: (List<Product>) -> List<Product>
 ) {
-
-
 
     when (productsUiState) {
         DataState.Loading -> {
@@ -44,5 +40,3 @@ fun ProductsStateHandler(
         }
     }
 }
-
-

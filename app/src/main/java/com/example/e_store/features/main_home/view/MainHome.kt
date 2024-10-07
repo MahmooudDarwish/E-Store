@@ -22,6 +22,7 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.utils.shared_components.NoInternetScreen
 import com.example.weather.utils.managers.InternetChecker
@@ -35,7 +36,8 @@ fun MainHomeScreen(
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
-    profileViewModelFactory: ProfileViewModelFactory
+    profileViewModelFactory: ProfileViewModelFactory,
+    ordersViewModelFactory : OrdersViewModelFactory
 ) {
     val items = listOf(
         Screen.Home,
@@ -96,7 +98,8 @@ fun MainHomeScreen(
                 (currentRoute in items.map { it.route }
                         || currentRoute.startsWith(Screen.Home.route)
                         || currentRoute.startsWith(Screen.Categories.route)
-                        || currentRoute.startsWith(Screen.Cart.route))) {
+                        || currentRoute.startsWith(Screen.Cart.route)
+                        || currentRoute.startsWith(Screen.Profile.route))) {
 
                     BottomNavigationBar(
                         items = items,
@@ -117,7 +120,9 @@ fun MainHomeScreen(
                             searchViewModelFactory = searchViewModelFactory,
                             profileViewModelFactory = profileViewModelFactory,
                             productInfoViewModelFactory = productInfoViewModelFactory,
-                            shoppingCartViewModelFactory = shoppingCartViewModelFactory
+                            shoppingCartViewModelFactory = shoppingCartViewModelFactory,
+                            ordersViewModelFactory = ordersViewModelFactory,
+
                         )
                     }
                 } else {

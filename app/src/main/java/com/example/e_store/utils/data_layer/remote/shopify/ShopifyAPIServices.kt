@@ -1,5 +1,6 @@
 package com.example.e_store.utils.data_layer.remote.shopify
 
+import OrderResponse
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.shared_models.ProductResponse
 import com.example.e_store.utils.shared_models.SmartCollectionsResponse
@@ -39,7 +40,10 @@ interface ShopifyAPIServices {
         @Path(APIKeys.PRICE_RULE_ID_PARAM) priceRuleId: Long
     ): DiscountCodesResponse
 
-
+    @GET(APIKeys.ORDERS_ENDPOINT)
+    suspend fun fetchOrders(
+        @Query(APIKeys.STATUS_PARAM) status: String? = null
+    ): OrderResponse
 
 
     //shop cart draft order

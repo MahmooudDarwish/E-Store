@@ -20,6 +20,7 @@ import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
@@ -40,6 +41,7 @@ class LandingScreen : ComponentActivity() {
     private val profileViewModelFactory by lazy { ProfileViewModelFactory(repo) }
     private val productInfoViewModelFactory by lazy { ProductInfoViewModelFactory(repo) }
     private val shoppingCartViewModelFactory by lazy { ShoppingCartViewModelFactory(repo) }
+    private val ordersViewModelFactory by lazy { OrdersViewModelFactory(repo) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +60,8 @@ class LandingScreen : ComponentActivity() {
                                 searchViewModelFactory = searchViewModelFactory,
                                 profileViewModelFactory = profileViewModelFactory,
                                 productInfoViewModelFactory = productInfoViewModelFactory,
-                                shoppingCartViewModelFactory = shoppingCartViewModelFactory
+                                shoppingCartViewModelFactory = shoppingCartViewModelFactory,
+                                ordersViewModelFactory = ordersViewModelFactory
                             )
                         }
                         composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }

@@ -1,6 +1,5 @@
 package com.example.e_store.utils.data_layer.remote.shopify
 
-import com.airbnb.lottie.compose.BuildConfig
 import com.example.e_store.utils.constants.APIKeys
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -23,11 +22,11 @@ object ShopifyRetrofitHelper {
         val clientBuilder = OkHttpClient.Builder()
             .addInterceptor(headerInterceptor)
 
-        if (BuildConfig.DEBUG) {
-            val logging = HttpLoggingInterceptor()
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-            clientBuilder.addInterceptor(logging)
-        }
+
+        val logging = HttpLoggingInterceptor()
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        clientBuilder.addInterceptor(logging)
+
 
         val client = clientBuilder.build()
 

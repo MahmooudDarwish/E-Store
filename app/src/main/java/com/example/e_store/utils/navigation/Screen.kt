@@ -17,6 +17,9 @@ import com.example.e_store.features.categories.view.CategoriesScreen
 import com.example.e_store.features.home.view.HomeScreen
 import com.example.e_store.features.home.view_model.HomeViewModel
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
+import com.example.e_store.features.orders.view.OrdersScreen
+import com.example.e_store.features.orders.view_model.OrdersViewModel
+import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.product_info.view.ProductInfoScreen
 import com.example.e_store.features.profile.view.ProfileScreen
 import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
@@ -41,7 +44,7 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
         fun createRoute(brand: String) = "$route/$brand"
     }
 
-
+    object Orders : Screen(NavigationKeys.ORDERS_ROUTE, R.string.orders_title, 0)
     object SignUp : Screen(NavigationKeys.SIGN_UP_ROUTE, R.string.sign_up, 0)
     object SignIn : Screen(NavigationKeys.SIGN_IN_ROUTE, R.string.sign_in, 0)
     object Categories :
@@ -52,16 +55,10 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Profile :
         Screen(NavigationKeys.PROFILE_ROUTE, R.string.profile_title, R.drawable.ic_person)
-
-    object ProductInfoFromCategories :
-        Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
-
-    object ProductInfoFromHome :
-        Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
-
+    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
+    object ProductInfoFromCategories : Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
     object Search_From_Home : Screen(NavigationKeys.SEARCH_HOME_ROUTE, R.string.search, 0)
-    object Search_From_Categories :
-        Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
+    object Search_From_Categories : Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
 
 }
 
@@ -74,7 +71,8 @@ fun AppNavigation(
     categoriesViewModelFactory: CategoriesViewModelFactory,
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
-    profileViewModelFactory: ProfileViewModelFactory
+    profileViewModelFactory: ProfileViewModelFactory,
+    ordersViewModelFactory: OrdersViewModelFactory
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -85,13 +83,10 @@ fun AppNavigation(
             val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
             CategoriesScreen(viewModel = viewModel, navController = navController)
         }
-
-
         composable(route = Screen.Profile.route) {
             val viewModel: ProfileViewModel = viewModel(factory = profileViewModelFactory)
             ProfileScreen(viewModel = viewModel, navController = navController)
         }
-
 
         composable(
             route = "${NavigationKeys.BRANDS_ROUTE}/{${NavigationKeys.BRAND_ID}}",
@@ -122,6 +117,10 @@ fun AppNavigation(
         composable(route = Screen.Search_From_Categories.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             SearchScreen(viewModel, navController)
+        }
+        composable(route = Screen.Orders.route) {
+            val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
+            OrdersScreen(viewModel = viewModel, navController = navController)
         }
 
         composable(route = Screen.SignIn.route) { SignInScreen(navController) }

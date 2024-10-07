@@ -1,5 +1,6 @@
 package com.example.e_store.utils.data_layer.remote
 
+import Order
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
 import com.example.e_store.utils.shared_models.Brand
@@ -40,6 +41,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         val response = apiService.fetchProducts().products
         return flowOf(response)
     }
+
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return try {
             val customCollections = fetchCustomCollections()
@@ -75,7 +77,8 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                 }
 
                 for (collection in filteredCollections) {
-                    val products = apiService.fetchProducts(collectionId = collection.id.toString()).products
+                    val products =
+                        apiService.fetchProducts(collectionId = collection.id.toString()).products
 
                     val uniqueProducts = products.filter { product ->
                         product.id !in productIdsSet
@@ -95,7 +98,6 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             flowOf(emptyList())
         }
     }
-
 
 
     override suspend fun fetchCustomCollections(): Flow<List<CustomCollection>> {
@@ -143,19 +145,18 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
 
-
-
     override suspend fun createDraftOrder(shoppingCartDraftOrder: DraftOrderRequest) {
         Log.d(TAG, "createShoppingCartDraftOrder: $shoppingCartDraftOrder")
-         apiService.createDraftOrder(shoppingCartDraftOrder)
+        apiService.createDraftOrder(shoppingCartDraftOrder)
     }
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
         shoppingCartDraftOrder: DraftOrderRequest
     ) {
-         apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
+        apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
+
     override suspend fun removeDraftOrder(draftOrderId: Long) {
         apiService.removeDraftDraftOrder(draftOrderId)
     }
@@ -169,6 +170,17 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             val response = apiService.fetchAllDraftOrders()
             emit(response)
         }
+    }
+
+    override suspend fun fetchAllOrders(email: String): Flow<List<Order>> {
+
+        val response = apiService.fetchOrders().orders
+
+
+        val filteredOrders = response.filter {
+            it.email == "moabdelraheem19@gmail.com"   //change it paramters email
+        }
+        return flowOf(filteredOrders)
     }
 
 

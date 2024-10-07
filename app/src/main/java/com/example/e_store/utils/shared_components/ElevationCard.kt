@@ -19,9 +19,11 @@ fun ElevationCard(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
+            containerColor = Color.White,
         ),
     ) {
         content()
     }
 }
+
+

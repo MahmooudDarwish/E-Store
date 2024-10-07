@@ -1,5 +1,6 @@
 package com.example.e_store.utils.data_layer
 
+import Order
 import android.util.Log
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.shared_models.Brand
@@ -82,6 +83,10 @@ class EStoreRepositoryImpl private constructor(
 
     override suspend fun fetchAllDraftOrders(): Flow<DraftOrderResponse> {
         return eStoreRemoteDataSource.fetchAllDraftOrders()
+    }
+
+    override suspend fun fetchAllOrders(email: String): Flow<List<Order>> {
+        return eStoreRemoteDataSource.fetchAllOrders(email = email)
     }
 
 

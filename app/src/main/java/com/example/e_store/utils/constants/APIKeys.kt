@@ -27,6 +27,7 @@ object APIKeys {
 
     const val DRAFT_ORDERS_ENDPOINT = "draft_orders.json"
     const val ORDERS_DRAFT_ORDER_ID_ENDPOINT = "draft_orders/{draft_order_id}.json"
+    const val ORDERS_ENDPOINT = "orders.json"
 
 
 
@@ -37,6 +38,7 @@ object APIKeys {
     const val PRODUCT_TYPE_PARAM = "product_type"
     const val COLLECTION_ID_PARAM = "collection_id"
     const val DRAFT_ORDER_ID_PARAM = "draft_order_id" //{draft_order_id} for SHOP_CART_DRAFT_ORDERS_ENDPOINT
+    const val STATUS_PARAM = "status"
 
 
 
