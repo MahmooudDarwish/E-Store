@@ -176,11 +176,14 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
         val response = apiService.fetchOrders().orders
 
-
         val filteredOrders = response.filter {
-            it.email == "moabdelraheem19@gmail.com"   //change it paramters email
+            it.email == email
         }
         return flowOf(filteredOrders)
+    }
+
+    override suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long) {
+        apiService.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
     }
 
 

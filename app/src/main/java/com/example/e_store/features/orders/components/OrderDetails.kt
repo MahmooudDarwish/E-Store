@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.e_store.utils.constants.Keys
+import com.example.e_store.utils.shared_models.UserSession
 
 @Composable
 fun OrderDetails(order: Order) {
@@ -26,7 +28,7 @@ fun OrderDetails(order: Order) {
 
         HorizontalDivider()
         Text(
-            text = "Customer Name",   // TODO: Replace with actual user session name
+            text = UserSession.name!!,
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Bold
             ),
@@ -41,7 +43,7 @@ fun OrderDetails(order: Order) {
         ) {
             order.line_items?.forEach { lineItem ->
                 lineItem.properties?.forEach { property ->
-                    if (property.name == "imageUrl") {
+                    if (property.name == Keys.IMAGE_URL_KEY) {
                         item {
                             AsyncImage(
                                 model = property.value,

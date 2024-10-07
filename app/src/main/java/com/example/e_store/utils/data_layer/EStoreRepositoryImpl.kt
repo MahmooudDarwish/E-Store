@@ -17,17 +17,18 @@ class EStoreRepositoryImpl private constructor(
     private var eStoreLocalDataSource: EStoreLocalDataSource,
 ) : EStoreRepository {
 
-    private  val TAG = "EShopRepositoryImpl"
+    private val TAG = "EShopRepositoryImpl"
 
-    companion object{
+    companion object {
         private var instance: EStoreRepositoryImpl? = null
         fun getInstance(
             moviesRemoteDataSource: EStoreRemoteDataSource,
             moviesLocalDataSource: EStoreLocalDataSource
         ): EStoreRepositoryImpl {
-            return instance ?: synchronized(this){
+            return instance ?: synchronized(this) {
                 val temp = EStoreRepositoryImpl(
-                    moviesRemoteDataSource, moviesLocalDataSource)
+                    moviesRemoteDataSource, moviesLocalDataSource
+                )
                 instance = temp
                 temp
             }
@@ -38,6 +39,7 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun fetchBrands(): Flow<List<Brand>> {
         return eStoreRemoteDataSource.fetchBrands()
     }
+
     override suspend fun fetchCustomCollections(): Flow<List<CustomCollection>> {
         return eStoreRemoteDataSource.fetchCustomCollections()
     }
@@ -53,11 +55,12 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
         return eStoreRemoteDataSource.fetchForUProducts()
     }
+
     override suspend fun fetchProducts(): Flow<List<Product>> {
         return eStoreRemoteDataSource.fetchProducts()
     }
 
-    override suspend fun fetchDiscountCodes( ): Flow<List<DiscountCodesResponse>?> {
+    override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?> {
         return eStoreRemoteDataSource.fetchDiscountCodes()
     }
 
@@ -87,6 +90,10 @@ class EStoreRepositoryImpl private constructor(
 
     override suspend fun fetchAllOrders(email: String): Flow<List<Order>> {
         return eStoreRemoteDataSource.fetchAllOrders(email = email)
+    }
+
+    override suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long) {
+        eStoreRemoteDataSource.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
     }
 
 

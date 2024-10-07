@@ -45,6 +45,11 @@ interface ShopifyAPIServices {
         @Query(APIKeys.STATUS_PARAM) status: String? = null
     ): OrderResponse
 
+    @PUT(APIKeys.COMPLETE_DRAFT_ORDERS_ENDPOINT)
+    fun updateDraftOrderToCompleteDraftOrder(
+        @Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long
+    )
+
 
     //shop cart draft order
     @POST(APIKeys.DRAFT_ORDERS_ENDPOINT)

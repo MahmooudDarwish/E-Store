@@ -9,4 +9,6 @@ object Keys {
     const val T_SHIRTS_KEY = "T-SHIRTS"
     const val SHOES_KEY = "SHOES"
 
+    const val IMAGE_URL_KEY = "imageUrl"
+
 }
