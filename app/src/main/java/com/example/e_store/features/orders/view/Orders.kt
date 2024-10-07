@@ -20,6 +20,7 @@ import com.example.e_store.features.orders.components.OrdersHeader
 import com.example.e_store.features.orders.view_model.OrdersViewModel
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
+import com.example.e_store.utils.shared_components.LottieWithText
 import com.example.e_store.utils.shared_models.DataState
 
 
@@ -52,10 +53,14 @@ fun OrdersScreen(viewModel: OrdersViewModel, navController: NavHostController) {
                 val orders = (ordersUiState as DataState.Success).data
                 LazyColumn {
                     if (orders.isEmpty()) {
-                        item { Text(text = "No Orders yet") }
+                        item {
+                            LottieWithText(
+                                displayText = stringResource(id = R.string.no_orders_message),
+                                lottieRawRes = R.raw.no_data_found
+                            )
+                        }
                     } else {
                         items(orders.size) { index ->
-
                             OrderItem(order = orders[index])
                         }
                     }

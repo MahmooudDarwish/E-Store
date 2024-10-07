@@ -78,5 +78,9 @@
     <string name="login_failed_error">Login failed</string>
     <string name="guest_user">Guest User</string>
     <string name="orders_title">Orders</string>
+    <string name="no_orders_message">You don\'t have any orders yet.</string>
+    <string name="no_products_message">No Products Found.</string>
+    <string name="no_products_shopping_message">There\'s no Products added to Shopping cart.</string>
+
 
 </resources>

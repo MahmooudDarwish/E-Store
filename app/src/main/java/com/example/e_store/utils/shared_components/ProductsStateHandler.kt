@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.example.e_store.R
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
 
@@ -24,11 +26,19 @@ fun ProductsStateHandler(
 
         is DataState.Success -> {
             val brandProducts = productsUiState.data
-            ProductsGrid(
-                navController = navController,
-                route = route,
-                products = filterProducts(brandProducts)
-            )
+            if (filterProducts.invoke(brandProducts).isEmpty()) {
+                LottieWithText(
+                    displayText = stringResource(id = R.string.no_products_message),
+                    lottieRawRes = R.raw.no_data_found
+                )
+            } else {
+                ProductsGrid(
+                    navController = navController,
+                    route = route,
+                    products = filterProducts(brandProducts)
+                )
+            }
+
         }
 
         is DataState.Error -> {
