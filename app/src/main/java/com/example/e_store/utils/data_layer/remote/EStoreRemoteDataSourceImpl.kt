@@ -14,6 +14,8 @@ import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
+import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.SingleProductResponse
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
@@ -170,6 +172,9 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             val response = apiService.fetchAllDraftOrders()
             emit(response)
         }
+    }
+    override suspend fun fetchProduct(productId: Long): SingleProductResponse {
+        return apiService.fetchProduct(productId)
     }
 
     override suspend fun fetchAllOrders(email: String): Flow<List<Order>> {

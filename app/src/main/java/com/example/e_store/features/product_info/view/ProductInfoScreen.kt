@@ -1,6 +1,7 @@
 package com.example.e_store.features.product_info.view
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -74,6 +75,7 @@ fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoVi
     val allReviewsVisible by viewModel.allReviewsVisible
     val favoriteIcon by viewModel.favoriteIcon
     val context = LocalContext.current
+    viewModel.fetchAllDraftOrders()
 
     var showQuantityDialog by remember { mutableStateOf(false) }
     var quantityInput by remember { mutableStateOf(TextFieldValue("1")) }
@@ -335,11 +337,11 @@ fun createDraftOrderItems(
     // Extract price and variantId from the found variant
     val price = variant?.price
     val variantId = variant?.id
-
-    if (price != null && variantId != null) {
-        val properties: List<Property> = listOf(
+    if (price != null && variantId != null ) {
+            val properties: List<Property> = listOf(
             Property("Size", selectedSize),    // Capitalized "Size"
             Property("Color", selectedColor),  // Capitalized "Color"
+            Property("imageUrl", ProductDetails.images[0])
         )
 
         // Create a line item and add it to the list
