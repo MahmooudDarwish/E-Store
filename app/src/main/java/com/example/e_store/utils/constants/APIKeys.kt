@@ -21,10 +21,7 @@ object APIKeys {
 
     const val PRICING_RULES_ENDPOINT = "price_rules.json"
     const val DISCOUNT_CODES_ENDPOINT = "price_rules/{price_rule_id}/discount_codes.json"
-
-
-
-
+    const val COMPLETE_DRAFT_ORDERS_ENDPOINT = "draft_orders/{draft_order_id}/complete.json"
     const val DRAFT_ORDERS_ENDPOINT = "draft_orders.json"
     const val ORDERS_DRAFT_ORDER_ID_ENDPOINT = "draft_orders/{draft_order_id}.json"
     const val ORDERS_ENDPOINT = "orders.json"

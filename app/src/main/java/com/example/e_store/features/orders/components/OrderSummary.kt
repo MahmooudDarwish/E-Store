@@ -33,7 +33,7 @@ fun OrderSummary(order: Order, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "${order.current_total_price} USD",
+                text = "${order.current_total_price} USD", ///TODO change currency
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold
                 )

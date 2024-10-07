@@ -38,4 +38,6 @@ interface EStoreRemoteDataSource {
 
     suspend fun fetchAllOrders(email: String): Flow<List<Order>>
 
+    suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long)
+
 }
