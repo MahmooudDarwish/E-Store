@@ -1,5 +1,6 @@
 package com.example.e_store.utils.data_layer.remote
 
+import Order
 import com.example.e_store.utils.shared_models.Brand
 import kotlinx.coroutines.flow.Flow
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
@@ -25,7 +26,7 @@ interface EStoreRemoteDataSource {
 
     suspend fun updateDraftOrder(
         draftOrderId: Long,
-         shoppingCartDraftOrder: DraftOrderRequest
+        shoppingCartDraftOrder: DraftOrderRequest
     )
 
     suspend fun fetchDraftOrderByID(draftOrderId: Long): DraftOrderResponse
@@ -35,5 +36,6 @@ interface EStoreRemoteDataSource {
     suspend fun fetchAllDraftOrders(
     ): Flow<DraftOrderResponse>
 
+    suspend fun fetchAllOrders(email: String): Flow<List<Order>>
 
 }
