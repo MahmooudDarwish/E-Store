@@ -11,6 +11,8 @@ import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
 import com.example.e_store.utils.shared_models.DraftOrderRequest
+import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.SingleProductResponse
 
 class EStoreRepositoryImpl private constructor(
     private var eStoreRemoteDataSource: EStoreRemoteDataSource,
@@ -94,6 +96,11 @@ class EStoreRepositoryImpl private constructor(
 
     override suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long) {
         eStoreRemoteDataSource.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
+    }
+
+    override suspend fun fetchProduct(productId: Long): SingleProductResponse {
+        return eStoreRemoteDataSource.fetchProduct(productId)
+
     }
 
 

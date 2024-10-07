@@ -17,6 +17,9 @@
     <string name="sign_in">Sign in</string>
     <string name="brand_products">Brand Products</string>
 
+    <!-- String for insufficient stock -->
+    <string name="insufficient_stock">Insufficient stock to add more of this item.</string>
+
     <string name="category_men">Men</string>
     <string name="category_women">Women</string>
     <string name="category_kid">Kid</string>
@@ -77,6 +80,7 @@
     <string name="failed_to_reload_user_error">Failed to reload user</string>
     <string name="login_failed_error">Login failed</string>
     <string name="guest_user">Guest User</string>
+    <string name="maximum_quantity_reached">Maximum quantity reached</string>
     <string name="orders_title">Orders</string>
     <string name="no_orders_message">You don\'t have any orders yet.</string>
     <string name="no_products_message">No Products Found.</string>

@@ -8,6 +8,8 @@ import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
+import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.SingleProductResponse
 
 interface EStoreRemoteDataSource {
     suspend fun fetchBrands(): Flow<List<Brand>>
@@ -19,6 +21,9 @@ interface EStoreRemoteDataSource {
 
     //fetch all products
     suspend fun fetchProducts(): Flow<List<Product>>
+
+    suspend fun fetchProduct(productId: Long): SingleProductResponse
+
 
 
     //shop cart draft order

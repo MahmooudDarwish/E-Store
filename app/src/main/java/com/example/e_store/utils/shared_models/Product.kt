@@ -3,6 +3,10 @@ package com.example.e_store.utils.shared_models
 import com.google.gson.annotations.SerializedName
 data class ProductResponse(
     val products: List<Product>
+
+)
+data class  SingleProductResponse(
+    val product: Product
 )
 
 data class Product(

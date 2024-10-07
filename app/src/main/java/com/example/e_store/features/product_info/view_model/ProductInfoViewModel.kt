@@ -2,27 +2,27 @@ package com.example.e_store.features.product_info.view_model
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.e_store.utils.data_layer.EStoreRepository
+import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.LineItem
+import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.shared_models.LineItem
-import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
+
 class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel() {
 
-    init {
-        fetchAllDraftOrders()
-    }
 
     private val product = ProductDetails // Load your product data here.
 
@@ -46,6 +46,10 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     private val _draftOrderItems =
         MutableStateFlow<DataState<DraftOrderResponse>>(DataState.Loading)
     private val _customerDraftOrders = MutableStateFlow<List<DraftOrderDetails>>(emptyList())
+    private val _customerDraftOrdersFavorite =
+        MutableStateFlow<List<DraftOrderDetails>>(emptyList())
+    private val _customerDraftOrdersShoppingCart =
+        MutableStateFlow<List<DraftOrderDetails>>(emptyList())
 
     init {
         // Initialize the ViewModel with the first variant's details.
@@ -109,12 +113,8 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
     }
 
-    fun filterDraftOrdersByCustomerEmail(
-        draftOrderResponse: DraftOrderResponse,
-        email: String
-    ) {
-        _customerDraftOrders.value =
-            draftOrderResponse.draft_orders.filter { it.email == email }
+    fun filterDraftOrdersByCustomerEmail(draftOrderResponse: DraftOrderResponse, email: String) {
+        _customerDraftOrders.value = draftOrderResponse.draft_orders.filter { it.email == email }
     }
 
     fun filterCustomerDraftOrdersByProductIDAndVariantID(
@@ -137,7 +137,17 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     }
 
     fun filterCustomerDraftOrdersType(isFavorite: Boolean) {
+        when (isFavorite) {
+            true -> {
+                _customerDraftOrdersFavorite.value =
+                    _customerDraftOrders.value.filter { it.note == "Favorite" }
+            }
 
+            false -> {
+                _customerDraftOrdersShoppingCart.value =
+                    _customerDraftOrders.value.filter { it.note == "Shopping Cart" }
+            }
+        }
     }
 
 
@@ -148,14 +158,21 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     ) {
         val note = if (isFavorite) "Favorite" else "Shopping Cart"
         fetchAllDraftOrders()
+        filterCustomerDraftOrdersType(isFavorite)
 
         viewModelScope.launch {
             delay(4000)
         }
 
-        if (_customerDraftOrders.value.isNotEmpty()) {
+        val draftOrders = when (isFavorite) {
+            true -> {
+                _customerDraftOrdersFavorite.value }
+            false -> {
+                _customerDraftOrdersShoppingCart.value }
+        }
 
-            val existingDraftOrder = _customerDraftOrders.value.first()
+        if (draftOrders.isNotEmpty()) {
+            val existingDraftOrder = draftOrders.first()
             if (existingDraftOrder.line_items.isNotEmpty()) {
                 val existingLineItems = filterCustomerDraftOrdersByProductIDAndVariantID(
                     productID,
@@ -192,7 +209,8 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
 
 
 
-            lineItemList.addAll(existingDraftOrder.line_items)
+            lineItemList.addAll( existingDraftOrder.line_items)
+
 
 
             val cartDraftOrder = UserSession.email?.let {
@@ -219,7 +237,7 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
             Log.d("ProductInfoViewModel", "Update item to draft order: $lineItemList")
 
 
-        } else {
+        }else{
 
             val cartDraftOrder = UserSession.email?.let {
                 DraftOrderDetails(
@@ -246,6 +264,8 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
 
 
+
+
         //_cartItems.add(newItem)
     }
 
@@ -259,7 +279,6 @@ private fun <E> MutableList<E>.addAll(elements: List<E?>) {
         }
     }
 }
-
 
 
 

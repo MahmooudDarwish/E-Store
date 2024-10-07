@@ -1,5 +1,7 @@
 package com.example.e_store.features.shopping_cart.view
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,18 +41,31 @@ import com.example.e_store.R
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
 import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_components.LottieWithText
+import com.example.e_store.utils.shared_models.LineItem
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun ShoppingCartScreen(viewModel: ShoppingCartViewModel) {
-    val cartItems =
-        remember { mutableStateListOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5") }
+fun ShoppingCartScreen ( viewModel: ShoppingCartViewModel) {
+    //viewModel.fetchShoppingCartItems()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchShoppingCartItems()
+    }
+
+    viewModel.fetchCustomerShoppingCartDraftOrders()
+    val draftOrderItems by viewModel.shoppingCartItems.collectAsState()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.addtocart))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever // Loop the animation infinitely
+    )
 
     var showAllItems by remember { mutableStateOf(false) }
 
-    if (cartItems.isEmpty()) {
+
+    if (draftOrderItems.isEmpty()) {
         LottieWithText(
             displayText = stringResource(id = R.string.no_products_shopping_message),
             lottieRawRes = R.raw.no_data_found
@@ -60,26 +77,30 @@ fun ShoppingCartScreen(viewModel: ShoppingCartViewModel) {
                 .fillMaxSize()
                 .background(Color.White),
         ) {
-            val displayedItems = if (showAllItems) cartItems else cartItems.take(2)
-
+            val displayedItems = if (showAllItems) draftOrderItems else draftOrderItems.take(2)
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(displayedItems) { item ->
-                    SwipeableItem(item) { deletedItem ->
-                        cartItems.remove(deletedItem)
+                    SwipeableItem(viewModel,item) { deletedItem ->
+                        deletedItem.product_id?.let { viewModel.removeShoppingCartDraftOrder(it, deletedItem.variant_id.toLong()) }
+                        // Here, you would update your ViewModel to handle the deletion of an item
+                        //viewModel.removeItemFromDraftOrder(deletedItem)
                     }
                 }
-
-                if (cartItems.size > 3) {
+                if (draftOrderItems.size > 2) {  // Display "See More" when there are more than 2 items
                     item {
                         Text(
-                            text = if (showAllItems) stringResource(R.string.see_less) else stringResource(
-                                R.string.see_more
-                            ),
+                            text = if (showAllItems) stringResource(R.string.see_less) else stringResource(R.string.see_more),
                             modifier = Modifier
-                                .clickable { showAllItems = !showAllItems }
+                                .clickable {
+                                    showAllItems = !showAllItems
+                                    Log.d(
+                                        " Shopping Cart",
+                                        "Current state of showAllItems: $showAllItems"
+                                    ) // Debug log
+                                }
                                 .padding(vertical = 8.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.primary
@@ -113,7 +134,8 @@ fun ShoppingCartScreen(viewModel: ShoppingCartViewModel) {
 }
 
 @Composable
-fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
+fun SwipeableItem(viewModel: ShoppingCartViewModel,item: LineItem, onItemDeleted: (LineItem) -> Unit) {
+  val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.ic_delete))
@@ -125,6 +147,37 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
     val offsetX = remember { Animatable(0f) }
     val deleteIconVisible by remember { derivedStateOf { offsetX.value < -100 } }
     val coroutineScope = rememberCoroutineScope() // Create a coroutine scope
+    var shouldCheckStock by remember { mutableStateOf(false) }
+
+    if (shouldCheckStock) {
+        LaunchedEffect(Unit) {
+            delay(3000) // Add 3-second delay before checking stock
+
+            val productCountInCart = item.quantity
+            val availableStock = viewModel.shoppingCartItemsCount.value
+
+            if (availableStock != null) {
+                if (productCountInCart < 3 && availableStock > productCountInCart) {
+                    item.product_id?.let {
+                        viewModel.increaseProductQuantity(it, item.variant_id.toLong())
+                    }
+                } else if (productCountInCart >= 3) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.maximum_quantity_reached),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (availableStock <= productCountInCart) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.insufficient_stock),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            shouldCheckStock = false // Reset the flag after the stock check
+        }
+    }
     if (showDialog) {
         AnimatedVisibility(
             visible = showDialog,
@@ -156,7 +209,29 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
         }
     }
 
-    ElevationCard {
+    ElevationCard (
+    ){
+
+        AnimatedVisibility(
+            visible = deleteIconVisible,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut()
+        ) {
+            LottieAnimation(
+                composition = composition,
+                progress = progress,
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        showDialog = true
+                    }
+                    .background(
+                        Color.Red.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(50)
+                    ) // Background for better visibility
+                    .clip(RoundedCornerShape(50)) // Circular background
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,7 +247,6 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     }
                 }
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
         ) {
 
 
@@ -184,7 +258,7 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
-                    model = "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
+                    model =item.properties.get(2).value,
                     contentDescription = stringResource(R.string.product_image),
                     modifier = Modifier
                         .size(100.dp)
@@ -198,13 +272,15 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     modifier = Modifier.fillMaxHeight()
                 ) {
                     Text(
-                        text = item,
-                        style = MaterialTheme.typography.titleLarge,
+                        text = item.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         color = colorResource(id = R.color.colorTextCardHeader)
                     )
 
                     Text(
-                        text = stringResource(R.string.price),
+                        text = stringResource(R.string.price )+ ((item.price.toDouble())*item.quantity).toString(),
                         style = MaterialTheme.typography.bodyLarge,
                         color = colorResource(id = R.color.colorTextCardBody)
                     )
@@ -214,7 +290,15 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = { /* Handle click */ }) {
+                        IconButton(onClick = {
+                            Log.d("ShoppingCart", "Product ID: ${item.product_id}")
+
+                            // Fetch the product ID and current stock information
+                            item.product_id?.let { viewModel.fetchProductByID(it, item.variant_id.toLong()) }
+
+                            // Set a flag to trigger the stock check in a composable scope
+                            shouldCheckStock = true
+                        }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_add_square),
                                 contentDescription = stringResource(R.string.increase_quantity),
@@ -222,9 +306,15 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "1", fontSize = 20.sp)
+                        Text(text = item.quantity.toString(), fontSize = 20.sp)
                         Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = { /* Handle click */ }) {
+                        IconButton(onClick = {
+                            item.product_id?.let { viewModel.decreaseProductQuantity(it, item.variant_id.toLong()) }
+                            if (item.quantity == 0) {
+                                onItemDeleted(item)
+                            }
+
+                        }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_minus_square),
                                 contentDescription = stringResource(R.string.decrease_quantity),
@@ -234,25 +324,7 @@ fun SwipeableItem(item: String, onItemDeleted: (String) -> Unit) {
                     }
                 }
 
-                AnimatedVisibility(
-                    visible = deleteIconVisible,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    LottieAnimation(
-                        composition = composition,
-                        progress = progress,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .align(Alignment.CenterVertically)
-                            .padding(start = 16.dp)
-                            .clickable {
-                                showDialog = true
 
-                            }
-                    )
-
-                }
             }
         }
     }

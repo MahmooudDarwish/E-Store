@@ -13,6 +13,8 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.PriceRuleResponse
 import com.example.e_store.utils.shared_models.DraftOrderRequest
+import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.SingleProductResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
@@ -60,6 +62,14 @@ interface ShopifyAPIServices {
         @Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long,
         @Body shoppingCartDraftOrder: DraftOrderRequest
     )
+
+    @GET(APIKeys.PRODUCT_ID_ENDPOINT)
+    suspend fun fetchProduct(
+        @Path(APIKeys.PRODUCT_ID_PARAM) productId: Long
+    ): SingleProductResponse
+
+
+
 
     @GET(APIKeys.ORDERS_DRAFT_ORDER_ID_ENDPOINT)
     suspend fun fetchDraftOrderByID(@Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long): DraftOrderResponse
