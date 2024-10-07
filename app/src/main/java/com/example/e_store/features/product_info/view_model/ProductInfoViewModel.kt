@@ -2,23 +2,20 @@ package com.example.e_store.features.product_info.view_model
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.lifecycle.ViewModel
-
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.e_store.utils.data_layer.EStoreRepository
-import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.DataState
-import com.example.e_store.utils.shared_models.LineItem
-import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
+import com.example.e_store.utils.shared_models.LineItem
+import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-
 
 
 class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel() {
@@ -26,6 +23,7 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     init {
         fetchAllDraftOrders()
     }
+
     private val product = ProductDetails // Load your product data here.
 
     // Private mutable state variables
@@ -111,8 +109,12 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
     }
 
-    fun filterDraftOrdersByCustomerEmail(draftOrderResponse: DraftOrderResponse, email: String) {
-        _customerDraftOrders.value = draftOrderResponse.draft_orders.filter { it.email == email }
+    fun filterDraftOrdersByCustomerEmail(
+        draftOrderResponse: DraftOrderResponse,
+        email: String
+    ) {
+        _customerDraftOrders.value =
+            draftOrderResponse.draft_orders.filter { it.email == email }
     }
 
     fun filterCustomerDraftOrdersByProductIDAndVariantID(
@@ -123,7 +125,10 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
 
 
         return draftOrders.line_items.filter { lineItem ->
-            Log.d("ProductInfoViewModel22", "Line Item ID: ${lineItem.id} , Variant ID: ${lineItem.variant_id}")
+            Log.d(
+                "ProductInfoViewModel22",
+                "Line Item ID: ${lineItem.id} , Variant ID: ${lineItem.variant_id}"
+            )
             Log.d("ProductInfoViewModel22", "Product ID: $productId , Variant ID: $variantId")
             lineItem.product_id == productId && lineItem.variant_id == variantId.toString()
 
@@ -131,14 +136,16 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
 
     }
 
-    fun filterCustomerDraftOrdersType(isFavorite: Boolean)
-    {
+    fun filterCustomerDraftOrdersType(isFavorite: Boolean) {
 
     }
 
 
-
-    fun createDraftOrder(lineItemList: MutableList<LineItem>, isFavorite: Boolean,productID :Long) {
+    fun createDraftOrder(
+        lineItemList: MutableList<LineItem>,
+        isFavorite: Boolean,
+        productID: Long
+    ) {
         val note = if (isFavorite) "Favorite" else "Shopping Cart"
         fetchAllDraftOrders()
 
@@ -185,8 +192,7 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
 
 
 
-            lineItemList.addAll( existingDraftOrder.line_items)
-
+            lineItemList.addAll(existingDraftOrder.line_items)
 
 
             val cartDraftOrder = UserSession.email?.let {
@@ -213,7 +219,7 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
             Log.d("ProductInfoViewModel", "Update item to draft order: $lineItemList")
 
 
-        }else{
+        } else {
 
             val cartDraftOrder = UserSession.email?.let {
                 DraftOrderDetails(
@@ -240,8 +246,6 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
 
 
-
-
         //_cartItems.add(newItem)
     }
 
@@ -255,6 +259,7 @@ private fun <E> MutableList<E>.addAll(elements: List<E?>) {
         }
     }
 }
+
 
 
 

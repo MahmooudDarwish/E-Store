@@ -36,7 +36,7 @@ fun SplashLottie(navController: NavController) {
             delay(3000)
             if (user != null)
                 navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Splash.route) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                     user.email?.let { viewModel.initializeUserSession(context, it, false) }
                 }
             else {

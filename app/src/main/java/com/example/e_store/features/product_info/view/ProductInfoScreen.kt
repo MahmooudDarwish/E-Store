@@ -23,7 +23,6 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -58,15 +57,11 @@ import com.example.e_store.ui.theme.LightGreen
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_models.LineItem
-import com.example.e_store.utils.shared_models.Option
-import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.ProductDetails
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-import com.example.e_store.utils.shared_models.ProductImage
 import com.example.e_store.utils.shared_models.Property
-import com.example.e_store.utils.shared_models.Variant
 
 @Composable
 fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoViewModel) {
@@ -502,191 +497,4 @@ val reviews = listOf(
 )
 
 
-fun getStaticProductResponse(): Product {
-    return Product(
-        id = 8650536845553,
-        title = "PALLADIUM | PALLATECH HI TX | CHEVRON",
-        //bodyHtml = "The Palladium iconic classic receives a subtle, yet stylish update. The Pallatech Hi TX features a full grain leather upper with cotton canvas and soft cuff around the collar, providing even more comfort. The boot is finished with a single-unit molded rubber outsole, offering excellent traction while exploring your city. The EVA-cushioned footbed and hugging heel cup cradle the foot for lasting support.",
-        vendor = "PALLADIUM",
-        productType = "SHOES",
-        createdAt = "2024-09-30T13:04:39-04:00",
-        handle = "palladium-pallatech-hi-tx-chevron",
-        updatedAt = "2024-09-30T13:15:47-04:00",
-        publishedAt = "2024-09-30T13:04:39-04:00",
-        templateSuffix = null,
-        publishedScope = "global",
-        tags = "egnition-sample-data, men, palladium, winter",
-        status = "active",
-        adminGraphqlApiId = "gid://shopify/Product/8650536845553",
-        variants = listOf(
-            Variant(
-                id = 45557749547249,
-                productId = 8650536845553,
-                title = "9 / red",
-                price = "159.95",
-                position = 1,
-                inventoryPolicy = "deny",
-                compareAtPrice = null,
-                option1 = "9",
-                option2 = "red",
-                option3 = null,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:07:05-04:00",
-                taxable = true,
-                barcode = null,
-                fulfillmentService = "manual",
-                grams = 0,
-                inventoryManagement = "shopify",
-                requiresShipping = true,
-                sku = "PAL-01\r\n-red-9",
-                weight = 0.0,
-                weightUnit = "kg",
-                inventoryItemId = 47589337170161,
-                inventoryQuantity = 17,
-                oldInventoryQuantity = 17,
-                adminGraphqlApiId = "gid://shopify/ProductVariant/45557749547249",
-                imageId = null
-            ),
-            Variant(
-                id = 45557749580017,
-                productId = 8650536845553,
-                title = "10 / red",
-                price = "159.95",
-                position = 2,
-                inventoryPolicy = "deny",
-                compareAtPrice = null,
-                option1 = "10",
-                option2 = "red",
-                option3 = null,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:07:05-04:00",
-                taxable = true,
-                barcode = null,
-                fulfillmentService = "manual",
-                grams = 0,
-                inventoryManagement = "shopify",
-                requiresShipping = true,
-                sku = "PAL-01\r\n-red-10",
-                weight = 0.0,
-                weightUnit = "kg",
-                inventoryItemId = 47589337170162,
-                inventoryQuantity = 20,
-                oldInventoryQuantity = 20,
-                adminGraphqlApiId = "gid://shopify/ProductVariant/45557749580017",
-                imageId = null
-            ),
-            Variant(
-                id = 45557749612785,
-                productId = 8650536845553,
-                title = "12 / red",
-                price = "159.95",
-                position = 3,
-                inventoryPolicy = "deny",
-                compareAtPrice = null,
-                option1 = "12",
-                option2 = "red",
-                option3 = null,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:07:05-04:00",
-                taxable = true,
-                barcode = null,
-                fulfillmentService = "manual",
-                grams = 0,
-                inventoryManagement = "shopify",
-                requiresShipping = true,
-                sku = "PAL-01\r\n-red-12",
-                weight = 0.0,
-                weightUnit = "kg",
-                inventoryItemId = 47589337170163,
-                inventoryQuantity = 15,
-                oldInventoryQuantity = 15,
-                adminGraphqlApiId = "gid://shopify/ProductVariant/45557749612785",
-                imageId = null
-            )
-        ),
-        options = listOf(
-            Option(
-                id = 10908486500593,
-                productId = 8650536845553,
-                name = "Size",
-                position = 1,
-                values = listOf("9", "10", "12")
-            ),
-            Option(
-                id = 10908486533361,
-                productId = 8650536845553,
-                name = "Color",
-                position = 2,
-                values = listOf("red")
-            )
-        ),
-        images = listOf(
-            ProductImage(
-                id = 42252095226097,
-                alt = null,
-                position = 1,
-                productId = 8650536845553,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:04:39-04:00",
-                adminGraphqlApiId = "gid://shopify/ProductImage/42252095226097",
-                width = 635,
-                height = 560,
-                src = "https://cdn.shopify.com/s/files/1/0713/4370/2257/files/09ba62adafa6de79108792f1e5467f6e.jpg?v=1727715879",
-                variantIds = emptyList()
-            ),
-            ProductImage(
-                id = 42252095258865,
-                alt = null,
-                position = 2,
-                productId = 8650536845553,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:04:39-04:00",
-                adminGraphqlApiId = "gid://shopify/ProductImage/42252095258865",
-                width = 640,
-                height = 560,
-                src = "https://cdn.shopify.com/s/files/1/0713/4370/2257/files/d3da7f191d6bd6a6f11a8bc60e52586f.jpg?v=1727715879",
-                variantIds = emptyList()
-            ),
-            ProductImage(
-                id = 42252095291633,
-                alt = null,
-                position = 3,
-                productId = 8650536845553,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:04:39-04:00",
-                adminGraphqlApiId = "gid://shopify/ProductImage/42252095291633",
-                width = 640,
-                height = 560,
-                src = "https://cdn.shopify.com/s/files/1/0713/4370/2257/files/3eb2f945b07a1d8f91be23f11f52a164.jpg?v=1727715879",
-                variantIds = emptyList()
-            ),
-            ProductImage(
-                id = 42252095324401,
-                alt = null,
-                position = 4,
-                productId = 8650536845553,
-                createdAt = "2024-09-30T13:04:39-04:00",
-                updatedAt = "2024-09-30T13:04:39-04:00",
-                adminGraphqlApiId = "gid://shopify/ProductImage/42252095324401",
-                width = 640,
-                height = 560,
-                src = "https://cdn.shopify.com/s/files/1/0713/4370/2257/files/45e49fcb2432da09289e6b5b505e64aa.jpg?v=1727715879",
-                variantIds = emptyList()
-            )
-        ),
-        image = ProductImage(
-            id = 42252095226097,
-            alt = null,
-            position = 1,
-            productId = 8650536845553,
-            createdAt = "2024-09-30T13:04:39-04:00",
-            updatedAt = "2024-09-30T13:04:39-04:00",
-            adminGraphqlApiId = "gid://shopify/ProductImage/42252095226097",
-            width = 635,
-            height = 560,
-            src = "https://cdn.shopify.com/s/files/1/0713/4370/2257/files/09ba62adafa6de79108792f1e5467f6e.jpg?v=1727715879",
-            variantIds = emptyList()
-        )
-    )
-}
 

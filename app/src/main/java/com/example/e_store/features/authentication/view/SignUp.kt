@@ -1,5 +1,6 @@
 package com.example.e_store.features.authentication.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -104,6 +105,7 @@ fun SignUpScreen(navController: NavHostController) {
         EShopButton(
             text = stringResource(id = R.string.sign_up),
             onClick = {
+                Log.d("SignUpScreen", "Sign Up button clicked")
                 viewModel.signUpUser(context, onAuthSuccess = {
 
                     isProgressing.value = false

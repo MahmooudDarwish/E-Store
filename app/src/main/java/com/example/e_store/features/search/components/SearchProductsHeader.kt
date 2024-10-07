@@ -28,10 +28,9 @@ fun SearchProductsHeader(
     onSearchQueryChange: (String) -> Unit = {},
 ) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 16.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BackButton(onBackClick = { navController.popBackStack() })
@@ -42,7 +41,7 @@ fun SearchProductsHeader(
             modifier = Modifier
                 .fillMaxWidth(.8f)
                 .height(70.dp)
-                .padding(top = 20.dp, end = 8.dp)
+                .padding(top = 20.dp, end = 6.dp , start = 4.dp)
                 .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
         )
 

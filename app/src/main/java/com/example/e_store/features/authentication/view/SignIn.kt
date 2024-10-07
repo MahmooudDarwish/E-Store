@@ -77,7 +77,11 @@ fun SignInScreen(navController: NavHostController) {
             text = stringResource(id = R.string.sign_in),
             onClick = {
                 viewModel.signInAndCheckEmailVerification(context, onAuthSuccess = {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Home.route){
+                        popUpTo(0){
+                            inclusive = true
+                        }
+                    }
                     viewModel.initializeUserSession(context, viewModel.email.value, false)
                     Toast.makeText(
                         context,
