@@ -83,7 +83,7 @@ fun UserLayout(navHostController: NavHostController) {
             ///TODO: Log out from Firebase @kk98989898 @MahmoudDarwish
             FirebaseAuth.getInstance().signOut()
             navHostController.navigate(Screen.SignIn.route) {
-                popUpTo(Screen.Profile.route) {
+                popUpTo(0) {
                     inclusive = true
                 }
             }

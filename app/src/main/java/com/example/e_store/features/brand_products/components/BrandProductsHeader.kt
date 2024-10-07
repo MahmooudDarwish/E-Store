@@ -30,7 +30,7 @@ fun BrandProductsHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BackButton(onBackClick = { navController.popBackStack() })

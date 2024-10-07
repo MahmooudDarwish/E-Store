@@ -92,14 +92,18 @@ fun MainHomeScreen(
 
         },
         bottomBar = {
-            if (currentRoute in items.map { it.route } || currentRoute.startsWith(Screen.Home.route)) {
-                if (isInternetAvailable && currentRoute in items.map { it.route }) {
+            if (isInternetAvailable &&
+                (currentRoute in items.map { it.route }
+                        || currentRoute.startsWith(Screen.Home.route)
+                        || currentRoute.startsWith(Screen.Categories.route)
+                        || currentRoute.startsWith(Screen.Cart.route))) {
+
                     BottomNavigationBar(
                         items = items,
                         currentRoute = selectedRoute,
                         navController = navController,
                     )
-                }
+
             }
         }
     ) { paddingValues ->

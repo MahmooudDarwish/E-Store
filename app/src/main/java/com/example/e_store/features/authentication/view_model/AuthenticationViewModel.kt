@@ -2,6 +2,7 @@ package com.example.e_store.features.authentication.view_model
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.runtime.State
@@ -155,11 +156,15 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     }
 
     fun signUpUser(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit) {
+
         isProgressing.value = true
+        Log.d("AuthenticationViewModel", "Signing up user with email: ${_email.value}")
         if (checkSignUpTextValues(context)) {
             auth.createUserWithEmailAndPassword(_email.value, _password.value)
                 .addOnCompleteListener { task ->
+                    Log.d("AuthenticationViewModel", "createUserWithEmailAndPassword:onComplete:${task.isSuccessful}")
                     if (task.isSuccessful) {
+                        Log.d("AuthenticationViewModel", "User created successfully")
                         onAuthSuccess()
                         sendEmailVerification(context)
                     } else {
@@ -200,7 +205,6 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                             if (user.isEmailVerified) {
                                 onAuthSuccess()
                             } else {
-                                Toast.makeText(context, context.getString(R.string.email_not_verified_error), Toast.LENGTH_SHORT).show()
                                 onError(context.getString(R.string.email_not_verified_error))
                             }
                         } else {

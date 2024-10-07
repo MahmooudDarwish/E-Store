@@ -1,13 +1,25 @@
 package com.example.e_store.features.search.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
@@ -26,7 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.e_store.R
-import com.example.e_store.features.brand_products.components.BrandProductsHeader
+import com.example.e_store.features.search.components.SearchProductsHeader
+import com.example.e_store.features.search.components.SuggestionItem
 import com.example.e_store.features.search.view_model.SearchViewModel
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.constants.NavigationKeys
@@ -36,24 +50,6 @@ import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.utils.shared_methods.initializeProductDetails
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.draw.shadow
-import com.example.e_store.features.search.components.SearchProductsHeader
-import com.example.e_store.features.search.components.SuggestionItem
 
 @Composable
 fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
@@ -63,6 +59,8 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
     var maxPrice by remember { mutableFloatStateOf(0f) }
     var showSliderDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    val currentBackStackEntry = navController.currentBackStackEntry
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllProducts()
@@ -120,7 +118,7 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
 
             ProductsStateHandler(
                 productsUiState = productsUiState,
-                route = NavigationKeys.PRODUCT_INFO_HOME_ROUTE,
+                route = if(currentRoute == NavigationKeys.SEARCH_HOME_ROUTE) NavigationKeys.PRODUCT_INFO_HOME_ROUTE else NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE,
                 navController = navController,
                 filterProducts = ::filterProducts
             )
@@ -128,22 +126,21 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
 
         AnimatedVisibility(
             visible = searchQuery.isNotEmpty() && filteredSuggestions.isNotEmpty(),
-            enter = fadeIn() + expandIn() + slideInVertically(),
-            exit = fadeOut() + shrinkOut() + slideOutVertically(),
+            enter = fadeIn() + expandIn(),
+            exit = fadeOut() + shrinkOut(),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 105.dp)
+                .offset(x = (-20).dp, y = 103.dp)  
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(0.7f)
                     .heightIn(max = 300.dp)
                     .shadow(elevation = 8.dp),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 LazyColumn(
-                    modifier = Modifier
-                        .background(Color.White)
+                    modifier = Modifier.background(Color.White)
                 ) {
                     items(filteredSuggestions) { suggestion ->
                         SuggestionItem(
@@ -159,8 +156,6 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
             }
         }
     }
-
-
 }
 
 
