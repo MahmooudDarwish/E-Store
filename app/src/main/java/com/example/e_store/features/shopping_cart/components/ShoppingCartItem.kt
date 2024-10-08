@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.e_store.utils.shared_models.LineItem
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -66,12 +67,17 @@ fun ShoppingCartItem(
 
             IconButton(
                 onClick = { showDialog = true },
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = CircleShape
+                    )
+                    .size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.Red
+                    contentDescription = "Delete Favourite",
+                    tint = MaterialTheme.colorScheme.onErrorContainer
                 )
             }
         }

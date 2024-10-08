@@ -82,7 +82,6 @@ fun SignInScreen(navController: NavHostController) {
                             inclusive = true
                         }
                     }
-                    viewModel.initializeUserSession(context, viewModel.email.value, false)
                     Toast.makeText(
                         context,
                         getString(context, R.string.sign_in_successful),
