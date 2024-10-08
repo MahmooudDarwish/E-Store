@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.CustomCollection
+import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.ProductResponse
@@ -22,7 +23,7 @@ interface EStoreRemoteDataSource {
     //fetch all products
     suspend fun fetchProducts(): Flow<List<Product>>
 
-    suspend fun fetchProduct(productId: Long): SingleProductResponse
+    suspend fun fetchProduct(productId: Long): Flow<SingleProductResponse>
 
 
 
@@ -37,6 +38,10 @@ interface EStoreRemoteDataSource {
     suspend fun fetchDraftOrderByID(draftOrderId: Long): DraftOrderResponse
 
     suspend fun removeDraftOrder(draftOrderId: Long)
+
+    suspend fun fetchShoppingCartDraftOrders(
+        email: String
+    ): Flow<DraftOrderDetails?>
 
     suspend fun fetchAllDraftOrders(
     ): Flow<DraftOrderResponse>

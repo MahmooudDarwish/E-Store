@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flow
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
+import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.ProductResponse
@@ -173,9 +174,35 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             emit(response)
         }
     }
-    override suspend fun fetchProduct(productId: Long): SingleProductResponse {
-        return apiService.fetchProduct(productId)
+
+
+    override suspend fun fetchShoppingCartDraftOrders(email: String): Flow<DraftOrderDetails?> {
+        val response = apiService.fetchAllDraftOrders().draft_orders
+
+        val filteredOrders = response.filter {
+            val emailFilter = it.email == email
+            val draftOrderType = it.note == APIKeys.SHOPPING_CART
+            emailFilter && draftOrderType
+        }
+        return if (filteredOrders.isNotEmpty()) {
+            flowOf(filteredOrders[0])
+
+        } else {
+            flowOf(null)
+        }
     }
+
+
+
+
+
+    override suspend fun fetchProduct(productId: Long):  Flow<SingleProductResponse> {
+
+        return flowOf(
+            apiService.fetchProduct(productId = productId)
+        )
+    }
+
 
     override suspend fun fetchAllOrders(email: String): Flow<List<Order>> {
 
