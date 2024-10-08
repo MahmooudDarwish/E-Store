@@ -1,7 +1,6 @@
 package com.example.e_store.utils.shared_components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +26,6 @@ fun EShopButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .padding(16.dp)
             .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
         shape = RoundedCornerShape(cornerRadius.dp)

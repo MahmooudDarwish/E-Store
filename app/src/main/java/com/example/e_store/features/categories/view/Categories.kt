@@ -1,5 +1,6 @@
 package com.example.e_store.features.categories.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,7 +35,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
     val categoriesProductsUiState by viewModel.categoriesProducts.collectAsStateWithLifecycle()
 
     var sliderMaxValue by remember { mutableFloatStateOf(1000F) }
-    var maxPrice by remember { mutableFloatStateOf(0f) }
+    var maxPrice by remember { mutableFloatStateOf(10000f) }
     var showSliderDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf("") }
     var selectedProductType by remember { mutableStateOf("") }
@@ -54,6 +55,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
 
     fun filterProducts(products: List<Product>): List<Product> {
         return products.filter { product ->
+
             val categoryMatches = when (selectedCategory.lowercase()) {
                 Keys.MEN_KEY -> product.tags?.contains(Keys.MEN_KEY) == true || product.tags?.contains(
                     Keys.UNISEX_KEY

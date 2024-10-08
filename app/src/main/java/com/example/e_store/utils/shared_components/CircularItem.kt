@@ -24,26 +24,25 @@ fun CircularItem(title: String, imageUrl: String, onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(8.dp)
-            .width(80.dp)
             .clickable(onClick = onClick)
     ) {
         Card(
             shape = CircleShape,
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier.size(60.dp)
+            modifier = Modifier.size(100.dp)
         ) {
             AsyncImage(
                 model = imageUrl,
                 contentDescription = title,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().clip(CircleShape),
             )
         }
 
         Text(
             text = title,
             modifier = Modifier.padding(top = 4.dp),
-            fontSize = 12.sp,
+            fontSize = 16.sp,
             color = Color.Gray,
             maxLines = 1
         )

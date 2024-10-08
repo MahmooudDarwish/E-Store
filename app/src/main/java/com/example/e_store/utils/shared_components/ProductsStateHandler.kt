@@ -1,5 +1,6 @@
 package com.example.e_store.utils.shared_components
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +16,7 @@ fun ProductsStateHandler(
     productsUiState: DataState<List<Product>>,
     navController: NavHostController,
     route: String,
-    filterProducts: (List<Product>) -> List<Product>
+    filterProducts: (List<Product>) -> List<Product>,
 ) {
 
     when (productsUiState) {
@@ -26,16 +27,19 @@ fun ProductsStateHandler(
 
         is DataState.Success -> {
             val brandProducts = productsUiState.data
-            if (filterProducts.invoke(brandProducts).isEmpty()) {
+            val filteredProducts = filterProducts(brandProducts)
+
+            if (filteredProducts.isEmpty()) {
                 LottieWithText(
                     displayText = stringResource(id = R.string.no_products_message),
                     lottieRawRes = R.raw.no_data_found
                 )
             } else {
+
                 ProductsGrid(
                     navController = navController,
                     route = route,
-                    products = filterProducts(brandProducts)
+                    products = filteredProducts
                 )
             }
 
