@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,15 +60,30 @@ import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
+import com.example.e_store.utils.shared_models.Property
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-import com.example.e_store.utils.shared_models.Property
 
 @Composable
 fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoViewModel) {
 
-    //val viewModel: ProductInfoViewModel = viewModel()
+    if(ProductDetails.isNavigationFromFavourites) {
+
+
+
+    } else {
+        ProductDetails(navController, viewModel)
+    }
+
+
+
+
+}
+
+@Composable
+fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewModel) {
+
     val selectedSize by viewModel.selectedSize
     val selectedColor by viewModel.selectedColor
     val price by viewModel.price
@@ -75,7 +91,7 @@ fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoVi
     val allReviewsVisible by viewModel.allReviewsVisible
     val favoriteIcon by viewModel.favoriteIcon
     val context = LocalContext.current
-    viewModel.fetchAllDraftOrders()
+    viewModel.fetchAllDraftOrders(true)
 
     var showQuantityDialog by remember { mutableStateOf(false) }
     var quantityInput by remember { mutableStateOf(TextFieldValue("1")) }
@@ -210,7 +226,7 @@ fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoVi
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(80.dp),
+                .height(60.dp),
             elevation = 8.dp,
             color = Color.White
         ) {
@@ -221,7 +237,37 @@ fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoVi
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { viewModel.toggleFavorite() }) {
+                Log.d("ProductInfoScreen", "$favoriteIcon")
+                IconButton(onClick = {
+                    if (viewModel.favoriteIcon.value) {
+                        viewModel.toggleFavorite()
+                        Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
+
+                        viewModel.removeShoppingCartDraftOrder(
+                            productId = ProductDetails.id,
+                            variantId = ProductDetails.variants.first().id
+                        )
+                    } else {
+                        Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
+
+                        viewModel.toggleFavorite()
+
+                        viewModel.createDraftOrder(
+                            lineItemList = createDraftOrderItems(
+
+                                quantity = 1,
+                                selectedSize = selectedSize,
+                                selectedColor = selectedColor,
+                                context = context,
+                            ),
+                            isFavorite = true,
+                            productID = ProductDetails.id
+                        )
+                    }
+                })
+
+
+                {
                     Icon(
                         imageVector = if (favoriteIcon) Icons.Filled.Favorite else Icons.Outlined.Favorite,
                         contentDescription = null,
@@ -318,9 +364,8 @@ fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoVi
             }
         }
     }
-
-
 }
+
 
 fun createDraftOrderItems(
     selectedSize: String,

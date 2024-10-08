@@ -122,11 +122,12 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             item {
                 SearchWithFavoriteSection(
                     onSearchClick = {
-                        navController.navigate(Screen.Search_From_Home.route)
+                        navController.navigate(Screen.SearchFromHome.route)
                     },
                     onFavoriteClick = {
                         // Navigate to favorite screen
                         ///TODO: Navigate to favorite products screen @kk989898
+                        navController.navigate(Screen.FavouriteFromHome.route)
                     }
                 )
             }

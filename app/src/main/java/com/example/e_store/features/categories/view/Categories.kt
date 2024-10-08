@@ -26,6 +26,7 @@ import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.utils.constants.Keys
 import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
@@ -105,6 +106,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                     },
                     onFavoriteClick = {
                         /// TODO: navigate to favorite screen @MahmoudDariwsh @kk98989898
+                        navController.navigate(Screen.FavouriteFromCategories.route)
                     },
                     onFilterClick = { showSliderDialog = !showSliderDialog },
                 )

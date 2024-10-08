@@ -22,6 +22,7 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.favourites.FavouritesViewModelFactory
 import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.utils.shared_components.NoInternetScreen
@@ -36,6 +37,7 @@ fun MainHomeScreen(
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
+    favouritesViewModelFactory: FavouritesViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory,
     ordersViewModelFactory : OrdersViewModelFactory
 ) {
@@ -120,6 +122,7 @@ fun MainHomeScreen(
                             searchViewModelFactory = searchViewModelFactory,
                             profileViewModelFactory = profileViewModelFactory,
                             productInfoViewModelFactory = productInfoViewModelFactory,
+                            favouritesViewModelFactory = favouritesViewModelFactory,
                             shoppingCartViewModelFactory = shoppingCartViewModelFactory,
                             ordersViewModelFactory = ordersViewModelFactory,
 

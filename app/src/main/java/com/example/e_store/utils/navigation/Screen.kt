@@ -33,6 +33,9 @@ import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewMod
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.favourites.FavouritesScreen
+import com.example.e_store.features.favourites.FavouritesViewModel
+import com.example.e_store.features.favourites.FavouritesViewModelFactory
 import com.example.e_store.features.profile.view_model.ProfileViewModel
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 
@@ -55,10 +58,24 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Profile :
         Screen(NavigationKeys.PROFILE_ROUTE, R.string.profile_title, R.drawable.ic_person)
-    object ProductInfoFromHome : Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
-    object ProductInfoFromCategories : Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
-    object Search_From_Home : Screen(NavigationKeys.SEARCH_HOME_ROUTE, R.string.search, 0)
-    object Search_From_Categories : Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
+
+    object ProductInfoFromCategories :
+        Screen(NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromHome :
+        Screen(NavigationKeys.PRODUCT_INFO_HOME_ROUTE, R.string.product_info, 0)
+
+    object SearchFromHome : Screen(NavigationKeys.SEARCH_HOME_ROUTE, R.string.search, 0)
+    object SearchFromCategories :
+        Screen(NavigationKeys.SEARCH_CATEGORIES_ROUTE, R.string.search, 0)
+
+    object FavouriteFromHome :
+        Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_HOME, R.string.favourite, 0)
+    object FavouriteFromCategories :
+        Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_CATEGORIES, R.string.favourite, 0)
+    object FavouriteFromProfile :
+        Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_PROFILE, R.string.favourite, 0)
+    object ProductInfoFromFavourite : Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
 
 }
 
@@ -72,6 +89,7 @@ fun AppNavigation(
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory,
+    favouritesViewModelFactory: FavouritesViewModelFactory,
     ordersViewModelFactory: OrdersViewModelFactory
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
@@ -108,13 +126,18 @@ fun AppNavigation(
             ProductInfoScreen(navController, viewModel)
         }
 
+        composable(route = Screen.ProductInfoFromFavourite.route) {
+            val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+            ProductInfoScreen(navController, viewModel)
+        }
 
 
-        composable(route = Screen.Search_From_Home.route) {
+
+        composable(route = Screen.SearchFromHome.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             SearchScreen(viewModel, navController)
         }
-        composable(route = Screen.Search_From_Categories.route) {
+        composable(route = Screen.SearchFromCategories.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             SearchScreen(viewModel, navController)
         }
@@ -129,6 +152,18 @@ fun AppNavigation(
         composable(route = Screen.Cart.route) {
             val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
             ShoppingCartScreen(viewModel)
+        }
+        composable(route = Screen.FavouriteFromHome.route) {
+            val viewModel: FavouritesViewModel = viewModel(factory = favouritesViewModelFactory)
+            FavouritesScreen(viewModel, navController)
+        }
+        composable(route = Screen.FavouriteFromCategories.route) {
+            val viewModel: FavouritesViewModel = viewModel(factory = favouritesViewModelFactory)
+            FavouritesScreen(viewModel, navController)
+        }
+        composable(route = Screen.FavouriteFromProfile.route) {
+            val viewModel: FavouritesViewModel = viewModel(factory = favouritesViewModelFactory)
+            FavouritesScreen(viewModel, navController)
         }
     }
 }

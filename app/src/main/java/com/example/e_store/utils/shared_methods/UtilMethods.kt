@@ -10,7 +10,7 @@ fun initializeProductDetails(product: Product) {
     ProductDetails.title = product.title
     ProductDetails.vendor = product.vendor
     ProductDetails.price = product.variants[0].price
-    //ProductDetails.description = product.bodyHtml
+    ProductDetails.description = product.description
     ProductDetails.stock = product.variants[0].inventoryQuantity
     ProductDetails.images = product.images.map { it.src }
     ProductDetails.colors = product.options[1].values

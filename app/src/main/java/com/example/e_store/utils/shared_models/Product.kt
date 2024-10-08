@@ -14,6 +14,9 @@ data class Product(
     val title: String,
     val vendor: String,
 
+    @SerializedName("body_html")
+    val description:String,
+
     @SerializedName("product_type")
     val productType: String,
 

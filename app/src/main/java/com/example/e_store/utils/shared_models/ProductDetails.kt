@@ -18,6 +18,7 @@ object ProductDetails {
     var colors: List<String> = listOf("Red", "Blue", "Green")
     var sizes: List<String> = listOf("S", "M", "L", "XL")
     var variants: List<Variant> = listOf()
+    var isNavigationFromFavourites: Boolean = false
 
 
 }
