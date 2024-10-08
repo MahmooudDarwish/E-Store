@@ -10,6 +10,7 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
+import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.ProductResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
@@ -85,6 +86,9 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun removeDraftOrder(draftOrderId: Long) {
         eStoreRemoteDataSource.removeDraftOrder(draftOrderId)
     }
+    override suspend fun fetchShoppingCartDraftOrders(email: String): Flow<DraftOrderDetails?> {
+        return eStoreRemoteDataSource.fetchShoppingCartDraftOrders(email = email)
+    }
 
     override suspend fun fetchAllDraftOrders(): Flow<DraftOrderResponse> {
         return eStoreRemoteDataSource.fetchAllDraftOrders()
@@ -98,7 +102,7 @@ class EStoreRepositoryImpl private constructor(
         eStoreRemoteDataSource.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
     }
 
-    override suspend fun fetchProduct(productId: Long): SingleProductResponse {
+    override suspend fun fetchProduct(productId: Long):  Flow<SingleProductResponse> {
         return eStoreRemoteDataSource.fetchProduct(productId)
 
     }

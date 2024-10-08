@@ -20,7 +20,6 @@ import com.example.e_store.features.authentication.view.SignUpScreen
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
-import com.example.e_store.features.location.view.MapScreen
 import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.payment.view.PaymentScreen
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
@@ -51,8 +50,8 @@ class LandingScreen : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface {
-                    MapScreen( )
-                  /* val navController = rememberNavController()
+
+                   val navController = rememberNavController()
                     NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
                         composable(Screen.Home.route) {
@@ -69,7 +68,7 @@ class LandingScreen : ComponentActivity() {
                         }
                         composable(Screen.SignUp.route) { SignUpScreen(navController = navController) }
                         composable(Screen.SignIn.route) { SignInScreen(navController = navController) }
-                    }*/
+                    }
                 }
             }
         }

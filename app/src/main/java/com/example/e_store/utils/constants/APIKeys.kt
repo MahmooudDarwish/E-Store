@@ -41,6 +41,7 @@ object APIKeys {
 
     //Values
     const val HOME = "Home"
+    const val SHOPPING_CART = "Shopping Cart"
 
 
 
