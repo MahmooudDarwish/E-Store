@@ -86,5 +86,9 @@
     <string name="no_products_message">No Products Found.</string>
     <string name="no_products_shopping_message">There\'s no Products added to Shopping cart.</string>
 
+    <string name="shopping_cart">Shopping Cart</string>
+    <string name="please_wait_till_we_process_your_request">Please wait till we process your request</string>
+
+
 
 </resources>
