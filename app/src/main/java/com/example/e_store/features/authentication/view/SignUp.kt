@@ -106,16 +106,10 @@ fun SignUpScreen(navController: NavHostController) {
             text = stringResource(id = R.string.sign_up),
             onClick = {
                 Log.d("SignUpScreen", "Sign Up button clicked")
+                isProgressing.value = true
                 viewModel.signUpUser(context, onAuthSuccess = {
-
                     isProgressing.value = false
                     navController.navigate(Screen.SignIn.route)
-                    viewModel.saveNameToSharedPref(
-                        context = context,
-                        email = viewModel.email.value,
-                        name = viewModel.name.value,
-                        phone = viewModel.phone.value
-                    )
                     Toast.makeText(
                         context,
                         getString(context, R.string.sign_up_successful),
@@ -144,6 +138,7 @@ fun SignUpScreen(navController: NavHostController) {
             )
         }
     }
+
 }
 
 

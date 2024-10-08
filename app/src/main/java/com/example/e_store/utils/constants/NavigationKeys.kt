@@ -2,6 +2,10 @@ package com.example.e_store.utils.constants
 
 object NavigationKeys {
 
+    const val PRODUCT_INFO_FAVOURITE_ROUTE= "favourite/product_info"
+    const val FAVOURITE_ROUTE_FROM_HOME = "home/favourite"
+    const val FAVOURITE_ROUTE_FROM_CATEGORIES = "categories/favourite"
+    const val FAVOURITE_ROUTE_FROM_PROFILE = "profile/favourite"
     const val SEARCH_CATEGORIES_ROUTE = "categories/search"
     const val SEARCH_HOME_ROUTE = "home/search"
     const val PRODUCT_INFO_CATEGORIES_ROUTE = "categories/product_info"

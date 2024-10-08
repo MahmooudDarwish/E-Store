@@ -80,6 +80,7 @@
     <string name="failed_to_reload_user_error">Failed to reload user</string>
     <string name="login_failed_error">Login failed</string>
     <string name="guest_user">Guest User</string>
+    <string name="favourite">Favourites</string>
     <string name="maximum_quantity_reached">Maximum quantity reached</string>
     <string name="orders_title">Orders</string>
     <string name="no_orders_message">You don\'t have any orders yet.</string>

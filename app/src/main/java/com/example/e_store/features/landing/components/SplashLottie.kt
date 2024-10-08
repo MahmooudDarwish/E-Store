@@ -1,5 +1,6 @@
 package com.example.e_store.features.landing.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -29,21 +30,31 @@ fun SplashLottie(navController: NavController) {
     val context = LocalContext.current
     val viewModel: AuthenticationViewModel =
         viewModel(factory = AuthenticationViewModelFactory(FirebaseAuth.getInstance()))
-    val user = FirebaseAuth.getInstance().currentUser
 
     LaunchedEffect(composition) {
         if (composition != null) {
             delay(3000)
-            if (user != null)
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(0) { inclusive = true }
-                    user.email?.let { viewModel.initializeUserSession(context, it, false) }
+
+
+            viewModel.checkEmailVerification(
+                context = context,
+                onAuthSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onError = {
+                    navController.navigate(Screen.SignIn.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onNoUserFound = {
+                    navController.navigate(Screen.SignIn.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
-            else {
-                navController.navigate(Screen.SignIn.route) {
-                    popUpTo(Screen.Splash.route) { inclusive = true }
-                }
-            }
+            )
+
         }
     }
 

@@ -49,6 +49,7 @@ fun UserLayout(navHostController: NavHostController) {
         icon = Icons.Default.FavoriteBorder,
         onClick = {
             ///TODO: Navigate to Wishlist screen @kk98989898 @MahmoudDarwish
+            navHostController.navigate(Screen.FavouriteFromProfile.route)
         },
     )
 
