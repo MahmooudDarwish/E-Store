@@ -1,5 +1,7 @@
 package com.example.e_store.features.home.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.unit.dp
 import com.example.e_store.utils.shared_components.ElevationCard
@@ -9,36 +11,54 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.RoundedRectangleItem
 import com.example.e_store.utils.shared_methods.initializeProductDetails
+import kotlinx.coroutines.delay
 
 @Composable
 fun ForUSection(
     navController: NavHostController, products: List<Product>
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 500.dp).padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(300)
+        isVisible = true
+    }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = expandVertically()
     ) {
-        items(products) { product ->
-            ElevationCard(
-                modifier = Modifier.padding(bottom = 10.dp)
-            ) {
-                RoundedRectangleItem(
-                    product = product,
-                    onClick = {
-                        ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898})
-                        initializeProductDetails(product)
-                        navController.navigate(NavigationKeys.PRODUCT_INFO_HOME_ROUTE)
-                    },
-                )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 500.dp).padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(products) { product ->
+                ElevationCard(
+                    modifier = Modifier.padding(bottom = 10.dp)
+                ) {
+                    RoundedRectangleItem(
+                        product = product,
+                        onClick = {
+                            ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898})
+                            initializeProductDetails(product)
+                            navController.navigate(NavigationKeys.PRODUCT_INFO_HOME_ROUTE)
+                        },
+                    )
+                }
             }
         }
     }
