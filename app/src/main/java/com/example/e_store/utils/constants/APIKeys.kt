@@ -11,6 +11,7 @@ object APIKeys {
     const val SHOPIFY_API_SECRET_KEY = "2d54b067f29fe607ccecd2c91294acb3"
     const val STOREFRONT_API_ACCESS_TOKEN = "7d0ecff0b6c5a01e2350a2c44428ae0f"
 
+
     //Headers
     const val ACCESS_TOKEN_HEADER = "X-Shopify-Access-Token"
 
@@ -40,6 +41,9 @@ object APIKeys {
 
     //Values
     const val HOME = "Home"
+
+
+
 
 }
 
