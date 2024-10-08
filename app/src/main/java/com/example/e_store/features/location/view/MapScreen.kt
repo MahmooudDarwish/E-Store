@@ -1,6 +1,7 @@
 package com.example.e_store.features.location.view
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -15,6 +16,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,22 +32,56 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.e_store.BuildConfig
 import com.example.e_store.R
+import com.example.e_store.features.location.view.components.SearchPlacesHeader
+import com.example.e_store.features.search.components.SearchProductsHeader
+import com.example.e_store.utils.shared_components.PriceSlider
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen() {
     val context = LocalContext.current
+
+    // Initialize Places API
+    Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
+    val placesClient: PlacesClient = Places.createClient(context)
+    var query by remember { mutableStateOf("") }
+
+    // Intent launcher for Google Autocomplete
+    val autocompleteLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            data?.let {
+                val place = Autocomplete.getPlaceFromIntent(data)
+                query = place.name ?: ""
+            }
+        } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            val status: Status = Autocomplete.getStatusFromIntent(result.data)
+            println("Autocomplete canceled: $status")
+        }
+    }
+
+
     val locationPermissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -56,11 +92,11 @@ fun MapScreen() {
     var currentLocation by remember { mutableStateOf<Location?>(null) }
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     var showPermissionDialog by remember { mutableStateOf(false) }
-    var markerState = rememberMarkerState ( position = LatLng(0.0, 0.0))
+    var markerState = rememberMarkerState(position = LatLng(0.0, 0.0))
 
     // Google Map state
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition(LatLng(   0.0, 0.0), 10f, 0f, 0f)
+        position = CameraPosition(LatLng(0.0, 0.0), 10f, 0f, 0f)
     }
 
 
@@ -73,24 +109,26 @@ fun MapScreen() {
     LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
         if (locationPermissionsState.allPermissionsGranted) {
             // Check if GPS is enabled
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationManager =
+                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 getCurrentLocation(fusedLocationClient) { location ->
                     currentLocation = location
                     Log.d("MapScreen", "Current Location: $location")
 
-                cameraPositionState.position = CameraPosition(
-                    LatLng(
-                        currentLocation!!.latitude,
-                        currentLocation!!.longitude
-                    ),
-                    10f,
-                    0f,
-                    0f
-                )
-                    markerState.position = LatLng( currentLocation!!.latitude, currentLocation!!.longitude)
+                    cameraPositionState.position = CameraPosition(
+                        LatLng(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude
+                        ),
+                        10f,
+                        0f,
+                        0f
+                    )
+                    markerState.position =
+                        LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
 
-            }
+                }
             } else {
                 showPermissionDialog = true
             }
@@ -103,11 +141,30 @@ fun MapScreen() {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Map Screen") },
-                actions = {
-                }
-            )
+            // UI for the search input
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+            ) {
+                TextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    label = { Text("Enter a place") },
+                    modifier = Modifier.fillMaxWidth()
+                        .background( Color.White)
+                )
+                    val intent = Autocomplete.IntentBuilder(
+                        AutocompleteActivityMode.OVERLAY, listOf(
+                            Place.Field.ID, Place.Field.NAME
+                        )
+                    )
+
+                        .build(context)
+                    autocompleteLauncher.launch(intent)
+
+
+            }
+
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -123,13 +180,17 @@ fun MapScreen() {
                                 Log.d("MapScreen", "Current Location: $location")
                                 currentLocation?.let {
                                     cameraPositionState.position = CameraPosition(
-                                        LatLng(it.latitude, it.longitude), // Move to the new position
+                                        LatLng(
+                                            it.latitude,
+                                            it.longitude
+                                        ), // Move to the new position
                                         10f, // Zoom level
                                         0f,
                                         0f
                                     )
                                 }
-                                markerState.position = LatLng( currentLocation!!.latitude, currentLocation!!.longitude)
+                                markerState.position =
+                                    LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
 
                             }
                         } else {
@@ -165,24 +226,34 @@ fun MapScreen() {
                         latitude = latLng.latitude
                         longitude = latLng.longitude
                     }
-                    markerState.position = LatLng( currentLocation!!.latitude, currentLocation!!.longitude)
+                    markerState.position =
+                        LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
 
                     cameraPositionState.position = CameraPosition(
-                        LatLng(currentLocation!!.latitude, currentLocation!!.longitude), // Move to the new position
+                        LatLng(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude
+                        ), // Move to the new position
                         10f, // Zoom level
                         0f,
                         0f
                     )
                     Log.d("MapScreen", "Clicked Location: $latLng")
                     Log.d("MapScreen", "currentLocation: $currentLocation")
-                    Log.d("MapScreen", "Marker Location: ${markerState.position.latitude}, ${markerState.position.longitude}")
+                    Log.d(
+                        "MapScreen",
+                        "Marker Location: ${markerState.position.latitude}, ${markerState.position.longitude}"
+                    )
                 }
             ) {
                 // Only display marker if currentLocation is not null
                 currentLocation?.let { location ->
-                    Log.d("MapScreen", "Marker Location: ${location.latitude}, ${location.longitude}")
+                    Log.d(
+                        "MapScreen",
+                        "Marker Location: ${location.latitude}, ${location.longitude}"
+                    )
                     Marker(
-                        state =  markerState,
+                        state = markerState,
                         title = "Your Location",
                         snippet = "Current Location"
                     )

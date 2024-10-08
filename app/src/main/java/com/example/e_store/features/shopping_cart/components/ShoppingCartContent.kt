@@ -1,6 +1,7 @@
 package com.example.e_store.features.shopping_cart.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,8 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
 import com.example.e_store.utils.shared_components.EShopButton
@@ -22,6 +28,8 @@ fun ShoppingCartContent(
     viewModel: ShoppingCartViewModel,
     onCheckout: () -> Unit
 ) {
+    var showAllItems by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -33,8 +41,9 @@ fun ShoppingCartContent(
                 .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(items.size) { currentItem ->
-                val item = items[currentItem]
+            val itemsToShow = if (showAllItems) items else items.take(2)
+            items(itemsToShow.size) { currentItem ->
+                val item = itemsToShow[currentItem]
                 ShoppingCartItem(
                     item = item,
                     viewModel = viewModel,
@@ -46,6 +55,19 @@ fun ShoppingCartContent(
                     }
                 )
             }
+        }
+
+        if (items.size > 2) {
+            Text(
+                text = if (showAllItems) "See Less" else "See More",
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier
+                    .clickable {
+                        showAllItems = !showAllItems
+                    }
+                    .padding(vertical = 8.dp)
+            )
         }
 
         Text(

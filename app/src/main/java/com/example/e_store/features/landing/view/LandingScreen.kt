@@ -51,6 +51,7 @@ class LandingScreen : ComponentActivity() {
             MaterialTheme {
                 Surface {
 
+
                    val navController = rememberNavController()
                     NavHost(navController, startDestination = Screen.Splash.route) {
                         composable(Screen.Splash.route) { SplashLottie(navController) }
