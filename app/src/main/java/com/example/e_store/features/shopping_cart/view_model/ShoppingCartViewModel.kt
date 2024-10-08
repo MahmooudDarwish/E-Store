@@ -98,9 +98,6 @@ class ShoppingCartViewModel(private val repository: EStoreRepository) : ViewMode
 
         _shoppingCartItems.value =
             _customerDraftOrdersShoppingCart.value.firstOrNull()?.line_items ?: emptyList()
-
-
-
         Log.d("ShoppingCart", "Customer Shopping Cart Draft Orders: ${_shoppingCartItems.value}")
     }
 
@@ -165,6 +162,7 @@ class ShoppingCartViewModel(private val repository: EStoreRepository) : ViewMode
     fun calculateTotalPrice(): Double {
         return _shoppingCartItems.value.sumOf { it.price.toDouble() * it.quantity }
     }
+
 
     fun updateShoppingCartDraftOrder(
         draftOrderId: Long,
@@ -311,4 +309,7 @@ class ShoppingCartViewModel(private val repository: EStoreRepository) : ViewMode
 
        */
 }
+
+
+
 
