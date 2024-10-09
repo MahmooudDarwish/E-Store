@@ -218,5 +218,11 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         apiService.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
     }
 
+    override suspend fun fetchProductById(productId: Long): SingleProductResponse {
+
+        return apiService.fetchProduct(productId)
+
+    }
+
 
 }

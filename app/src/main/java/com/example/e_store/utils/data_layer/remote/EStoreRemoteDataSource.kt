@@ -50,4 +50,7 @@ interface EStoreRemoteDataSource {
 
     suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long)
 
+
+    suspend fun fetchProductById(productId: Long): SingleProductResponse
+
 }

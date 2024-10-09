@@ -7,6 +7,9 @@
         <!-- Enable light status bar to make icons and text dark -->
         <item name="android:windowLightStatusBar">true</item>
 
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorButtonNormal">@color/colorPrimaryButton</item>
+
 
     </style>
 </resources>

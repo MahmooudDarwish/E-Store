@@ -5,7 +5,7 @@ data class ProductResponse(
     val products: List<Product>
 
 )
-data class  SingleProductResponse(
+data class SingleProductResponse(
     val product: Product
 )
 

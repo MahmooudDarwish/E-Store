@@ -1,5 +1,6 @@
 package com.example.e_store.features.favourites
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,13 +32,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -46,14 +50,13 @@ import coil.request.ImageRequest
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.BackButton
+import com.example.e_store.utils.shared_components.ConfirmNegativeActionDialog
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.res.stringResource
+
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import com.example.e_store.R
@@ -270,46 +273,17 @@ fun FavouritesListItem(
         }
     }
 
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = {
-                Text(
-                    text = "Remove from Favourites",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to remove this item from your favourites?",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onDeleteClick()
-                        showDeleteDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("Remove", color = Color.White)
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = { showDeleteDialog = false }
-                ) {
-                    Text("Cancel")
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            shape = RoundedCornerShape(16.dp)
-        )
-    }
+    ConfirmNegativeActionDialog(
+        showDialog = showDeleteDialog,
+        title = stringResource(R.string.remove_from_favourites),
+        message = stringResource(R.string.are_you_sure_you_want_to_remove_this_item_from_your_favourites),
+        onConfirm = {
+            onDeleteClick()
+        },
+        onDismiss = {
+            showDeleteDialog = false
+        }
+    )
 
 }
 

@@ -29,6 +29,8 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -51,16 +53,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModel
+import com.example.e_store.ui.theme.ButtonColor
 import com.example.e_store.ui.theme.LightGreen
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.shared_components.BackButton
+import com.example.e_store.utils.shared_components.EShopLoadingIndicator
+import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.Property
+import com.example.e_store.utils.shared_models.UserSession
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
@@ -68,21 +75,49 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun ProductInfoScreen(navController: NavHostController, viewModel: ProductInfoViewModel) {
 
-    if(ProductDetails.isNavigationFromFavourites) {
+
+    val productState by viewModel.productState.collectAsStateWithLifecycle()
+    //Log.d("ProductInfoScreen", "ProductDetails: $productState")
 
 
+    if (ProductDetails.isNavigationFromFavourites) {
+        LaunchedEffect(Unit) {
+            viewModel.fetchProductById()
+        }
 
+        when (productState) {
+            is DataState.Loading -> {
+                EShopLoadingIndicator()
+                Log.d("ProductInfoScreen", "Loading")
+            }
+
+            is DataState.Success -> {
+                val product = (productState as DataState.Success).data.product
+                Log.d("ProductInfoScreen", "Success")
+                Log.d("ProductInfoScreen", "Product: $product")
+                ProductDetails(navController, viewModel)
+            }
+
+            is DataState.Error -> {
+                Toast.makeText(
+                    LocalContext.current,
+                    (productState as DataState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        ProductDetails.isNavigationFromFavourites = false
     } else {
         ProductDetails(navController, viewModel)
     }
-
-
 
 
 }
 
 @Composable
 fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewModel) {
+
+    //Log.d("ProductInfoScreen", "ProductDetails: $ProductDetails")
 
     val selectedSize by viewModel.selectedSize
     val selectedColor by viewModel.selectedColor
@@ -91,7 +126,10 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
     val allReviewsVisible by viewModel.allReviewsVisible
     val favoriteIcon by viewModel.favoriteIcon
     val context = LocalContext.current
-    viewModel.fetchAllDraftOrders(true)
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllDraftOrders(true)
+    }
 
     var showQuantityDialog by remember { mutableStateOf(false) }
     var quantityInput by remember { mutableStateOf(TextFieldValue("1")) }
@@ -127,21 +165,25 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                         .padding(16.dp)
                         .fillMaxWidth()
                 ) {
+                    // Log.d("ProductInfoScreen", "ProductDetails: ${ProductDetails.title}")
                     Text(
                         text = ProductDetails.title,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
+                    //  Log.d("ProductInfoScreen", "ProductDetails: ${ProductDetails.vendor}")
                     Text(
                         text = ProductDetails.vendor,
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.Gray
                     )
+                    //      Log.d("ProductInfoScreen", "ProductDetails: $price")
                     Text(
                         text = price,
                         style = MaterialTheme.typography.titleLarge,
                         color = PrimaryColor
                     )
+                    // Log.d("ProductInfoScreen", "ProductDetails: $stock")
                     Text(
                         text = "$stock in stock",
                         style = MaterialTheme.typography.bodyMedium,
@@ -160,20 +202,16 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                             .fillMaxWidth()
                     ) {
                         Text("Size", style = MaterialTheme.typography.titleSmall)
-                        CustomChip(
-                            options = ProductDetails.sizes,
+                        CustomChip(options = ProductDetails.sizes,
                             selectedOption = selectedSize,
-                            onSelect = { newSize -> viewModel.updateSelectedSize(newSize) }
-                        )
+                            onSelect = { newSize -> viewModel.updateSelectedSize(newSize) })
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text("Color", style = MaterialTheme.typography.titleSmall)
-                        CustomChip(
-                            options = ProductDetails.colors,
+                        CustomChip(options = ProductDetails.colors,
                             selectedOption = selectedColor,
-                            onSelect = { newColor -> viewModel.updateSelectedColor(newColor) }
-                        )
+                            onSelect = { newColor -> viewModel.updateSelectedColor(newColor) })
                     }
                 }
             }
@@ -221,144 +259,141 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                 }
             }
         }
-
-        Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(60.dp),
-            elevation = 8.dp,
-            color = Color.White
-        ) {
-            Row(
+        if (!UserSession.isGuest) {
+            Surface(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(60.dp),
+                elevation = 8.dp,
+                color = Color.White
             ) {
-                Log.d("ProductInfoScreen", "$favoriteIcon")
-                IconButton(onClick = {
-                    if (viewModel.favoriteIcon.value) {
-                        viewModel.toggleFavorite()
-                        Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Log.d("ProductInfoScreen", "$favoriteIcon")
+                    IconButton(onClick = {
+                        if (viewModel.favoriteIcon.value) {
+                            viewModel.toggleFavorite()
+                            //   Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
 
-                        viewModel.removeShoppingCartDraftOrder(
-                            productId = ProductDetails.id,
-                            variantId = ProductDetails.variants.first().id
-                        )
-                    } else {
-                        Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
+                            viewModel.removeShoppingCartDraftOrder(
+                                productId = ProductDetails.id,
+                                variantId = ProductDetails.variants.first().id
+                            )
+                            //  Log.d("ProductInfoScreen", "Delete Item")
+                        } else {
+                            //  Log.d("ProductInfoScreen", "favoriteIcon: ${viewModel.favoriteIcon.value}")
 
-                        viewModel.toggleFavorite()
+                            viewModel.toggleFavorite()
 
-                        viewModel.createDraftOrder(
-                            lineItemList = createDraftOrderItems(
+                            viewModel.createDraftOrder(
+                                lineItemList = createDraftOrderItems(
 
-                                quantity = 1,
-                                selectedSize = selectedSize,
-                                selectedColor = selectedColor,
-                                context = context,
-                            ),
-                            isFavorite = true,
-                            productID = ProductDetails.id
+                                    quantity = 1,
+                                    selectedSize = selectedSize,
+                                    selectedColor = selectedColor,
+                                    context = context,
+                                ), isFavorite = true, productID = ProductDetails.id
+                            )
+                            // Log.d("ProductInfoScreen", "Add Item")
+                        }
+                    })
+
+
+                    {
+                        Icon(
+                            imageVector = if (favoriteIcon) Icons.Filled.Favorite else Icons.Outlined.Favorite,
+                            contentDescription = null,
+                            tint = if (favoriteIcon) PrimaryColor else Color.Gray
                         )
                     }
-                })
-
-
-                {
-                    Icon(
-                        imageVector = if (favoriteIcon) Icons.Filled.Favorite else Icons.Outlined.Favorite,
-                        contentDescription = null,
-                        tint = if (favoriteIcon) PrimaryColor else Color.Gray
-                    )
-                }
-                if (showQuantityDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showQuantityDialog = false },
-                        title = { Text(text = "Enter Quantity") },
-                        text = {
-                            Column {
-                                Text("Available stock: $stock")
-                                androidx.compose.material.TextField(
-                                    value = quantityInput,
-                                    onValueChange = { newValue ->
-                                        // Ensure the input is numeric and within stock limits
-                                        if (newValue.text.all { it.isDigit() }) {
-                                            val quantity = newValue.text.toIntOrNull() ?: 0
-                                            if (quantity <= stock) {
-                                                quantityInput = newValue
+                    if (showQuantityDialog) {
+                        AlertDialog(onDismissRequest = { showQuantityDialog = false },
+                            title = { Text(text = "Enter Quantity") },
+                            text = {
+                                Column {
+                                    Text("Available stock: $stock")
+                                    androidx.compose.material.TextField(value = quantityInput,
+                                        onValueChange = { newValue ->
+                                            // Ensure the input is numeric and within stock limits
+                                            if (newValue.text.all { it.isDigit() }) {
+                                                val quantity = newValue.text.toIntOrNull() ?: 0
+                                                if (quantity <= stock) {
+                                                    quantityInput = newValue
+                                                }
                                             }
-                                        }
-                                    },
-                                    label = { Text("Quantity") },
-                                    singleLine = true
-                                )
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                // Check if the quantity is valid before confirming
-                                val quantity = quantityInput.text.toIntOrNull() ?: 0
-                                if (quantity in 1..3) {
-                                    showQuantityDialog = false
-
-                                    viewModel.createDraftOrder(
-                                        lineItemList = createDraftOrderItems(
-
-                                            quantity = quantity,
-                                            selectedSize = selectedSize,
-                                            selectedColor = selectedColor,
-                                            context = context,
-                                        ),
-                                        isFavorite = false,
-                                        productID = ProductDetails.id
-
+                                        },
+                                        label = { Text("Quantity") },
+                                        singleLine = true
                                     )
-
-                                    Toast.makeText(
-                                        context,
-                                        "Items Added to Cart Successfully",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(context, "Invalid quantity", Toast.LENGTH_SHORT)
-                                        .show()
                                 }
-                            }) {
-                                Text("Confirm")
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showQuantityDialog = false }) {
-                                Text("Cancel")
+                            },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    // Check if the quantity is valid before confirming
+                                    val quantity = quantityInput.text.toIntOrNull() ?: 0
+                                    if (quantity in 1..3) {
+                                        showQuantityDialog = false
+
+                                        viewModel.createDraftOrder(
+                                            lineItemList = createDraftOrderItems(
+
+                                                quantity = quantity,
+                                                selectedSize = selectedSize,
+                                                selectedColor = selectedColor,
+                                                context = context,
+                                            ), isFavorite = false, productID = ProductDetails.id
+
+                                        )
+
+                                        Toast.makeText(
+                                            context,
+                                            "Items Added to Cart Successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            context, "Invalid quantity", Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }) {
+                                    Text("Confirm")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showQuantityDialog = false }) {
+                                    Text("Cancel")
 
 
-                            }
-                        }
-                    )
-                }
+                                }
+                            })
+                    }
 
-                Button(
-                    onClick = {
-                        showQuantityDialog = true
+                    Button(
+                        onClick = {
+                            showQuantityDialog = true
 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 16.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        }, modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 16.dp),
+                        colors = ButtonDefaults.buttonColors(ButtonColor)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text("Add to Cart")
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text("Add to Cart")
+                        }
                     }
                 }
             }
@@ -382,8 +417,8 @@ fun createDraftOrderItems(
     // Extract price and variantId from the found variant
     val price = variant?.price
     val variantId = variant?.id
-    if (price != null && variantId != null ) {
-            val properties: List<Property> = listOf(
+    if (price != null && variantId != null) {
+        val properties: List<Property> = listOf(
             Property("Size", selectedSize),    // Capitalized "Size"
             Property("Color", selectedColor),  // Capitalized "Color"
             Property("imageUrl", ProductDetails.images[0])
@@ -412,8 +447,7 @@ fun createDraftOrderItems(
 fun ReviewItem(review: Review) {
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = review.name,
@@ -425,7 +459,7 @@ fun ReviewItem(review: Review) {
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = null,
-                        tint = Color.Yellow,
+                        tint = PrimaryColor,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -433,9 +467,7 @@ fun ReviewItem(review: Review) {
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = review.comment,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
+            text = review.comment, style = MaterialTheme.typography.bodyMedium, color = Color.Gray
         )
     }
 }
@@ -466,8 +498,7 @@ fun CustomChip(
 ) {
     LazyRow(modifier = modifier) {
         items(options) { option ->
-            FilterChip(
-                selected = option == selectedOption,
+            FilterChip(selected = option == selectedOption,
                 onClick = { onSelect(option) },
                 label = {
                     Text(
@@ -490,18 +521,12 @@ fun ImageSliderWithPager(images: List<String>) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
-            count = images.size,
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
+            count = images.size, state = pagerState, modifier = Modifier.fillMaxWidth()
         ) { page ->
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(images[page])
-                        .size(300, 300)
-                        .crossfade(true)
-                        .build()
+                    model = ImageRequest.Builder(LocalContext.current).data(images[page])
+                        .size(300, 300).crossfade(true).build()
                 ),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
@@ -525,9 +550,7 @@ fun ImageSliderWithPager(images: List<String>) {
 
 
 data class Review(
-    val name: String,
-    val comment: String,
-    val rating: Int
+    val name: String, val comment: String, val rating: Int
 )
 
 val reviews = listOf(

@@ -209,21 +209,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                 !password.contains(Regex("\\s"))
     }
 
-    fun saveNameToSharedPref(context: Context, email: String, name: String, phone: String) {
-        val sanitizedEmail = email.replace("[^a-zA-Z0-9_.-]".toRegex(), "_")
-
-        val sharedPref: SharedPreferences =
-            context.getSharedPreferences(sanitizedEmail, Context.MODE_PRIVATE)
-        val sharedPrefEditor = sharedPref.edit()
-
-        sharedPrefEditor.putString("name", name)
-        sharedPrefEditor.putString("phone", phone)
-        sharedPrefEditor.apply()
-    }
 
     fun signUpUser(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit) {
-
-        isProgressing.value = true
         Log.d("AuthenticationViewModel", "Signing up user with email: ${_email.value}")
         if (checkSignUpTextValues(context)) {
             auth.createUserWithEmailAndPassword(_email.value, _password.value)

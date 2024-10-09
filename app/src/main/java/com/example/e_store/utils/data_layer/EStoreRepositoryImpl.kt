@@ -107,5 +107,11 @@ class EStoreRepositoryImpl private constructor(
 
     }
 
+    override suspend fun fetchProductById(productId: Long): SingleProductResponse {
+        return eStoreRemoteDataSource.fetchProductById(productId)
+
+    }
+
+
 
 }
