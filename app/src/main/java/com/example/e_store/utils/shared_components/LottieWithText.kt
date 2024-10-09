@@ -40,6 +40,7 @@ fun LottieWithText(
                 .padding(bottom = 16.dp)
         ) {
             LottieAnimation(
+                speed = 2f,
                 composition = composition,
                 iterations = LottieConstants.IterateForever,
                 modifier = Modifier.fillMaxSize()

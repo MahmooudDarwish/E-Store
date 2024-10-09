@@ -17,6 +17,9 @@ import java.io.IOException
 import java.util.concurrent.TimeoutException
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 
 class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
@@ -33,24 +36,21 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private val MIN_REFRESH_INTERVAL_MS = 5000
-    private var lastRefreshTime = 0L
 
     fun refreshAllData() {
-        val currentTime = System.currentTimeMillis()
-
-        if (_isRefreshing.value || (currentTime - lastRefreshTime < MIN_REFRESH_INTERVAL_MS)) return
-
         _isRefreshing.value = true
-        lastRefreshTime = currentTime
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                launch(Dispatchers.IO) { getBrands() }
-                launch(Dispatchers.IO) { getForUProducts() }
-                launch(Dispatchers.IO) { fetchDiscountCodes() }
+                coroutineScope {
+                    val brandsJob = launch { getBrands() }
+                    val forUProductsJob = launch { getForUProducts() }
+                    val discountCodesJob = launch { fetchDiscountCodes() }
+                    delay(500)  //to show the animation xDD
 
-            } catch (ex: Exception) {
+                    joinAll(brandsJob, forUProductsJob, discountCodesJob)
+                }
+                } catch (ex: Exception) {
                 Log.e("TAG", "Error refreshing data: ${ex.message}")
             } finally {
                 _isRefreshing.value = false
@@ -72,6 +72,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     }
 
     fun getBrands() {
+        _brands.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             try {
                 val brands = repository.fetchBrands()
@@ -89,6 +90,8 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     }
 
     fun getForUProducts() {
+        _forUProducts.value = DataState.Loading
+
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             try {
                 val brands = repository.fetchForUProducts()

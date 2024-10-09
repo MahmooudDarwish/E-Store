@@ -7,6 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.e_store.R
 import com.example.e_store.ui.theme.PrimaryColor
 
 @Composable
@@ -16,8 +17,6 @@ import com.example.e_store.ui.theme.PrimaryColor
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CircularProgressIndicator(
-            color = PrimaryColor,
-        )
+        LottieWithText(lottieRawRes = R.raw.loading, displayText = "")
     }
 }
