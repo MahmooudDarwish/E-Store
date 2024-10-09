@@ -89,7 +89,14 @@
 
     <string name="shopping_cart">Shopping Cart</string>
     <string name="please_wait_till_we_process_your_request">Please wait till we process your request</string>
-
+    <string name="remove_from_favourites">Remove from Favourites</string>
+    <string name="are_you_sure_you_want_to_remove_this_item_from_your_favourites">Are you sure you want to remove this item from your favourites?</string>
+    <string name="remove_from_shopping_cart">Remove From Shopping Cart</string>
+    <string name="are_you_sure_you_want_to_remove_this_item_from_your_shopping_cart">Are you sure you want to remove this item from your shopping cart?</string>
+    <string name="login_required">Login Required</string>
+    <string name="you_need_to_login_to_use_this_feature">You need to login to use this feature</string>
+    <string name="are_you_sure_you_want_to_log_out">Are you sure you want to log out?</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>

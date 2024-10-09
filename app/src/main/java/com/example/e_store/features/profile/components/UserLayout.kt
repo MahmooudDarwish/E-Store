@@ -7,6 +7,10 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -17,12 +21,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.e_store.R
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.utils.shared_components.ConfirmNegativeActionDialog
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun UserLayout(navHostController: NavHostController) {
+
+    var showDialog by remember { mutableStateOf(false) }
     Text(
         text = stringResource(
             id = R.string.hello_user,
@@ -69,19 +76,29 @@ fun UserLayout(navHostController: NavHostController) {
         },
     )
 
-    ProfileButton(
-        text = stringResource(id = R.string.log_out),
-        icon = ImageVector.vectorResource(id = R.drawable.ic_log_out),
-        iconColor = Color.Red,
-        textColor = Color.Red,
-        onClick = {
-            ///TODO: Log out from Firebase @kk98989898 @MahmoudDarwish
+    ConfirmNegativeActionDialog(
+        confirmText = "Log Out",
+        showDialog = showDialog,
+        title =stringResource(id = R.string.log_out) ,
+        message = stringResource(R.string.are_you_sure_you_want_to_log_out),
+        onConfirm = {
             FirebaseAuth.getInstance().signOut()
             navHostController.navigate(Screen.SignIn.route) {
                 popUpTo(0) {
                     inclusive = true
                 }
             }
+        }) {
+        showDialog = false
+    }
+
+    ProfileButton(
+        text = stringResource(id = R.string.log_out),
+        icon = ImageVector.vectorResource(id = R.drawable.ic_log_out),
+        iconColor = Color.Red,
+        textColor = Color.Red,
+        onClick = {
+            showDialog = true
         }
     )
 }

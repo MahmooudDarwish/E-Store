@@ -43,7 +43,6 @@ fun SignUpScreen(navController: NavHostController) {
     val context = LocalContext.current
     val viewModel: AuthenticationViewModel =
         viewModel(factory = AuthenticationViewModelFactory(auth))
-    val isProgressing = remember { mutableStateOf(false) }
 
 
     Column(
@@ -56,7 +55,7 @@ fun SignUpScreen(navController: NavHostController) {
     ) {
         WelcomeLabel()
 
-        if (isProgressing.value) {
+        if (viewModel.isProgressing.value) {
             EShopLoadingIndicator()
         }
 
@@ -106,9 +105,9 @@ fun SignUpScreen(navController: NavHostController) {
             text = stringResource(id = R.string.sign_up),
             onClick = {
                 Log.d("SignUpScreen", "Sign Up button clicked")
-                isProgressing.value = true
+                viewModel.isProgressing.value = true
                 viewModel.signUpUser(context, onAuthSuccess = {
-                    isProgressing.value = false
+                    viewModel.isProgressing.value = false
                     navController.navigate(Screen.SignIn.route)
                     Toast.makeText(
                         context,
@@ -117,7 +116,7 @@ fun SignUpScreen(navController: NavHostController) {
                     ).show()
                 }, onError = {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                    isProgressing.value = false
+                    viewModel.isProgressing.value = false
                 })
 
             },

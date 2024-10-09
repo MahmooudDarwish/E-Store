@@ -15,9 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.example.e_store.R
 import com.example.e_store.features.categories.components.CategoryList
 import com.example.e_store.features.categories.components.FloatingActionButtonSection
 import com.example.e_store.features.categories.components.SearchWithFavoriteWithFilterSection
@@ -27,9 +29,11 @@ import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.utils.constants.Keys
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.utils.shared_components.Popup
 import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.UserSession
 
 @Composable
 fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostController) {
@@ -41,6 +45,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
     var selectedCategory by remember { mutableStateOf("") }
     var selectedProductType by remember { mutableStateOf("") }
     var fabExpanded by remember { mutableStateOf(false) }
+    var showLoginDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getCategoriesProducts()
@@ -91,6 +96,22 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
             )
         },
     ) { contentPadding ->
+
+        Popup(
+            showDialog = showLoginDialog,
+            onDismiss = { showLoginDialog = false },
+            title = stringResource(R.string.login_required),
+            body = stringResource(R.string.you_need_to_login_to_use_this_feature) ,
+            confirmButtonText = stringResource(R.string.sign_in),
+            onConfirm = {
+                navController.navigate(Screen.SignIn.route){
+                    popUpTo(0){
+                        inclusive = true
+                    }
+                }
+            },
+            dismissButtonText = "Cancel"
+        )
         LazyColumn(
             modifier = Modifier
                 .background(Color.White)
@@ -98,15 +119,18 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                 .padding(contentPadding)
 
         ) {
+
             item {
                 SearchWithFavoriteWithFilterSection(
                     onSearchClick = {
-                        /// TODO: navigate to Search screen @MahmoudDariwsh @kk98989898
                         navController.navigate(NavigationKeys.SEARCH_CATEGORIES_ROUTE)
                     },
                     onFavoriteClick = {
-                        /// TODO: navigate to favorite screen @MahmoudDariwsh @kk98989898
-                        navController.navigate(Screen.FavouriteFromCategories.route)
+                        if (UserSession.isGuest) {
+                            showLoginDialog = true
+                        } else {
+                            navController.navigate(Screen.FavouriteFromCategories.route)
+                        }
                     },
                     onFilterClick = { showSliderDialog = !showSliderDialog },
                 )
@@ -136,7 +160,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                 ProductsStateHandler(
                     productsUiState = categoriesProductsUiState,
                     navController = navController,
-                    route = NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE, /// TODO: add route to product info @MahmoudDariwsh @kk98989898
+                    route = NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE,
                     filterProducts = ::filterProducts
                 )
             }

@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +40,8 @@ import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
 import androidx.compose.ui.res.stringResource
+import com.example.e_store.utils.shared_components.Popup
+import com.example.e_store.utils.shared_models.UserSession
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -49,6 +53,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
+    var showLoginDialog by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = { viewModel.refreshAllData() }
@@ -116,6 +121,22 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             .pullRefresh(pullRefreshState)
             .background(color = Color.White)
     ) {
+
+        Popup(
+            showDialog = showLoginDialog,
+            onDismiss = { showLoginDialog = false },
+            title = stringResource(R.string.login_required),
+            body = stringResource(R.string.you_need_to_login_to_use_this_feature) ,
+            confirmButtonText = stringResource(R.string.sign_in),
+            onConfirm = {
+                navController.navigate(Screen.SignIn.route){
+                    popUpTo(0){
+                        inclusive = true
+                    }
+                }
+            },
+            dismissButtonText = stringResource(R.string.cancel)
+        )
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -125,9 +146,11 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                         navController.navigate(Screen.SearchFromHome.route)
                     },
                     onFavoriteClick = {
-                        // Navigate to favorite screen
-                        ///TODO: Navigate to favorite products screen @kk989898
-                        navController.navigate(Screen.FavouriteFromHome.route)
+                        if (UserSession.isGuest) {
+                            showLoginDialog = true
+                        } else {
+                            navController.navigate(Screen.FavouriteFromHome.route)
+                        }
                     }
                 )
             }
