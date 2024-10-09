@@ -13,7 +13,7 @@ fun LoadingDialog() {
         onDismissRequest = { },
         title = {
             LottieWithText(
-                lottieRawRes = R.raw.splash,
+                lottieRawRes = R.raw.loading,
                 displayText = stringResource(id = R.string.please_wait_till_we_process_your_request)
             )
         },

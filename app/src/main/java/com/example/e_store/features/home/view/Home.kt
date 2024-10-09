@@ -4,9 +4,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -126,61 +129,56 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             showDialog = showLoginDialog,
             onDismiss = { showLoginDialog = false },
             title = stringResource(R.string.login_required),
-            body = stringResource(R.string.you_need_to_login_to_use_this_feature) ,
+            body = stringResource(R.string.you_need_to_login_to_use_this_feature),
             confirmButtonText = stringResource(R.string.sign_in),
             onConfirm = {
-                navController.navigate(Screen.SignIn.route){
-                    popUpTo(0){
+                navController.navigate(Screen.SignIn.route) {
+                    popUpTo(0) {
                         inclusive = true
                     }
                 }
             },
             dismissButtonText = stringResource(R.string.cancel)
         )
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            item {
-                SearchWithFavoriteSection(
-                    onSearchClick = {
-                        navController.navigate(Screen.SearchFromHome.route)
-                    },
-                    onFavoriteClick = {
-                        if (UserSession.isGuest) {
-                            showLoginDialog = true
-                        } else {
-                            navController.navigate(Screen.FavouriteFromHome.route)
-                        }
+            SearchWithFavoriteSection(
+                onSearchClick = {
+                    navController.navigate(Screen.SearchFromHome.route)
+                },
+                onFavoriteClick = {
+                    if (UserSession.isGuest) {
+                        showLoginDialog = true
+                    } else {
+                        navController.navigate(Screen.FavouriteFromHome.route)
                     }
-                )
-            }
-
-            item {
-                AdsSlider(initialImages = sliderImages) { clickedItem ->
-                    Toast.makeText(
-                        context,
-                        "Coupons: ${clickedItem.title} Copied!",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
+            )
+
+
+            AdsSlider(initialImages = sliderImages) { clickedItem ->
+                Toast.makeText(
+                    context,
+                    "Coupons: ${clickedItem.title} Copied!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
-            item { Gap(height = 16) }
-
-            item {
-                Text(
-                    text = stringResource(id = R.string.brands),
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
-                    fontSize = 20.sp
-                )
-            }
-
-            item {
+            Gap(height = 16)
                 when (brandsUiState) {
                     DataState.Loading -> EShopLoadingIndicator()
 
                     is DataState.Success -> {
                         val brands = (brandsUiState as DataState.Success).data
+
+                        Text(
+                            text = stringResource(id = R.string.brands),
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
+                            fontSize = 20.sp
+                        )
                         BrandsSection(navController = navController, brands = brands)
                     }
 
@@ -191,24 +189,20 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                         }
                     }
                 }
-            }
 
-            item {
-                Text(
-                    text = stringResource(id = R.string.for_you),
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
-                    fontSize = 20.sp
-                )
-            }
 
-            item { Gap(height = 16) }
 
-            item {
                 when (forUProductsUiState) {
-                    DataState.Loading -> EShopLoadingIndicator()
+                    DataState.Loading -> {} //EShopLoadingIndicator()
 
                     is DataState.Success -> {
                         val forUProducts = (forUProductsUiState as DataState.Success).data
+                        Text(
+                            text = stringResource(id = R.string.for_you),
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
+                            fontSize = 20.sp
+                        )
+                        Gap(height = 16)
                         ForUSection(
                             navController = navController,
                             products = forUProducts
@@ -222,8 +216,9 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                         }
                     }
                 }
-            }
+
         }
+
 
 
         PullRefreshIndicator(
