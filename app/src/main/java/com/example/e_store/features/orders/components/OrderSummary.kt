@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.e_store.utils.shared_components.ProductPrice
 import com.example.e_store.utils.shared_methods.changeDateFormat
 
 @Composable
@@ -32,12 +33,8 @@ fun OrderSummary(order: Order, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "${order.current_total_price} USD", ///TODO change currency
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
+            ProductPrice(price = order.current_total_price.toString(), isHorizontalItem = true, isOrder = true )
+
             Text(
                 text = "· ${order.line_items?.size} items",
                 style = MaterialTheme.typography.bodySmall.copy(

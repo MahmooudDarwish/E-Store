@@ -23,8 +23,8 @@ fun BackButton(onBackClick: () -> Unit) {
         Image(
             painter = painterResource(id = R.drawable.back_button),
             modifier = Modifier
-                .height(50.dp)
-                .width(25.dp)
+                .height(65.dp)
+                .width(45.dp)
                 .wrapContentWidth(Alignment.Start)
                 .clickable {
                     onBackClick()

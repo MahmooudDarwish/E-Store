@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import com.example.e_store.R
 import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.CustomIconButton
 import com.example.e_store.utils.shared_components.ElevationCard
+import com.example.e_store.utils.shared_components.HeaderText
 
 
 @Composable
@@ -35,12 +34,7 @@ fun BrandProductsHeader(
     ) {
         BackButton(onBackClick = { navController.popBackStack() })
 
-
-        Text(
-            modifier = Modifier.padding(top = 20.dp),
-            text = brandName ?: "Brands",
-            style = MaterialTheme.typography.titleMedium
-        )
+        HeaderText(headerText = brandName ?: "Brands")
 
 
         ElevationCard(modifier = Modifier.padding(top = 20.dp)) {
