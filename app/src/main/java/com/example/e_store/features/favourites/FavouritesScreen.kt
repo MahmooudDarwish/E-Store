@@ -53,6 +53,14 @@ import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.sp
+import com.example.e_store.R
+import com.example.e_store.utils.shared_components.Gap
+import com.example.e_store.utils.shared_components.HeaderText
+import com.example.e_store.utils.shared_components.ProductPrice
+import com.example.e_store.utils.shared_components.ProductTitle
 
 
 @Composable
@@ -70,7 +78,16 @@ fun FavouritesScreen(viewModel: FavouritesViewModel, navController: NavHostContr
     Column(
         modifier = Modifier
             .background(Color.White)
+            .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = stringResource(R.string.app_name),
+            fontSize = 24.sp,
+            color = PrimaryColor,
+            fontStyle = FontStyle.Italic
+        )
+
         FavouritesHeader(navController)
 
 
@@ -107,23 +124,15 @@ fun FavouritesScreen(viewModel: FavouritesViewModel, navController: NavHostContr
 fun FavouritesHeader(navController: NavHostController) {
 
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 16.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BackButton(onBackClick = { navController.popBackStack() })
 
-        Text(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .fillMaxWidth(),
-            text = "Favourites",
-            style = MaterialTheme.typography.headlineLarge,
-            color = PrimaryColor,
-            textAlign = TextAlign.Center
-        )
+        Gap(width = 20)
+        HeaderText(headerText = stringResource(id = R.string.favourite))
     }
 
 }
@@ -165,7 +174,7 @@ fun EmptyFavouritesIndicator() {
 fun FavouritesList(
     navController: NavHostController,
     favourites: List<DraftOrderDetails>,
-    onDeleteClick: (Long, Long) -> Unit
+    onDeleteClick: (Long, Long) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -189,7 +198,7 @@ fun FavouritesList(
 fun FavouritesListItem(
     lineItem: LineItem,
     onDeleteClick: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -237,17 +246,10 @@ fun FavouritesListItem(
                     .weight(1f)
                     .background(Color.White)
             ) {
-                Text(
-                    text = lineItem.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                ProductTitle(title = lineItem.title)
+
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${lineItem.price} USD",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                ProductPrice(price = lineItem.price, isHorizontalItem = true)
             }
 
             IconButton(

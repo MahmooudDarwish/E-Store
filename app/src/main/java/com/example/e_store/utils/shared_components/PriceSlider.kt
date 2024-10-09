@@ -32,7 +32,7 @@ fun PriceSlider(
             )
         )
         Text(
-            text = "Max Price: ${String.format("%.2f", maxPrice)} USD",
+            text = "Max Price: ${String.format("%.2f", maxPrice)} USD",        ///todo change currency
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 20.dp),

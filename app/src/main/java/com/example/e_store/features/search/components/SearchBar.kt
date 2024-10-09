@@ -57,7 +57,7 @@ fun SearchBar(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp)
+                .padding(vertical = 12.dp, horizontal = 16.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
