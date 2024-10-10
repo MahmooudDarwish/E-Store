@@ -75,9 +75,7 @@ class AuthenticationViewModel(
     private fun checkSignUpTextValues(context: Context): Boolean {
         if (_nameError.value) {
             Toast.makeText(
-                context,
-                context.getString(R.string.name_empty_error),
-                Toast.LENGTH_SHORT
+                context, context.getString(R.string.name_empty_error), Toast.LENGTH_SHORT
             ).show()
             return false
         }
@@ -85,15 +83,11 @@ class AuthenticationViewModel(
         if (_phoneError.value) {
             if (_phone.value.isEmpty()) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.phone_empty_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.phone_empty_error), Toast.LENGTH_SHORT
                 ).show()
             } else if (_phone.value.length != 11) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.phone_invalid_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.phone_invalid_error), Toast.LENGTH_SHORT
                 ).show()
             }
             return false
@@ -102,15 +96,11 @@ class AuthenticationViewModel(
         if (_emailError.value) {
             if (_email.value.isEmpty()) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.email_empty_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.email_empty_error), Toast.LENGTH_SHORT
                 ).show()
             } else if (!isValidEmail(_email.value)) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.email_invalid_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.email_invalid_error), Toast.LENGTH_SHORT
                 ).show()
             }
             return false
@@ -119,15 +109,11 @@ class AuthenticationViewModel(
         if (_passwordError.value) {
             if (_password.value.isEmpty()) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.password_empty_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.password_empty_error), Toast.LENGTH_SHORT
                 ).show()
             } else {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.password_invalid_error),
-                    Toast.LENGTH_LONG
+                    context, context.getString(R.string.password_invalid_error), Toast.LENGTH_LONG
                 ).show()
                 Toast.makeText(
                     context,
@@ -147,9 +133,7 @@ class AuthenticationViewModel(
                 ).show()
             } else if (_confirmPassword.value != _password.value) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.password_mismatch_error),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.password_mismatch_error), Toast.LENGTH_SHORT
                 ).show()
             }
             return false
@@ -163,15 +147,11 @@ class AuthenticationViewModel(
             _emailError.value -> {
                 if (email.value.isEmpty()) {
                     Toast.makeText(
-                        context,
-                        context.getString(R.string.email_empty_error),
-                        Toast.LENGTH_SHORT
+                        context, context.getString(R.string.email_empty_error), Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     Toast.makeText(
-                        context,
-                        context.getString(R.string.email_invalid_error),
-                        Toast.LENGTH_SHORT
+                        context, context.getString(R.string.email_invalid_error), Toast.LENGTH_SHORT
                     ).show()
                 }
                 false
@@ -235,13 +215,12 @@ class AuthenticationViewModel(
 
                         auth.currentUser?.let {
                             saveUserCredentialsInFirestore(
-                                context,
-                                it.uid,
-                                _name.value,
-                                _phone.value,
-                                _email.value,
-                                onAuthSuccess
-
+                                context = context,
+                                userId = it.uid,
+                                name = _name.value,
+                                phoneNumber = _phone.value,
+                                email = _email.value,
+                                onAuthSuccess = onAuthSuccess
                             )
                         }
                         sendEmailVerificationAndCreateShopifyCustomer(context)
@@ -263,37 +242,33 @@ class AuthenticationViewModel(
         name: String,
         phoneNumber: String,
         email: String,
+        currencyChoice: String = "EGP",
         onAuthSuccess: () -> Unit
     ) {
         val userMap = hashMapOf(
             "uid" to userId,
             "name" to name,
             "phoneNumber" to phoneNumber,
-            "email" to email
+            "email" to email,
+            "currency" to currencyChoice
         )
 
-        db.collection("users").document(userId).set(userMap)
-            .addOnSuccessListener {
-                Log.d("AuthenticationViewModel", "User credentials saved successfully")
-                Toast.makeText(context, "User credentials saved successfully", Toast.LENGTH_SHORT)
-                    .show()
-                onAuthSuccess()
-
-
-            }
-            .addOnFailureListener { e ->
-                Log.e("AuthenticationViewModel", "Error saving user credentials", e)
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
+        db.collection("users").document(userId).set(userMap).addOnSuccessListener {
+            Log.d("AuthenticationViewModel", "User credentials and currency saved successfully")
+            Toast.makeText(context, "User credentials saved successfully", Toast.LENGTH_SHORT)
+                .show()
+            onAuthSuccess()
+        }.addOnFailureListener { e ->
+            Log.e("AuthenticationViewModel", "Error saving user credentials and currency", e)
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun sendEmailVerificationAndCreateShopifyCustomer(context: Context) {
         auth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
             if (it.isSuccessful) {
                 Toast.makeText(
-                    context,
-                    context.getString(R.string.email_verification_sent),
-                    Toast.LENGTH_SHORT
+                    context, context.getString(R.string.email_verification_sent), Toast.LENGTH_SHORT
                 ).show()
 
                 createShopifyCustomer(
@@ -317,9 +292,7 @@ class AuthenticationViewModel(
     }
 
     fun signInAndCheckEmailVerification(
-        context: Context,
-        onAuthSuccess: () -> Unit,
-        onError: (String) -> Unit
+        context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit
     ) {
         if (!checkSignInTextValues(context)) {
             isProgressing.value = false
@@ -359,22 +332,22 @@ class AuthenticationViewModel(
     }
 
     private fun getUserData(context: Context, userId: String, onAuthSuccess: () -> Unit) {
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    UserSession.name = document.getString("name")
-                    UserSession.phone = document.getString("phoneNumber")
-                    UserSession.email = document.getString("email")
-                    UserSession.Uid = userId
-                    UserSession.isGuest = false
-                    onAuthSuccess()
-                } else {
-                    Toast.makeText(context, "No such document", Toast.LENGTH_SHORT).show()
-                }
+        db.collection("users").document(userId).get().addOnSuccessListener { document ->
+            if (document != null) {
+                UserSession.name = document.getString("name")
+                UserSession.phone = document.getString("phoneNumber")
+                UserSession.email = document.getString("email")
+                UserSession.Uid = userId
+                UserSession.isGuest = false
+                UserSession.currency =
+                    document.getString("currency").toString()
+                onAuthSuccess()
+            } else {
+                Toast.makeText(context, "No such document", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
+        }.addOnFailureListener { e ->
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -385,6 +358,7 @@ class AuthenticationViewModel(
         UserSession.phone = ""
         UserSession.Uid = ""
         UserSession.isGuest = true
+        UserSession.currency = "EGP"
     }
 
 

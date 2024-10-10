@@ -26,13 +26,14 @@ import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.shared_models.ProductResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
 import kotlinx.coroutines.delay
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
     private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.api
+
+    private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
 
     private val TAG = "EShopRemoteDataSourceImpl"
 
@@ -136,7 +137,6 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         shoppingCartDraftOrder: DraftOrderRequest
     ) {
         apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
-        Log.d("updateShoppingCartDraftOrder", "updateShoppingCartDraftOrder: $shoppingCartDraftOrder")
     }
 
     override suspend fun removeDraftOrder(draftOrderId: Long) {
@@ -194,16 +194,20 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun updateDraftOrderToCompleteDraftOrder(draftOrderId: Long) {
-        Log.d(TAG, "updateDraftOrderToCompleteDraftOrder: $draftOrderId")
         apiService.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
-
-
     }
 
     override suspend fun fetchProductById(productId: Long): SingleProductResponse {
 
         return apiService.fetchProduct(productId)
 
+    }
+
+    override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
+        return flow {
+            val response = exchangeRateApiService.getLatestExchangeRates()
+            emit(response)
+        }
     }
 
     override suspend fun createCustomer(customer: CustomerRequest) {
@@ -393,12 +397,5 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         apiService.updateCustomerAddress(customerId, addressId, address)
     }
 
-    private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
-    override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
-        return flow {
-            val response = exchangeRateApiService.getLatestExchangeRates()
-            emit(response)
-        }
-    }
 }
 

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,8 +37,8 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -77,6 +78,7 @@ import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.EShopButton
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
+import com.example.e_store.utils.shared_methods.convertCurrency
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.ProductDetails
@@ -145,6 +147,8 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
     var isConfirmState by remember { mutableStateOf(false) }
     val rotation = remember { Animatable(0f) }
 
+
+
     LaunchedEffect(Unit) {
         viewModel.fetchAllDraftOrders(true)
         if (isConfirmState) {
@@ -171,7 +175,7 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 80.dp)
         ) {
-            // Image Slider and Back Button
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -181,13 +185,11 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                 BackButton(onBackClick = { navController.popBackStack() })
             }
 
-            // Product Info Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(y = (-20).dp)
-                    .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(10),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(16.dp),
                 elevation = 8.dp
             ) {
                 Column(
@@ -195,57 +197,60 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                         .padding(16.dp)
                         .fillMaxWidth()
                 ) {
+                    // Log.d("ProductInfoScreen", "ProductDetails: ${ProductDetails.title}")
                     Text(
                         text = ProductDetails.title,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = ProductDetails.vendor,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = price,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = PrimaryColor
-                    )
-                    Text(
-                        text = "$stock in stock",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (stock > 0) LightGreen else Color.Red
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                        text = ProductDetails.price,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "$stock in stock",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (stock > 0) Color(0xFF4CAF50) else Color.Red
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = ProductDetails.description,
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Size and Color Selection
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text("Size", style = MaterialTheme.typography.titleSmall)
-                        CustomChip(
-                            options = ProductDetails.sizes,
-                            selectedOption = selectedSize,
-                            onSelect = { newSize -> viewModel.updateSelectedSize(newSize) })
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text("Color", style = MaterialTheme.typography.titleSmall)
-                        CustomChip(
-                            options = ProductDetails.colors,
-                            selectedOption = selectedColor,
-                            onSelect = { newColor -> viewModel.updateSelectedColor(newColor) })
-                    }
+                    Text("Size", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    CustomChip(
+                        options = ProductDetails.sizes,
+                        selectedOption = selectedSize,
+                        onSelect = { newSize -> viewModel.updateSelectedSize(newSize) }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text("Color", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    CustomChip(
+                        options = ProductDetails.colors,
+                        selectedOption = selectedColor,
+                        onSelect = { newColor -> viewModel.updateSelectedColor(newColor) }
+                    )
                 }
             }
 
-            // Reviews Section
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,10 +294,10 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                 }
             }
         }
-
         if (!UserSession.isGuest) {
             Surface(
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter),
                 elevation = 8.dp,
                 color = Color.White
             ) {
@@ -417,6 +422,7 @@ fun ProductDetails(navController: NavHostController, viewModel: ProductInfoViewM
                                             isFavorite = false,
                                             productID = ProductDetails.id
                                         )
+
                                         Toast.makeText(
                                             context,
                                             "Items Added to Cart Successfully",
@@ -535,23 +541,33 @@ fun CustomChip(
     options: List<String>,
     selectedOption: String,
     onSelect: (String) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    LazyRow(modifier = modifier) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         items(options) { option ->
-            FilterChip(
-                selected = option == selectedOption,
-                onClick = { onSelect(option) },
-                label = {
-                    Text(
-                        text = option,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Black
-                    )
-                },
-                colors = FilterChipDefaults.filterChipColors(),
-                modifier = Modifier.padding(horizontal = 4.dp) // Add padding to separate chips
-            )
+            val isSelected = option == selectedOption
+            Surface(
+                shape = RoundedCornerShape(50),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                ),
+                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surface,
+                modifier = Modifier.clickable { onSelect(option) }
+            ) {
+                Text(
+                    text = option,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
         }
     }
 }

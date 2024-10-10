@@ -38,9 +38,9 @@ import com.example.e_store.features.categories.view_model.CategoriesViewModelFac
 import com.example.e_store.features.checkout.view.CheckoutScreen
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModel
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
-import com.example.e_store.features.favourites.FavouritesScreen
-import com.example.e_store.features.favourites.FavouritesViewModel
-import com.example.e_store.features.favourites.FavouritesViewModelFactory
+import com.example.e_store.features.favourites.view.FavouritesScreen
+import com.example.e_store.features.favourites.view_model.FavouritesViewModel
+import com.example.e_store.features.favourites.view_model.FavouritesViewModelFactory
 import com.example.e_store.features.location.view.AddLocationScreen
 import com.example.e_store.features.location.view.MapScreen
 import com.example.e_store.features.location.view.LocationScreen
@@ -106,6 +106,7 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
     object FavouriteFromProfile :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_PROFILE, R.string.favourite, 0)
     object ProductInfoFromFavourite : Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
+    object ProductInfoFromProfile : Screen(NavigationKeys.PRODUCT_INFO_PROFILE_ROUTE, R.string.product_info, 0)
 
 }
 
@@ -121,13 +122,14 @@ fun AppNavigation(
     profileViewModelFactory: ProfileViewModelFactory,
     favouritesViewModelFactory: FavouritesViewModelFactory,
     ordersViewModelFactory: OrdersViewModelFactory,
+    settingsViewModelFactory: SettingsViewModelFactory,
+
     authenticationViewModelFactory : AuthenticationViewModelFactory,
     checkoutViewModelFactory: CheckoutViewModelFactory,
     addLocationViewModelFactory: AddLocationViewModelFactory,
     mapViewModelFactory: MapViewModelFactory,
     locationViewModelFactory: LocationViewModelFactory,
     paymentViewModelFactory : PaymentViewModelFactory,
-    settingsViewModelFactory: SettingsViewModelFactory,
 
     ) {
     NavHost(navController, startDestination = Screen.Home.route) {
@@ -173,8 +175,10 @@ fun AppNavigation(
             val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
             ProductInfoScreen(navController, viewModel)
         }
-
-
+        composable(route = Screen.ProductInfoFromProfile.route) {
+            val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+            ProductInfoScreen(navController, viewModel)
+        }
 
 
         composable(route = Screen.SearchFromHome.route) {

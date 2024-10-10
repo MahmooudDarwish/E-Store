@@ -23,8 +23,8 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.favourites.view_model.FavouritesViewModelFactory
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
-import com.example.e_store.features.favourites.FavouritesViewModelFactory
 import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
 import com.example.e_store.features.location.view_model.LocationViewModelFactory
 import com.example.e_store.features.location.view_model.MapViewModelFactory
