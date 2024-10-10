@@ -11,10 +11,19 @@ import kotlinx.coroutines.launch
 
 class PaymentViewModel( val repository: EStoreRepository) : ViewModel() {
 
-    fun  deleteDraftOrder()
-    {
+//    fun  deleteDraftOrder()
+//    {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.removeDraftOrder( DraftOrderIDHolder.draftOrderId!!)
+//        }
+//    }
+
+    fun sendEmailAnddeleteDraftOrder() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.removeDraftOrder( DraftOrderIDHolder.draftOrderId!!)
+            repository.updateDraftOrderToCompleteDraftOrder(DraftOrderIDHolder.draftOrderId!!)
+            repository.removeDraftOrder(DraftOrderIDHolder.draftOrderId!!)
         }
     }
 }
+
+
