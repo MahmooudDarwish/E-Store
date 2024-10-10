@@ -1,33 +1,11 @@
 package com.example.e_store.features.checkout.viewModel
 
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.airbnb.lottie.LottieComposition
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieConstants
 import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.Address
-import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.AppliedDiscount
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
@@ -37,9 +15,7 @@ import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 
 class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
 
@@ -68,35 +44,40 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
                 repo.fetchDefaultAddress(
                     UserSession.shopifyCustomerID!!
                 ).collect { addressResponse ->
-                    Log.d( "CheckotextutScreen", "Coupon Code: ${addressResponse}")
+                    Log.d("CheckotextutScreen", "Coupon Code: ${addressResponse}")
                     if (addressResponse != null) {
                         _defaultAddress.value = DataState.Success(addressResponse)
-                        Log.d( "CheckotextutScreen", "Coupon Code: ${ DataState.Success(addressResponse)}")
+                        Log.d(
+                            "CheckotextutScreen",
+                            "Coupon Code: ${DataState.Success(addressResponse)}"
+                        )
 
                     } else {
                         _defaultAddress.value = DataState.Success(null)
                     }
                 }
 
-                }catch (ex: Exception) {
-                    _defaultAddress.value = DataState.Error(R.string.unexpected_error)
-                    Log.e(TAG, "Error fetching shopping cart items", ex)
-                }
-
-
+            } catch (ex: Exception) {
+                _defaultAddress.value = DataState.Error(R.string.unexpected_error)
+                Log.e(TAG, "Error fetching shopping cart items", ex)
             }
-        }
 
+
+        }
+    }
 
 
     fun fetchDraftOrderByID(draftOrderId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repo.fetchDraftOrderByID(draftOrderId).collect { draftOrderResponse ->
-                    Log.d( "CheckotextutScreen", "Coupon Code: ${draftOrderResponse}")
+                    Log.d("CheckotextutScreen", "Coupon Code: ${draftOrderResponse}")
                     if (draftOrderResponse != null) {
                         _draftOrder.value = DataState.Success(draftOrderResponse)
-                        Log.d( "CheckotextutScreen", "Coupon Code: ${ DataState.Success(draftOrderResponse)}")
+                        Log.d(
+                            "CheckotextutScreen",
+                            "Coupon Code: ${DataState.Success(draftOrderResponse)}"
+                        )
 
                     } else {
                         _draftOrder.value = DataState.Success(null)
@@ -139,10 +120,11 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
         }
     }
 
-    fun  deleteDraftOrder()
-    {
+
+    fun sendEmailAnddeleteDraftOrder() {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.removeDraftOrder( DraftOrderIDHolder.draftOrderId!!)
+            repo.updateDraftOrderToCompleteDraftOrder(DraftOrderIDHolder.draftOrderId!!)
+            repo.removeDraftOrder(DraftOrderIDHolder.draftOrderId!!)
         }
     }
 
@@ -150,7 +132,6 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repo.fetchDiscountCodesByCode(code).collect { discountCodesResponse ->
-                    Log.d( "sssssssssssssssssssss", "Coupon Code: ${discountCodesResponse}")
                     if (discountCodesResponse != null) {
                         _discountCodes.value = DataState.Success(discountCodesResponse)
 
@@ -178,9 +159,9 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
             } catch (ex: Exception) {
                 _discountCodes.value = DataState.Error(R.string.unexpected_error)
                 Log.e(TAG, "Error fetching shopping cart items", ex)
-            }finally {
+            } finally {
                 fetchDraftOrderByID(DraftOrderIDHolder.draftOrderId!!)
-                Log.d( "CheckotextutScreen", "Coupon Code: ${DraftOrderIDHolder.draftOrderId}")
+                Log.d("CheckotextutScreen", "Coupon Code: ${DraftOrderIDHolder.draftOrderId}")
 
             }
         }

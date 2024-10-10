@@ -21,21 +21,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.airbnb.lottie.LottieComposition
-import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.e_store.R
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModel
-import com.example.e_store.features.home.component.SliderItem
-import com.example.e_store.features.home.component.updateSliderImages
 import com.example.e_store.features.payment.view.PaymentSuccessPopup
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.constants.NavigationKeys
@@ -44,8 +37,6 @@ import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_methods.convertCurrency
 import com.example.e_store.utils.shared_models.Address
-import com.example.e_store.utils.shared_models.AddressResponse
-import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderIDHolder
@@ -415,7 +406,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                         onClick = {
                             if (selectedPaymentMethod == "Cash on delivery") {
                                 showPopup = true
-                                viewModel.deleteDraftOrder()
+                                viewModel.sendEmailAnddeleteDraftOrder()
 
                             } else {
                                 navController.navigate(NavigationKeys.PAYMENT_ROUTE)
