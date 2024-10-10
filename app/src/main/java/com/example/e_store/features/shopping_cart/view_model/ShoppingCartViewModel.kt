@@ -9,6 +9,7 @@ import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
+import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.UserSession
@@ -43,6 +44,7 @@ class ShoppingCartViewModel(private val repository: EStoreRepository) : ViewMode
                     .collect { draftOrderResponse ->
                         if (draftOrderResponse != null) {
                             _shoppingCartItems.value = DataState.Success(draftOrderResponse)
+                            DraftOrderIDHolder.draftOrderId = draftOrderResponse.id
                         } else {
                             _shoppingCartItems.value = DataState.Success(null)
                         }
@@ -101,7 +103,10 @@ class ShoppingCartViewModel(private val repository: EStoreRepository) : ViewMode
 
     fun getTotalPrice(): Double {
         val draftOrder = (_shoppingCartItems.value as? DataState.Success<DraftOrderDetails?>)?.data
+        DraftOrderIDHolder.total_price = draftOrder?.total_price
         return draftOrder?.line_items?.sumOf { it.price.toDouble() * it.quantity } ?: 0.0
+
+
     }
 
     private fun updateShoppingCartDraftOrder(

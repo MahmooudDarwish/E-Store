@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
 import com.example.e_store.utils.shared_components.EShopButton
 import com.example.e_store.utils.shared_components.Gap
+import com.example.e_store.utils.shared_methods.convertCurrency
 import com.example.e_store.utils.shared_models.LineItem
 
 @Composable
@@ -71,10 +74,13 @@ fun ShoppingCartContent(
         }
 
         Text(
-            text = "Total price: ${viewModel.getTotalPrice()} EGP",
-        )
+            text = "Total price: ${convertCurrency(viewModel.getTotalPrice())}",
+            )
+
+
 
         Gap(height = 8)
+
         EShopButton(text = "CHECKOUT", onClick = onCheckout)
     }
 }

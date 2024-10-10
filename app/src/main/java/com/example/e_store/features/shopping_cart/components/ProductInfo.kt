@@ -27,7 +27,7 @@ fun ProductInfo(
     ) {
         ProductTitle(title = item.title)
         ProductPrice(
-            price = stringResource(R.string.price) + (item.price.toDouble() * item.quantity).toString(),
+            price =  (item.price.toDouble() * item.quantity).toString(),
             isHorizontalItem = true
         )
 

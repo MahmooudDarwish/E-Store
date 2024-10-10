@@ -1,19 +1,28 @@
 package com.example.e_store.features.authentication.view_model
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
+import com.example.e_store.utils.data_layer.EStoreRepository
+import com.example.e_store.utils.data_layer.local.shared_pref.CustomerSharedPreferencesHelper
+import com.example.e_store.utils.shared_models.Customer
+import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
-class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
+class AuthenticationViewModel(
+    private val auth: FirebaseAuth,
+    private val repository: EStoreRepository,
+    private val customerSharedPreferences: CustomerSharedPreferencesHelper
+) : ViewModel() {
 
     private val _name = mutableStateOf("")
     private val _phone = mutableStateOf("")
@@ -33,6 +42,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     private val _passwordError = mutableStateOf(true)
     private val _confirmPasswordError = mutableStateOf(true)
     val db = FirebaseFirestore.getInstance()
+
+    private val _customer = mutableStateOf<Customer?>(null)
 
 
     fun onNameChanged(newValue: String) {
@@ -230,9 +241,10 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                                 _phone.value,
                                 _email.value,
                                 onAuthSuccess
+
                             )
                         }
-                        sendEmailVerification(context)
+                        sendEmailVerificationAndCreateShopifyCustomer(context)
                     } else {
                         onError(
                             task.exception?.localizedMessage
@@ -266,6 +278,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                 Toast.makeText(context, "User credentials saved successfully", Toast.LENGTH_SHORT)
                     .show()
                 onAuthSuccess()
+
+
             }
             .addOnFailureListener { e ->
                 Log.e("AuthenticationViewModel", "Error saving user credentials", e)
@@ -273,7 +287,7 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
             }
     }
 
-    private fun sendEmailVerification(context: Context) {
+    private fun sendEmailVerificationAndCreateShopifyCustomer(context: Context) {
         auth.currentUser?.sendEmailVerification()?.addOnCompleteListener {
             if (it.isSuccessful) {
                 Toast.makeText(
@@ -281,6 +295,16 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                     context.getString(R.string.email_verification_sent),
                     Toast.LENGTH_SHORT
                 ).show()
+
+                createShopifyCustomer(
+                    CustomerRequest(
+                        Customer(
+                            first_name = _name.value,
+                            email = _email.value,
+                            phone = _phone.value,
+                        )
+                    )
+                )
             } else {
                 Toast.makeText(
                     context,
@@ -313,6 +337,8 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
                         if (reloadTask.isSuccessful) {
                             if (user.isEmailVerified) {
                                 getUserData(context, user.uid, onAuthSuccess)
+
+
                             } else {
                                 onError(context.getString(R.string.email_not_verified_error))
                             }
@@ -362,17 +388,40 @@ class AuthenticationViewModel(private val auth: FirebaseAuth) : ViewModel() {
     }
 
 
-    fun checkEmailVerification(context: Context, onAuthSuccess: () -> Unit, onError: (String) -> Unit, onNoUserFound: () -> Unit) {
+    fun checkEmailVerification(
+        context: Context,
+        onAuthSuccess: () -> Unit,
+        onError: (String) -> Unit,
+        onNoUserFound: () -> Unit
+    ) {
         val user = auth.currentUser
         if (user != null) {
             if (user.isEmailVerified) {
                 getUserData(context, user.uid, onAuthSuccess)
             } else {
-                  onError(context.getString(R.string.email_not_verified_error))
+                onError(context.getString(R.string.email_not_verified_error))
             }
         } else {
             Log.w("EmailVerification", "No user is signed in.")
             onNoUserFound()
         }
+    }
+
+
+    fun createShopifyCustomer(customer: CustomerRequest) {
+        viewModelScope.launch {
+            repository.createCustomer(customer)
+        }
+    }
+
+
+    fun fetchShopifyCustomer(email: String) {
+        viewModelScope.launch {
+            repository.fetchCustomerByEmail(email).let {
+                _customer.value = it
+            }
+        }
+
+
     }
 }

@@ -4,17 +4,19 @@ import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.e_store.features.shopping_cart.components.EmptyCartView
 import com.example.e_store.features.shopping_cart.components.LoadingDialog
 import com.example.e_store.features.shopping_cart.components.ShoppingCartContent
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
+import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 
 
 @Composable
-fun ShoppingCartScreen(viewModel: ShoppingCartViewModel) {
+fun ShoppingCartScreen(viewModel: ShoppingCartViewModel,navController: NavHostController) {
     val shoppingCartItemsUiState by viewModel.shoppingCartItems.collectAsStateWithLifecycle()
     val loadingProcessUiState by viewModel.applyChangesLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -35,7 +37,7 @@ fun ShoppingCartScreen(viewModel: ShoppingCartViewModel) {
                 ShoppingCartContent(
                     items = items,
                     viewModel = viewModel,
-                    onCheckout = { /* Handle checkout */ }
+                    onCheckout = { navController.navigate(NavigationKeys.CHECKOUT_ROUTE) }
                 )
             }
         }

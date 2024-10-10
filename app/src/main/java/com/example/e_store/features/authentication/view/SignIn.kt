@@ -34,9 +34,10 @@ import com.example.e_store.utils.shared_components.EShopTextButton
 
 
 @Composable
-fun SignInScreen(navController: NavHostController) {
-    val viewModel: AuthenticationViewModel =
+fun SignInScreen(navController: NavHostController , viewModel: AuthenticationViewModel) {
+    /*val viewModel: AuthenticationViewModel =
         viewModel(factory = AuthenticationViewModelFactory(FirebaseAuth.getInstance()))
+    */
     val isProgressing = viewModel.isProgressing
     val context = LocalContext.current
 

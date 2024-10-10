@@ -64,7 +64,7 @@ fun UserLayout(navHostController: NavHostController) {
         text = stringResource(id = R.string.delivery_address),
         icon = Icons.Default.Place,
         onClick = {
-            ///TODO: Navigate to Delivery Address screen @mohamed.abdelrahim @MahmoudDarwish
+            navHostController.navigate(Screen.Location.route)
         },
     )
 
@@ -72,7 +72,7 @@ fun UserLayout(navHostController: NavHostController) {
         text = stringResource(id = R.string.settings),
         icon = Icons.Default.Settings,
         onClick = {
-            ///TODO: Navigate to Settings screen @mohamed.abdelrahim @MahmoudDarwish
+            navHostController.navigate(Screen.Settings.route)
         },
     )
 

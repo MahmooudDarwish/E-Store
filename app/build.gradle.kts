@@ -33,8 +33,7 @@ android {
         manifestPlaceholders["google_maps_api_key"] = localProperties.getProperty("GOOGLE_MAPS_API_KEY")
 
 
-
-    }
+         }
 
     buildTypes {
         release {
@@ -93,6 +92,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:19.0.0")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.libraries.places:places:3.5.0")
+    implementation(libs.firebase.crashlytics.buildtools)
 
 
     val mapsComposeVersion = "6.1.0"
@@ -124,6 +124,7 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:1.7.3")
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer)
+
     //UI helpers
     implementation("androidx.compose.material:material:1.4.3")
     implementation("androidx.compose.ui:ui:1.4.3")
@@ -143,5 +144,7 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-pager:0.32.0")
 
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.32.0")
+
+
 
 }

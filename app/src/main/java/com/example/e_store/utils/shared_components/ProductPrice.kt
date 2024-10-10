@@ -5,12 +5,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
 import com.example.e_store.ui.theme.PrimaryColor
+import com.example.e_store.utils.shared_methods.convertCurrency
 
 @Composable
 fun ProductPrice(price: String, isHorizontalItem: Boolean, isOrder: Boolean = false) {
     if (isHorizontalItem) {
         Text(
-            text = "$price USD",
+            text = convertCurrency(price.toDouble())  ,
             style = if (isOrder) {
                 MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold
@@ -22,7 +23,7 @@ fun ProductPrice(price: String, isHorizontalItem: Boolean, isOrder: Boolean = fa
         )
     } else {
         Text(
-            text = "$price USD",
+            text = convertCurrency(price.toDouble()),
             color = PrimaryColor
         )
     }

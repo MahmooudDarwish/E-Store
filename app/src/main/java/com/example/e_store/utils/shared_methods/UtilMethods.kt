@@ -1,7 +1,11 @@
 package com.example.e_store.utils.shared_methods
 
+import android.util.Log
+import com.example.e_store.utils.constants.CurrencyKeys
+import com.example.e_store.utils.shared_models.ConversionRates
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.ProductDetails
+import com.example.e_store.utils.shared_models.UserSession
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -9,7 +13,7 @@ fun initializeProductDetails(product: Product) {
     ProductDetails.id = product.id
     ProductDetails.title = product.title
     ProductDetails.vendor = product.vendor
-    ProductDetails.price = product.variants[0].price
+    ProductDetails.price = convertCurrency(product.variants[0].price.toDouble())
     ProductDetails.description = product.description
     ProductDetails.stock = product.variants[0].inventoryQuantity
     ProductDetails.images = product.images.map { it.src }
@@ -27,4 +31,40 @@ fun changeDateFormat(inputDate: String): String {
     } else {
         "Invalid Date"
     }
+}
+
+fun convertCurrency(
+
+    price: Double
+): String {
+
+
+    val rates = UserSession.conversionRates
+    val newCurrency = UserSession.currency
+    val oldCurrency = CurrencyKeys.USD
+    if(oldCurrency == newCurrency) {
+        return "$price $newCurrency"
+    }
+    val currencyToRate = mapOf(
+        CurrencyKeys.USD to rates?.USD,
+        CurrencyKeys.AUD to rates?.AUD,
+        CurrencyKeys.BGN to rates?.BGN,
+        CurrencyKeys.CAD to rates?.CAD,
+        CurrencyKeys.CHF to rates?.CHF,
+        CurrencyKeys.CNY to rates?.CNY,
+        CurrencyKeys.EGP to rates?.EGP,
+        CurrencyKeys.EUR to rates?.EUR,
+        CurrencyKeys.GBP to rates?.GBP
+    )
+
+    val oldCurrencyRate = currencyToRate[oldCurrency] ?: error("Invalid old currency")
+    val newCurrencyRate = currencyToRate[newCurrency] ?: error("Invalid new currency")
+
+    val priceInUSD = price / oldCurrencyRate
+    val convertedPrice = priceInUSD * newCurrencyRate
+
+    var convertedPriceString = String.format("%d", convertedPrice.toInt())
+    convertedPriceString = "$convertedPriceString $newCurrency"
+
+    return convertedPriceString
 }
