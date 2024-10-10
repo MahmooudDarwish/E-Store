@@ -11,4 +11,5 @@ object Keys {
 
     const val IMAGE_URL_KEY = "imageUrl"
 
+
 }

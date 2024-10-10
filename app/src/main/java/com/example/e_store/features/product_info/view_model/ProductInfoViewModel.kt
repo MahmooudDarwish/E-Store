@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
+import com.example.e_store.utils.shared_methods.convertCurrency
 import com.example.e_store.utils.shared_methods.initializeProductDetails
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
@@ -28,7 +29,6 @@ import kotlinx.coroutines.launch
 
 class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel() {
 
-
     private val product = ProductDetails // Load your product data here.
 
     // Private mutable state variables
@@ -38,8 +38,9 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     private val _stock = mutableStateOf(0)
     private val _allReviewsVisible = mutableStateOf(false)
     private val _favoriteIcon = mutableStateOf(false)
-    private val _productState = MutableStateFlow<DataState<SingleProductResponse>>(DataState.Loading)
-    val productState= _productState.asStateFlow()
+    private val _productState =
+        MutableStateFlow<DataState<SingleProductResponse>>(DataState.Loading)
+    val productState = _productState.asStateFlow()
 
     // Public read-only state variables
     val selectedSize: State<String> get() = _selectedSize
@@ -49,7 +50,7 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     val allReviewsVisible: State<Boolean> get() = _allReviewsVisible
     val favoriteIcon: State<Boolean> get() = _favoriteIcon
 
-
+    // Draft orders
     private val _draftOrderItems =
         MutableStateFlow<DataState<DraftOrderResponse>>(DataState.Loading)
     private val _customerDraftOrders = MutableStateFlow<List<DraftOrderDetails>>(emptyList())
@@ -68,29 +69,24 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
     }
 
+    // Fetch product details
     fun fetchProductById() {
-
         viewModelScope.launch {
             try {
                 repository.fetchProduct(ProductDetails.id)
-                    .flowOn(Dispatchers.IO) // Specify the dispatcher for the flow's upstream
+                    .flowOn(Dispatchers.IO)
                     .collectLatest { product ->
-                        Log.d("ProductInfoViewModel", "Product: $product")
-                        delay(200) // Simulating a delay for demonstration purposes
                         _productState.value = DataState.Success(product)
                         initializeProductDetails(product.product)
+
                     }
             } catch (ex: Exception) {
-                // Log the error for debugging purposes
-                Log.e("ProductInfoViewModel", "Error fetching product", ex)
                 _productState.value = DataState.Error(R.string.unexpected_error)
             }
         }
     }
 
-
-
-
+    // Update selected size or color and adjust price and stock accordingly
     fun updateSelectedSize(newSize: String) {
         _selectedSize.value = newSize
         updatePriceAndStock()
@@ -106,45 +102,43 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
             it.option1 == _selectedSize.value && it.option2 == _selectedColor.value
         }
         variant?.let {
-            _price.value = it.price
+            _price.value = convertCurrency(it.price.toDouble())
             _stock.value = it.inventoryQuantity
         }
     }
 
+    // Toggle reviews visibility
     fun toggleAllReviews() {
         _allReviewsVisible.value = !_allReviewsVisible.value
     }
 
+    // Toggle favorite status
     fun toggleFavorite() {
         _favoriteIcon.value = !_favoriteIcon.value
     }
 
-
+    // Fetch all draft orders and filter by customer
     fun fetchAllDraftOrders(isStart: Boolean = false) {
         viewModelScope.launch {
             repository.fetchAllDraftOrders().collect { draftOrderResponse ->
                 _draftOrderItems.value = DataState.Success(draftOrderResponse)
-                Log.d("ProductInfoViewModel", "Draft Orders: $draftOrderResponse")
 
                 UserSession.email?.let {
-                    filterDraftOrdersByCustomerEmail(
-                        draftOrderResponse, it
-                    )
-                    if (isStart){
-                        checkIfItemIsInFavouriteDraftOrder(ProductDetails.id, ProductDetails.variants.first().id)
-                        }
-
-                    Log.d(
-                        "ProductInfoViewModel",
-                        "Filtered Draft Orders for ${UserSession.email}: ${_customerDraftOrders.value}"
-                    )
+                    filterDraftOrdersByCustomerEmail(draftOrderResponse, it)
+                    if (isStart) {
+                        checkIfItemIsInFavouriteDraftOrder(
+                            ProductDetails.id,
+                            ProductDetails.variants.first().id
+                        )
+                    }
                 }
             }
         }
     }
 
     private fun filterDraftOrdersByCustomerEmail(
-        draftOrderResponse: DraftOrderResponse, email: String
+        draftOrderResponse: DraftOrderResponse,
+        email: String,
     ) {
         _customerDraftOrders.value = draftOrderResponse.draft_orders.filter { it.email == email }
     }
@@ -154,240 +148,137 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         variantId: Long,
         draftOrders: DraftOrderDetails,
     ): List<LineItem> {
-
-
-        return draftOrders.line_items.filter { lineItem ->
-            Log.d(
-                "ProductInfoViewModel22",
-                "Line Item ID: ${lineItem.id} , Variant ID: ${lineItem.variant_id}"
-            )
-            Log.d("ProductInfoViewModel22", "Product ID: $productId , Variant ID: $variantId")
-            lineItem.product_id == productId && lineItem.variant_id == variantId.toString()
-
+        return draftOrders.line_items.filter {
+            it.product_id == productId && it.variant_id == variantId.toString()
         }
-
     }
 
     private fun filterCustomerDraftOrdersType(isFavorite: Boolean) {
-
         when (isFavorite) {
-            true -> {
-                _customerDraftOrdersFavorite.value = _customerDraftOrders.value.filter {
-                    it.note == "Favourite" && it.email == UserSession.email
-                }
+            true -> _customerDraftOrdersFavorite.value = _customerDraftOrders.value.filter {
+                it.note == "Favourite" && it.email == UserSession.email
             }
 
-            false -> {
-                _customerDraftOrdersShoppingCart.value =
-                    _customerDraftOrders.value.filter { it.note == "Shopping Cart" }
+            false -> _customerDraftOrdersShoppingCart.value = _customerDraftOrders.value.filter {
+                it.note == "Shopping Cart"
             }
         }
     }
 
-
+    // Create a draft order
     fun createDraftOrder(
-        lineItemList: MutableList<LineItem>, isFavorite: Boolean, productID: Long
+        lineItemList: MutableList<LineItem>,
+        isFavorite: Boolean,
+        productID: Long,
     ) {
-
-
         val note = if (isFavorite) "Favourite" else "Shopping Cart"
         fetchAllDraftOrders()
         filterCustomerDraftOrdersType(isFavorite)
 
         try {
-            // Call your repository method to create a draft order
-
-            // Handle success, e.g., updating state or showing a message
-
-            viewModelScope.launch {
-                delay(4000)
-            }
-
-            val draftOrders = when (isFavorite) {
-                true -> {
-                    _customerDraftOrdersFavorite.value
-                }
-
-                false -> {
-                    _customerDraftOrdersShoppingCart.value
-                }
-            }
+            val draftOrders =
+                if (isFavorite) _customerDraftOrdersFavorite.value else _customerDraftOrdersShoppingCart.value
 
             if (draftOrders.isNotEmpty()) {
                 val existingDraftOrder = draftOrders.first()
-                if (existingDraftOrder.line_items.isNotEmpty()) {
-                    val existingLineItems = filterCustomerDraftOrdersByProductIDAndVariantID(
-                        productID,
-                        lineItemList.first().variant_id.toLong(),
-                        existingDraftOrder,
-                    )
+                val existingLineItems = filterCustomerDraftOrdersByProductIDAndVariantID(
+                    productID,
+                    lineItemList.first().variant_id.toLong(),
+                    existingDraftOrder
+                )
 
-                    Log.d("existingDraftOrder", "Existing Line Items: $existingDraftOrder")
-
-                    if (existingLineItems.isNotEmpty()) {
-                        Log.d("ProductInfoViewModel22", "Existing Line Items: $existingLineItems")
-
-                        // Create a mutable copy of line_items
-                        val mutableLineItems = existingDraftOrder.line_items.toMutableList()
-
-                        // Remove the items that match the condition
-                        mutableLineItems.removeAll { lineItem ->
-                            existingLineItems.any { existingLineItem ->
-                                productID == existingLineItem.product_id && lineItem.variant_id == existingLineItem.variant_id
-                            }
+                if (existingLineItems.isNotEmpty()) {
+                    val mutableLineItems = existingDraftOrder.line_items.toMutableList()
+                    mutableLineItems.removeAll { lineItem ->
+                        existingLineItems.any { existingLineItem ->
+                            productID == existingLineItem.product_id && lineItem.variant_id == existingLineItem.variant_id
                         }
-
-                        // Update existingDraftOrder.line_items with the new list
-                        existingDraftOrder.line_items = mutableLineItems
                     }
-
-
+                    existingDraftOrder.line_items = mutableLineItems
                 }
-                Log.d("existingDraftOrder", "Existing Draft Order: $existingDraftOrder")
-
-
-
-
-
 
                 lineItemList.addAll(existingDraftOrder.line_items)
 
-
-                val cartDraftOrder = UserSession.email?.let {
-                    DraftOrderDetails(
-                        email = it, line_items = lineItemList, note = note, tags = null
-
-                    )
-                }?.let {
-                    DraftOrderRequest(
-                        draft_order = it
-                    )
-                }
                 viewModelScope.launch {
                     existingDraftOrder.id?.let {
-                        if (cartDraftOrder != null) {
-                            repository.updateDraftOrder(it, cartDraftOrder)
-                        }
-
+                        repository.updateDraftOrder(
+                            it,
+                            DraftOrderRequest(
+                                DraftOrderDetails(
+                                    email = UserSession.email!!,
+                                    line_items = lineItemList,
+                                    note = note
+                                )
+                            )
+                        )
                     }
                 }
-                Log.d("ProductInfoViewModel", "Update item to draft order: $lineItemList")
-
-
             } else {
-
                 val cartDraftOrder = UserSession.email?.let {
                     DraftOrderDetails(
-                        email = it, line_items = lineItemList, note = note, tags = null
-
+                        email = it,
+                        line_items = lineItemList,
+                        note = note,
+                        tags = null
                     )
                 }?.let {
-                    DraftOrderRequest(
-                        draft_order = it
-                    )
+                    DraftOrderRequest(draft_order = it)
                 }
+
                 viewModelScope.launch {
-
-                    if (cartDraftOrder != null) {
-                        repository.createDraftOrder(cartDraftOrder)
+                    cartDraftOrder?.let {
+                        repository.createDraftOrder(it)
                     }
-
                 }
-                Log.d("ProductInfoViewModel", "Adding item to draft order: $lineItemList")
             }
         } catch (e: Exception) {
-            // Handle error, e.g., show an error message
             Log.e("CreateDraftOrder", "Error creating draft order: ${e.message}")
         }
-
-
-        //_cartItems.add(newItem)
     }
 
-    private fun checkIfItemIsInFavouriteDraftOrder(productId: Long, variantId: Long) {
-
-        val favoriteDraftOrder = _customerDraftOrders.value.find { draftOrder ->
-            draftOrder.note == "Favourite"
-        }
-
-        if (favoriteDraftOrder == null) {
-            Log.d("checkIfItemIsInFavouriteDraftOrder", "No favorite draft order found.")
-            _favoriteIcon.value = false
-        }
-
-        val isItemInFavorites = favoriteDraftOrder?.line_items?.any { lineItem ->
-            lineItem.product_id == productId && lineItem.variant_id == variantId.toString()
-        }
-
-        Log.d("checkIfItemIsInFavouriteDraftOrder", "Item in favorite: $isItemInFavorites")
-
-        if (isItemInFavorites != null) {
-            _favoriteIcon.value = isItemInFavorites
-        }
-    }
-
+    // Remove an item from the shopping cart
     fun removeShoppingCartDraftOrder(productId: Long, variantId: Long) {
+        viewModelScope.launch {
+            repository.fetchAllDraftOrders().collect { draftOrderResponse ->
+                _draftOrderItems.value = DataState.Success(draftOrderResponse)
 
-        filterCustomerDraftOrdersType(true)
-        val existingCustomerDraftOrder = _customerDraftOrdersFavorite.value.firstOrNull()
-
-        Log.d("ShoppingCartUpdate", "Existing Draft Order: $existingCustomerDraftOrder")
-        if (existingCustomerDraftOrder != null) {
-            if (existingCustomerDraftOrder.line_items.isNotEmpty()) {
-                val existingLineItems = existingCustomerDraftOrder.let {
-                    filterCustomerDraftOrdersByProductIDAndVariantID(
-                        productId,
-                        variantId,
-                        it,
-                    )
-                }
-                viewModelScope.launch {
-                    delay(2000)
+                UserSession.email?.let {
+                    filterDraftOrdersByCustomerEmail(draftOrderResponse, it)
                 }
 
-                if (existingLineItems.isNotEmpty()) {
+                filterCustomerDraftOrdersType(true)
+                val existingCustomerDraftOrder = _customerDraftOrdersFavorite.value.firstOrNull()
 
-                    // Create a mutable copy of line_items
-                    val mutableLineItems = existingCustomerDraftOrder.line_items.toMutableList()
+                existingCustomerDraftOrder?.let {
+                    val existingLineItems =
+                        filterCustomerDraftOrdersByProductIDAndVariantID(productId, variantId, it)
 
-                    // Remove the items that match the condition
-                    mutableLineItems.removeAll { lineItem ->
-                        existingLineItems.any { existingLineItem ->
-                            productId == existingLineItem.product_id && lineItem.variant_id == existingLineItem.variant_id
-                        }
-                    }
-
-                    // If no line items are left after removal, delete the draft order
-                    if (mutableLineItems.isEmpty()) {
-                        // If it's the last item, delete the entire draft order
-                        existingCustomerDraftOrder.id?.let {
-                            deleteDraftOrder(it)
-                        }
-                        Log.d("ShoppingCartUpdate", "Draft order deleted as no items were left.")
-                    } else {
-                        // Update existingDraftOrder.line_items with the new list
-                        existingCustomerDraftOrder.line_items = mutableLineItems
-
-                        viewModelScope.launch {
-                            delay(2000)
+                    if (existingLineItems.isNotEmpty()) {
+                        val mutableLineItems = it.line_items.toMutableList()
+                        mutableLineItems.removeAll { lineItem ->
+                            existingLineItems.any { existingLineItem ->
+                                productId == existingLineItem.product_id && lineItem.variant_id == existingLineItem.variant_id
+                            }
                         }
 
-                        // Update the draft order with the remaining items
-                        existingCustomerDraftOrder.id?.let {
-                            updateShoppingCartDraftOrder(it, existingCustomerDraftOrder)
+                        if (mutableLineItems.isEmpty()) {
+                            deleteDraftOrder(it.id!!)
+                        } else {
+                            it.line_items = mutableLineItems
+                            updateShoppingCartDraftOrder(it.id!!, it)
                         }
-                        Log.d("ShoppingCartUpdate", "Draft order updated with remaining items.")
                     }
                 }
             }
+
         }
+
     }
 
     private fun deleteDraftOrder(draftOrderId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.removeDraftOrder(draftOrderId)
-                Log.d("ShoppingCartUpdate", "Draft order with ID $draftOrderId has been deleted.")
             } catch (ex: Exception) {
                 Log.e("ShoppingCartUpdate", "Failed to delete draft order: ${ex.message}")
             }
@@ -395,16 +286,13 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
     }
 
     private fun updateShoppingCartDraftOrder(
-        draftOrderId: Long, shoppingCartDraftOrderDerails: DraftOrderDetails
+        draftOrderId: Long,
+        shoppingCartDraftOrderDetails: DraftOrderDetails,
     ) {
-        val shoppingCartDraftOrder = DraftOrderRequest(
-            draft_order = shoppingCartDraftOrderDerails
-        )
-        Log.d("ShoppingCartUpdate", "Update item to draft order: $shoppingCartDraftOrder")
+        val shoppingCartDraftOrder = DraftOrderRequest(draft_order = shoppingCartDraftOrderDetails)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
-                Log.d("ShoppingCartUpdate", "Draft order with ID $draftOrderId has been updated.")
                 fetchAllDraftOrders()
             } catch (ex: Exception) {
                 Log.e("ShoppingCartUpdate", "Failed to update draft order: ${ex.message}")
@@ -412,19 +300,19 @@ class ProductInfoViewModel(private val repository: EStoreRepository) : ViewModel
         }
     }
 
-    fun refreshProductDetails() {
+    // Check if item is in favorite draft order
+    private fun checkIfItemIsInFavouriteDraftOrder(productId: Long, variantId: Long) {
+        val favoriteDraftOrder = _customerDraftOrders.value.find { it.note == "Favourite" }
 
-    }
-}
-
-
-private fun <E> MutableList<E>.addAll(elements: List<E?>) {
-    elements.forEach { element ->
-        if (element != null) {
-            this.add(element)
+        val isItemInFavorites = favoriteDraftOrder?.line_items?.any {
+            it.product_id == productId && it.variant_id == variantId.toString()
         }
+
+        _favoriteIcon.value = isItemInFavorites ?: false
     }
 }
+
+
 
 
 
