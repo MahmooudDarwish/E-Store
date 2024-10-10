@@ -1,6 +1,5 @@
 package com.example.e_store.utils.data_layer.remote
 
-import Order
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
 import com.example.e_store.utils.shared_models.Brand
@@ -23,12 +22,10 @@ import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.CustomerResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
-import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.SingleProductResponse
-import kotlinx.coroutines.delay
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
@@ -49,7 +46,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     override suspend fun fetchBrands(): Flow<List<Brand>> {
         val response = apiService.fetchBrands().smart_collections
-        return flowOf(response)
+
+        val filteredBrands = response.distinctBy { it.title }
+
+        return flowOf(filteredBrands)
     }
 
     override suspend fun fetchProducts(): Flow<List<Product>> {

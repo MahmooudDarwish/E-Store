@@ -1,6 +1,5 @@
 package com.example.e_store.features.orders.components
 
-import Order
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.e_store.utils.shared_components.ProductPrice
 import com.example.e_store.utils.shared_methods.changeDateFormat
+import com.example.e_store.utils.shared_models.Order
 
 @Composable
 fun OrderSummary(order: Order, modifier: Modifier = Modifier) {
