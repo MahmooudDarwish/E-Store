@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.Brand
+import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.DataState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import java.io.IOException
 import java.util.concurrent.TimeoutException
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
@@ -26,8 +28,11 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     private val _brands = MutableStateFlow<DataState<List<Brand>>>(DataState.Loading)
     val brands = _brands.asStateFlow()
 
+    private val _customer = MutableStateFlow<Customer?>(null)
+    val customer = _customer.asStateFlow()
+
     private val _discountCodes =
-        MutableStateFlow<DataState<List<DiscountCodesResponse>?>>(DataState.Loading)
+        MutableStateFlow<DataState<DiscountCodesResponse?>>(DataState.Loading)
     val discountCodes = _discountCodes.asStateFlow()
 
     private val _forUProducts = MutableStateFlow<DataState<List<Product>>>(DataState.Loading)
@@ -124,6 +129,18 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
             }
 
 
+        }
+    }
+
+    fun fetchShopifyCustomer(email: String) {
+        viewModelScope.launch {
+            repository.fetchCustomerByEmail(email).let {
+                _customer.value = it
+                Log.i("HomeViewModel", "get all customer : $it")
+                    UserSession.shopifyCustomerID = it.id
+                Log.i("HomeViewModel", "get all customer : ${UserSession.shopifyCustomerID}")
+
+            }
         }
     }
 

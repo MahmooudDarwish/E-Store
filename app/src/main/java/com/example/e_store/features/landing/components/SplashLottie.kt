@@ -23,14 +23,14 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashLottie(navController: NavController) {
+fun SplashLottie(navController: NavController, viewModel: AuthenticationViewModel) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash))
 
 
     val context = LocalContext.current
-    val viewModel: AuthenticationViewModel =
+ /*   val viewModel: AuthenticationViewModel =
         viewModel(factory = AuthenticationViewModelFactory(FirebaseAuth.getInstance()))
-
+*/
     LaunchedEffect(composition) {
         if (composition != null) {
             delay(3000)

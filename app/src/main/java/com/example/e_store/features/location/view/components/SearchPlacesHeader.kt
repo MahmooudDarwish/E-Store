@@ -1,12 +1,20 @@
 package com.example.e_store.features.location.view.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,32 +28,33 @@ import com.example.e_store.features.search.components.SearchBar
 import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.CustomIconButton
 import com.example.e_store.utils.shared_components.ElevationCard
+import com.example.e_store.utils.shared_components.Gap
 
 
+@Composable
+fun SearchMapBox(query: String = "Search", onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clickable { onClick() }
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 16.dp),
 
-    @Composable
-    fun SearchPlacesHeader(
-        navController: NavHostController,
-        searchQuery: String = "",
-        onSearchQueryChange: (String) -> Unit = {},
+        contentAlignment = Alignment.CenterStart
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxSize()
         ) {
-            BackButton(onBackClick = { navController.popBackStack() })
-
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                modifier = Modifier
-                    .fillMaxWidth(.8f)
-                    .height(70.dp)
-                    .padding(top = 20.dp, end = 6.dp , start = 4.dp)
-                    .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search Icon"
             )
+            Gap(width = 8)
+            Text(text = query, color = Color.Gray)
         }
     }
-
+}

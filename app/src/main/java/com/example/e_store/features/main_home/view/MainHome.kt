@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.e_store.R
+import com.example.e_store.features.authentication.view_model.AuthenticationViewModelFactory
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.main_home.components.BottomNavigationBar
@@ -22,9 +23,15 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
 import com.example.e_store.features.favourites.FavouritesViewModelFactory
+import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
+import com.example.e_store.features.location.view_model.LocationViewModelFactory
+import com.example.e_store.features.location.view_model.MapViewModelFactory
 import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
+import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
+import com.example.e_store.features.settings.view_model.SettingsViewModelFactory
 import com.example.e_store.utils.shared_components.NoInternetScreen
 import com.example.weather.utils.managers.InternetChecker
 
@@ -39,13 +46,23 @@ fun MainHomeScreen(
     categoriesViewModelFactory: CategoriesViewModelFactory,
     favouritesViewModelFactory: FavouritesViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory,
-    ordersViewModelFactory : OrdersViewModelFactory
-) {
+    ordersViewModelFactory : OrdersViewModelFactory,
+    authenticationViewModelFactory: AuthenticationViewModelFactory,
+    checkoutViewModelFactory: CheckoutViewModelFactory,
+    addLocationFactory: AddLocationViewModelFactory,
+    locationViewModelFactory: LocationViewModelFactory,
+    mapViewModelFactory: MapViewModelFactory,
+    paymentViewModelFactory : PaymentViewModelFactory,
+    settingsViewModelFactory: SettingsViewModelFactory,
+
+
+    ) {
     val items = listOf(
         Screen.Home,
         Screen.Categories,
         Screen.Cart,
-        Screen.Profile
+        Screen.Profile,
+
     )
 
     val navController = rememberNavController()
@@ -125,6 +142,13 @@ fun MainHomeScreen(
                             favouritesViewModelFactory = favouritesViewModelFactory,
                             shoppingCartViewModelFactory = shoppingCartViewModelFactory,
                             ordersViewModelFactory = ordersViewModelFactory,
+                            authenticationViewModelFactory = authenticationViewModelFactory,
+                            checkoutViewModelFactory = checkoutViewModelFactory,
+                            locationViewModelFactory = locationViewModelFactory,
+                            mapViewModelFactory = mapViewModelFactory,
+                            addLocationViewModelFactory = addLocationFactory,
+                            paymentViewModelFactory = paymentViewModelFactory,
+                            settingsViewModelFactory = settingsViewModelFactory,
 
                         )
                     }

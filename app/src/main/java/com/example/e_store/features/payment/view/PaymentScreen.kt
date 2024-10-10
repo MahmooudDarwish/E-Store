@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -20,11 +21,13 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.e_store.R
+import com.example.e_store.features.payment.view_model.PaymentViewModel
+import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.EShopButton
 import kotlinx.coroutines.delay
 
 @Composable
-fun PaymentScreen() {
+fun PaymentScreen(navController: NavController, viewModel: PaymentViewModel) {
     var cardholderName by remember { mutableStateOf("") }
     var cardNumber by remember { mutableStateOf("") }
     var month by remember { mutableStateOf("") }
@@ -72,6 +75,8 @@ fun PaymentScreen() {
             popupMessage = "Thank you for your payment!"
             delay(4000) // Show the success message for 2 seconds
             showPopup = false // Hide popup
+
+            navController.navigate(NavigationKeys.HOME_ROUTE)
         }
     }
 
@@ -137,12 +142,12 @@ fun PaymentScreen() {
         OutlinedTextField(
             value = cardNumber,
             onValueChange = {
-                if (it.length <= 14 && it.all { char -> char.isDigit() }) {
+                if (it.length <= 16 && it.all { char -> char.isDigit() }) {
                     cardNumber = it
                     determineCardType(cardNumber)
                 }
             },
-            label = { Text("Card Number (14 digits)") },
+            label = { Text("Card Number (16 digits)") },
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 Image(
@@ -221,6 +226,8 @@ fun PaymentScreen() {
                     isLoading = true
                     showPopup = true
 
+                    viewModel.deleteDraftOrder()
+
 
                 } else {
                     message = "Please fill all fields correctly!"
@@ -249,14 +256,14 @@ fun PaymentSuccessPopup(message: String, composition: LottieComposition? = null)
             tonalElevation = 8.dp, // Add elevation
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Transparent),
+                .background(Color.White),
 
         ) {
             Column(
 
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Transparent)
+                    .background(Color.White)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -269,7 +276,7 @@ fun PaymentSuccessPopup(message: String, composition: LottieComposition? = null)
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = message,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     textAlign =  TextAlign.Center,
                 )
 
@@ -278,8 +285,4 @@ fun PaymentSuccessPopup(message: String, composition: LottieComposition? = null)
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewPaymentScreen() {
-    PaymentScreen()
-}
+

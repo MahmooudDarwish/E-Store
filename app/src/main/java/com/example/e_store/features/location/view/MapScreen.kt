@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.provider.Settings
@@ -16,7 +18,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,13 +31,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.e_store.BuildConfig
 import com.example.e_store.R
-import com.example.e_store.features.location.view.components.SearchPlacesHeader
-import com.example.e_store.features.search.components.SearchProductsHeader
-import com.example.e_store.utils.shared_components.PriceSlider
+import com.example.e_store.features.location.view.components.SearchMapBox
+import com.example.e_store.features.location.view_model.MapViewModel
+import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.shared_components.ElevationCard
+import com.example.e_store.utils.shared_models.Customer
+import com.example.e_store.utils.shared_models.UserAddress
+import com.example.e_store.utils.shared_models.UserSession
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.common.api.Status
@@ -54,40 +59,17 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-
+import java.util.Locale
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen() {
+
+fun MapScreen( navController: NavController,viewModel: MapViewModel) {
     val context = LocalContext.current
 
     // Initialize Places API
     Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
     val placesClient: PlacesClient = Places.createClient(context)
-    var query by remember { mutableStateOf("") }
-
-    // Intent launcher for Google Autocomplete
-    val autocompleteLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
-            data?.let {
-                val place = Autocomplete.getPlaceFromIntent(data)
-                query = place.name ?: ""
-            }
-        } else if (result.resultCode == Activity.RESULT_CANCELED) {
-            val status: Status = Autocomplete.getStatusFromIntent(result.data)
-            println("Autocomplete canceled: $status")
-        }
-    }
-
-
-    val locationPermissionsState = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    )
+    var query by remember { mutableStateOf("Search") }
 
     var currentLocation by remember { mutableStateOf<Location?>(null) }
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -98,12 +80,61 @@ fun MapScreen() {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition(LatLng(0.0, 0.0), 10f, 0f, 0f)
     }
+    val locationPermissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
 
 
     // Request permissions
     LaunchedEffect(Unit) {
         locationPermissionsState.launchMultiplePermissionRequest()
     }
+
+
+    // Intent launcher for Google Autocomplete
+    val autocompleteLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            data?.let {
+                // Get the place from the autocomplete result
+                val place = Autocomplete.getPlaceFromIntent(data)
+
+                // Use the place's location (latitude and longitude)
+                val latLng = place.latLng
+                latLng?.let {
+                    // Update marker position based on the selected place
+                    markerState.position = LatLng(latLng.latitude, latLng.longitude)
+
+                    // Optionally, move the camera to the new position
+                    cameraPositionState.position = CameraPosition(
+                        LatLng(latLng.latitude, latLng.longitude), // Move to the new position
+                        10f, // Zoom level
+                        0f,  // Tilt angle
+                        0f   // Bearing
+                    )
+                    currentLocation = Location("").apply {
+                        latitude = latLng.latitude
+                        longitude = latLng.longitude
+
+                    }
+
+                    // Update the query with the place's name
+                    query = place.name ?: "Search"
+                }
+            }
+        } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            val status: Status? = result.data?.let { Autocomplete.getStatusFromIntent(it) }
+            println("Autocomplete canceled: $status")
+        }
+    }
+
+
+
 
     // Check if permissions are granted and location services are enabled
     LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
@@ -137,76 +168,130 @@ fun MapScreen() {
         }
     }
 
-
-
     Scaffold(
         topBar = {
-            // UI for the search input
-            Column(
+            Box(
                 modifier = Modifier
-                    .background(Color.White)
+                    .padding(16.dp)
             ) {
-                TextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    label = { Text("Enter a place") },
-                    modifier = Modifier.fillMaxWidth()
-                        .background( Color.White)
-                )
-                    val intent = Autocomplete.IntentBuilder(
-                        AutocompleteActivityMode.OVERLAY, listOf(
-                            Place.Field.ID, Place.Field.NAME
-                        )
-                    )
-
-                        .build(context)
-                    autocompleteLauncher.launch(intent)
-
-
-            }
-
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        if (locationPermissionsState.allPermissionsGranted) {
-                            getCurrentLocation(fusedLocationClient) { location ->
-                                currentLocation = location
-                                Log.d("MapScreen", "Current Location: $location")
-                                currentLocation?.let {
-                                    cameraPositionState.position = CameraPosition(
-                                        LatLng(
-                                            it.latitude,
-                                            it.longitude
-                                        ), // Move to the new position
-                                        10f, // Zoom level
-                                        0f,
-                                        0f
-                                    )
-                                }
-                                markerState.position =
-                                    LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
-
-                            }
-                        } else {
-                            showPermissionDialog = true
-                        }
-                    },
+                ElevationCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
                 ) {
-                    Icon(
-                        ImageVector.vectorResource(id = R.drawable.ic_gps),
-                        contentDescription = "Get Current Location",
-                        modifier = Modifier.size(30.dp)
+                    SearchMapBox(
+                        query = query,
+                        onClick = {
+                            val intent = Autocomplete.IntentBuilder(
+                                AutocompleteActivityMode.FULLSCREEN,
+                                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+                            ).build(context)
+                            autocompleteLauncher.launch(intent)
+                        }
                     )
                 }
             }
+        },
+        floatingActionButton = {
+            Column {
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+                    exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            if (locationPermissionsState.allPermissionsGranted) {
+                                getCurrentLocation(fusedLocationClient) { location ->
+                                    currentLocation = location
+                                    Log.d("MapScreen", "Current Location: $location")
+                                    currentLocation?.let {
+                                        cameraPositionState.position = CameraPosition(
+                                            LatLng(it.latitude, it.longitude), // Move to the new position
+                                            10f, // Zoom level
+                                            0f,
+                                            0f
+                                        )
+                                        // Update marker position to the current location
+                                        markerState.position = LatLng(it.latitude, it.longitude)
+                                    } ?: run {
+                                        Log.e("MapScreen", "Unable to get current location")
+                                    }
+                                    query = "Search"
+                                }
+                            } else {
+                                showPermissionDialog = true
+                            }
+                        },
+                    ) {
+                        Icon(
+                            ImageVector.vectorResource(id = R.drawable.ic_gps),
+                            contentDescription = "Get Current Location",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+                    exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            currentLocation?.let { location ->
+                                // Perform reverse geocoding to get address details
+                                val geocoder = Geocoder(context, Locale.getDefault())
+                                val addresses: List<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+
+                                addresses?.let {
+                                    val address = it.firstOrNull()
+                                    if (address != null) {
+                                        // Update the Adresse object
+                                        UserAddress.apply {
+                                            address1 = address.getAddressLine(0)
+                                            city = address.locality
+                                            province = address.adminArea
+                                            country = address.countryName
+                                            zip = address.postalCode
+                                        }
+
+
+                                        viewModel.saveAddress(  com.example.e_store.utils.shared_models.Address(
+                                            address1 = UserAddress.address1,
+                                            city = UserAddress.city,
+                                            phone = UserSession.phone,
+                                            firstName = UserSession.name,
+                                        ))
+
+                                        navController.navigate( NavigationKeys.CHECKOUT_ROUTE)
+
+                                        Log.d("SaveLocation", "Location saved: ${UserAddress.address1}")
+                                    } else {
+                                        Log.e("SaveLocation", "No address found for the current location")
+                                    }
+                                } ?: run {
+                                    Log.e("SaveLocation", "Unable to retrieve address for current location")
+                                }
+                            } ?: run {
+                                Log.e("SaveLocation", "Current location is null")
+                            }
+                        },
+                    ) {
+                        Icon(
+                            ImageVector.vectorResource(id = R.drawable.ic_save_location),
+                            contentDescription = "Save Location",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+
+                }
+            }
         }
-    ) { paddingValues ->
+    )
+    { paddingValues ->
 
         Box(
             modifier = Modifier
@@ -238,6 +323,8 @@ fun MapScreen() {
                         0f,
                         0f
                     )
+                    query="Search"
+
                     Log.d("MapScreen", "Clicked Location: $latLng")
                     Log.d("MapScreen", "currentLocation: $currentLocation")
                     Log.d(
@@ -308,8 +395,3 @@ private fun openGPSSettings(context: Context) {
     context.startActivity(intent)
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MapScreenPreview() {
-    MapScreen()
-}

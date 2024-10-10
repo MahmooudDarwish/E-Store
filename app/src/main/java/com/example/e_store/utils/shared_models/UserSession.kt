@@ -7,4 +7,9 @@ object UserSession{
     var Uid : String? = null
     var isGuest : Boolean = true
 
+    var shopifyCustomerID: Long?=null
+    var currency: String = "USD"
+    var conversionRates: ConversionRates? = null
+
+
 }

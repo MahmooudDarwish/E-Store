@@ -56,6 +56,18 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     val discountCodesUiState by viewModel.discountCodes.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
+    val customer by viewModel.customer.collectAsStateWithLifecycle()
+
+    if (!UserSession.isGuest) {
+
+        LaunchedEffect(Unit) {
+            UserSession.email?.let { viewModel.fetchShopifyCustomer(it) }
+        }
+
+        Log.i("HomeScreen", "HomeScreen: ${UserSession.shopifyCustomerID}")
+    }
+
+
     var showLoginDialog by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
@@ -84,8 +96,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
 
         is DataState.Success -> {
             (discountCodesUiState as DataState.Success).data?.let { data ->
-                val codesToProcess = data.flatMap { it.discount_codes }.take(5)
-                val newSliderItems = codesToProcess.map { discountCode ->
+
+               val newSliderItems = data.discount_codes.map { discountCode ->
                     val codeLower = discountCode.code.lowercase()
                     val imageId = when (codeLower) {
                         "fivepercentoff" -> R.drawable.fivepercentoff

@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.e_store.ui.theme.PrimaryColor
+import com.example.e_store.utils.shared_methods.convertCurrency
+import kotlin.math.ceil
 
 @Composable
 fun PriceSlider(
@@ -20,6 +22,7 @@ fun PriceSlider(
     sliderMaxValue: Float,
     onPriceChange: (Float) -> Unit
 ) {
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Slider(
             modifier = Modifier.padding(horizontal = 40.dp),
@@ -32,7 +35,7 @@ fun PriceSlider(
             )
         )
         Text(
-            text = "Max Price: ${String.format("%.2f", maxPrice)} USD",        ///todo change currency
+            text = "Max Price: ${ convertCurrency(ceil(maxPrice.toDouble()))} ",        ///todo change currency
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 20.dp),

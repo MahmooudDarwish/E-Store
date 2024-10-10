@@ -10,6 +10,8 @@ import androidx.navigation.navArgument
 import com.example.e_store.R
 import com.example.e_store.features.authentication.view.SignInScreen
 import com.example.e_store.features.authentication.view.SignUpScreen
+import com.example.e_store.features.authentication.view_model.AuthenticationViewModel
+import com.example.e_store.features.authentication.view_model.AuthenticationViewModelFactory
 import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
@@ -33,13 +35,40 @@ import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewMod
 import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
+import com.example.e_store.features.checkout.view.CheckoutScreen
+import com.example.e_store.features.checkout.viewModel.CheckoutViewModel
+import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
 import com.example.e_store.features.favourites.FavouritesScreen
 import com.example.e_store.features.favourites.FavouritesViewModel
 import com.example.e_store.features.favourites.FavouritesViewModelFactory
+import com.example.e_store.features.location.view.AddLocationScreen
+import com.example.e_store.features.location.view.MapScreen
+import com.example.e_store.features.location.view.LocationScreen
+import com.example.e_store.features.location.view_model.AddLocationViewModel
+import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
+import com.example.e_store.features.location.view_model.LocationViewModel
+import com.example.e_store.features.location.view_model.LocationViewModelFactory
+import com.example.e_store.features.location.view_model.MapViewModel
+import com.example.e_store.features.location.view_model.MapViewModelFactory
+import com.example.e_store.features.payment.view.PaymentScreen
+import com.example.e_store.features.payment.view_model.PaymentViewModel
+import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
 import com.example.e_store.features.profile.view_model.ProfileViewModel
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
+import com.example.e_store.features.settings.view.SettingsScreen
+import com.example.e_store.features.settings.view_model.SettingsViewModel
+import com.example.e_store.features.settings.view_model.SettingsViewModelFactory
 
 sealed class Screen(val route: String, val title: Int, val icon: Int) {
+
+    object Checkout : Screen(NavigationKeys.CHECKOUT_ROUTE, R.string.checkout, 0)
+
+    object  AddLocation : Screen(NavigationKeys.ADD_LOCATION_ROUTE, R.string.add_location, 0)
+    object  Map : Screen(NavigationKeys.MAP_ROUTE, R.string.map, 0)
+    object  Location : Screen(NavigationKeys.LOCATION_ROUTE, R.string.location, 0)
+    object  Payment : Screen(NavigationKeys.PAYMENT_ROUTE, R.string.payment, 0)
+
+    object Settings : Screen(NavigationKeys.SETTINGS_ROUTE, R.string.settings,0)
 
     object Splash : Screen(NavigationKeys.SPLASH_ROUTE, R.string.splash_title, 0)
     object Home : Screen(NavigationKeys.HOME_ROUTE, R.string.home_title, R.drawable.ic_home)
@@ -50,6 +79,7 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
     object Orders : Screen(NavigationKeys.ORDERS_ROUTE, R.string.orders_title, 0)
     object SignUp : Screen(NavigationKeys.SIGN_UP_ROUTE, R.string.sign_up, 0)
     object SignIn : Screen(NavigationKeys.SIGN_IN_ROUTE, R.string.sign_in, 0)
+
     object Categories :
         Screen(NavigationKeys.CATEGORIES_ROUTE, R.string.categories_title, R.drawable.ic_categories)
 
@@ -90,8 +120,16 @@ fun AppNavigation(
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory,
     favouritesViewModelFactory: FavouritesViewModelFactory,
-    ordersViewModelFactory: OrdersViewModelFactory
-) {
+    ordersViewModelFactory: OrdersViewModelFactory,
+    authenticationViewModelFactory : AuthenticationViewModelFactory,
+    checkoutViewModelFactory: CheckoutViewModelFactory,
+    addLocationViewModelFactory: AddLocationViewModelFactory,
+    mapViewModelFactory: MapViewModelFactory,
+    locationViewModelFactory: LocationViewModelFactory,
+    paymentViewModelFactory : PaymentViewModelFactory,
+    settingsViewModelFactory: SettingsViewModelFactory,
+
+    ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             val viewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
@@ -104,6 +142,11 @@ fun AppNavigation(
         composable(route = Screen.Profile.route) {
             val viewModel: ProfileViewModel = viewModel(factory = profileViewModelFactory)
             ProfileScreen(viewModel = viewModel, navController = navController)
+        }
+
+        composable(route = Screen.Checkout.route) {
+            val viewModel: CheckoutViewModel = viewModel(factory = checkoutViewModelFactory)
+            CheckoutScreen(viewModel = viewModel, navController = navController)
         }
 
         composable(
@@ -133,6 +176,7 @@ fun AppNavigation(
 
 
 
+
         composable(route = Screen.SearchFromHome.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             SearchScreen(viewModel, navController)
@@ -146,12 +190,19 @@ fun AppNavigation(
             OrdersScreen(viewModel = viewModel, navController = navController)
         }
 
-        composable(route = Screen.SignIn.route) { SignInScreen(navController) }
-        composable(route = Screen.SignUp.route) { SignUpScreen(navController) }
+
+
+
+        composable(route = Screen.SignIn.route) {
+            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
+            SignInScreen(navController, viewModel) }
+        composable(route = Screen.SignUp.route) {
+            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
+            SignUpScreen(navController,viewModel) }
 
         composable(route = Screen.Cart.route) {
             val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
-            ShoppingCartScreen(viewModel)
+            ShoppingCartScreen(viewModel, navController)
         }
         composable(route = Screen.FavouriteFromHome.route) {
             val viewModel: FavouritesViewModel = viewModel(factory = favouritesViewModelFactory)
@@ -165,5 +216,26 @@ fun AppNavigation(
             val viewModel: FavouritesViewModel = viewModel(factory = favouritesViewModelFactory)
             FavouritesScreen(viewModel, navController)
         }
+
+        composable(route = Screen.AddLocation.route) {
+            val viewModel: AddLocationViewModel = viewModel(factory = addLocationViewModelFactory)
+            AddLocationScreen(navController, viewModel)
+        }
+        composable(route = Screen.Map.route) {
+            val viewModel: MapViewModel = viewModel(factory = mapViewModelFactory)
+            MapScreen(navController, viewModel)
+        }
+        composable(route = Screen.Location.route) {
+            val viewModel: LocationViewModel = viewModel(factory = locationViewModelFactory)
+            LocationScreen(navController, viewModel)
+        }
+        composable(route = Screen.Payment.route) {
+
+            val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+            PaymentScreen(navController,viewModel)
+        }
+        composable(route = Screen.Settings.route) {
+            val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
+            SettingsScreen(viewModel, navController) }
     }
 }
