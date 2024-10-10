@@ -1,6 +1,5 @@
 package com.example.e_store.features.orders.components
 
-import Order
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.e_store.utils.constants.Keys
+import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.UserSession
 
 @Composable

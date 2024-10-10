@@ -1,6 +1,5 @@
 package com.example.e_store.utils.data_layer
 
-import Order
 import android.util.Log
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.shared_models.Brand
@@ -9,7 +8,6 @@ import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSource
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
@@ -19,12 +17,11 @@ import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.CustomerResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
-import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.SingleProductResponse
 
 class EStoreRepositoryImpl private constructor(
     private var eStoreRemoteDataSource: EStoreRemoteDataSource,
-    private var eStoreLocalDataSource: EStoreLocalDataSource,
 ) : EStoreRepository {
 
     private val TAG = "EShopRepositoryImpl"
@@ -33,11 +30,10 @@ class EStoreRepositoryImpl private constructor(
         private var instance: EStoreRepositoryImpl? = null
         fun getInstance(
             moviesRemoteDataSource: EStoreRemoteDataSource,
-            moviesLocalDataSource: EStoreLocalDataSource
         ): EStoreRepositoryImpl {
             return instance ?: synchronized(this) {
                 val temp = EStoreRepositoryImpl(
-                    moviesRemoteDataSource, moviesLocalDataSource
+                    moviesRemoteDataSource
                 )
                 instance = temp
                 temp
@@ -81,12 +77,12 @@ class EStoreRepositoryImpl private constructor(
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        shoppingCartDraftOrder: DraftOrderRequest
+        shoppingCartDraftOrder: DraftOrderRequest,
     ) {
         eStoreRemoteDataSource.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
 
-    override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails>  {
+    override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails> {
         return eStoreRemoteDataSource.fetchDraftOrderByID(draftOrderId)
     }
 
@@ -128,6 +124,7 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun updateCustomer(customerId: Long, customer: CustomerRequest) {
         eStoreRemoteDataSource.updateCustomer(customerId, customer)
     }
+
     override suspend fun fetchAllCustomers(): Flow<CustomerResponse> {
         return eStoreRemoteDataSource.fetchAllCustomers()
     }
@@ -162,12 +159,12 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun updateCustomerAddress(
         customerId: Long,
         addressId: Long,
-        address: AddNewAddress
+        address: AddNewAddress,
     ) {
         eStoreRemoteDataSource.updateCustomerAddress(customerId, addressId, address)
     }
 
     override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
         return eStoreRemoteDataSource.fetchConversionRates()
-        }
+    }
 }

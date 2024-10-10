@@ -1,11 +1,12 @@
+package com.example.e_store.utils.shared_models
 
 data class OrderResponse(
-    val orders: List<Order>
+    val orders: List<Order>,
 )
 
 
 data class Order(
-    val billing_address: Address?,
+    val billing_address: OrderAddress?,
     val browser_ip: String?,
     val buyer_accepts_marketing: Boolean,
     val cancel_reason: String?,
@@ -29,10 +30,10 @@ data class Order(
     val current_subtotal_price_set: MoneySet?,
     val current_total_tax: String?,
     val current_total_tax_set: MoneySet?,
-    val customer: Customer?,
+    val customer: OrderCustomer?,
     val customer_locale: String?,
     val discount_applications: List<DiscountApplication>?,
-    val discount_codes: List<DiscountCode>?,
+    val discount_codes: List<OrderDiscountCode>?,
     val email: String?,
     val estimated_taxes: Boolean,
     val financial_status: String?,
@@ -41,7 +42,7 @@ data class Order(
     val gateway: String?,
     val id: Long,
     val landing_site: String?,
-    val line_items: List<LineItem>?,
+    val line_items: List<OrderLineItem>?,
     val location_id: Long?,
     val merchant_of_record_app_id: Int?,
     val name: String?,
@@ -50,10 +51,10 @@ data class Order(
     val number: Int,
     val order_number: Int,
     val original_total_additional_fees_set: MoneySet?,
-    val original_total_duties_set: MoneySet?
+    val original_total_duties_set: MoneySet?,
 )
 
-data class Address(
+data class OrderAddress(
     val address1: String?,
     val address2: String?,
     val city: String?,
@@ -68,7 +69,7 @@ data class Address(
     val province_code: String?,
     val country_code: String?,
     val latitude: String?,
-    val longitude: String?
+    val longitude: String?,
 )
 
 data class ClientDetails(
@@ -77,25 +78,25 @@ data class ClientDetails(
     val browser_ip: String?,
     val browser_width: Int?,
     val session_hash: String?,
-    val user_agent: String?
+    val user_agent: String?,
 )
 
 data class Company(
     val id: Int,
-    val location_id: Int
+    val location_id: Int,
 )
 
 data class MoneySet(
     val shop_money: Money?,
-    val presentment_money: Money?
+    val presentment_money: Money?,
 )
 
 data class Money(
     val amount: String?,
-    val currency_code: String?
+    val currency_code: String?,
 )
 
-data class Customer(
+data class OrderCustomer(
     val id: Long?,
     val email: String?,
     val accepts_marketing: Boolean?,
@@ -114,7 +115,7 @@ data class Customer(
     val currency: String?,
     val addresses: Any?,
     val admin_graphql_api_id: String?,
-    val default_address: Any?
+    val default_address: Any?,
 )
 
 data class DiscountApplication(
@@ -125,13 +126,13 @@ data class DiscountApplication(
     val value_type: String?,
     val allocation_method: String?,
     val target_selection: String?,
-    val target_type: String?
+    val target_type: String?,
 )
 
-data class DiscountCode(
+data class OrderDiscountCode(
     val code: String?,
     val amount: String?,
-    val type: String?
+    val type: String?,
 )
 
 data class Fulfillment(
@@ -141,10 +142,10 @@ data class Fulfillment(
     val status: String?,
     val tracking_company: String?,
     val tracking_number: String?,
-    val updated_at: String?
+    val updated_at: String?,
 )
 
-data class LineItem(
+data class OrderLineItem(
     val attributed_staffs: List<AttributedStaff>?,
     val fulfillable_quantity: Int?,
     val fulfillment_service: String?,
@@ -164,24 +165,24 @@ data class LineItem(
     val name: String?,
     val gift_card: Boolean?,
     val price_set: MoneySet?,
-    val properties: List<Property>?,
+    val properties: List<OrderProperty>?,
     val taxable: Boolean?,
     val tax_lines: List<TaxLine>?,
     val total_discount: String?,
     val total_discount_set: MoneySet?,
     val discount_allocations: List<DiscountAllocation>?,
     val origin_location: OriginLocation?,
-    val duties: List<Duty>?
+    val duties: List<Duty>?,
 )
 
 data class AttributedStaff(
     val id: String?,
-    val quantity: Int?
+    val quantity: Int?,
 )
 
-data class Property(
+data class OrderProperty(
     val name: String?,
-    val value: String?
+    val value: String?,
 )
 
 data class TaxLine(
@@ -189,13 +190,13 @@ data class TaxLine(
     val price: String?,
     val price_set: MoneySet?,
     val channel_liable: Boolean?,
-    val rate: Double?
+    val rate: Double?,
 )
 
 data class DiscountAllocation(
     val amount: String?,
     val discount_application_index: Int?,
-    val amount_set: MoneySet?
+    val amount_set: MoneySet?,
 )
 
 data class OriginLocation(
@@ -206,7 +207,7 @@ data class OriginLocation(
     val address1: String?,
     val address2: String?,
     val city: String?,
-    val zip: String?
+    val zip: String?,
 )
 
 data class Duty(
@@ -216,10 +217,10 @@ data class Duty(
     val shop_money: Money?,
     val presentment_money: Money?,
     val tax_lines: List<TaxLine>?,
-    val admin_graphql_api_id: String?
+    val admin_graphql_api_id: String?,
 )
 
 data class NoteAttribute(
     val name: String?,
-    val value: String?
+    val value: String?,
 )

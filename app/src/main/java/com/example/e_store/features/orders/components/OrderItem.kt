@@ -1,6 +1,5 @@
 package com.example.e_store.features.orders.components
 
-import Order
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.e_store.utils.shared_components.ElevationCard
+import com.example.e_store.utils.shared_models.Order
 
 @Composable
 fun OrderItem(order: Order) {

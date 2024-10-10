@@ -13,7 +13,6 @@ import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.landing.components.SplashLottie
 import com.example.e_store.features.main_home.view.MainHomeScreen
 import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
-import com.example.e_store.utils.data_layer.local.room.EStoreLocalDataSourceImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.features.authentication.view.SignInScreen
@@ -42,7 +41,6 @@ class LandingScreen : ComponentActivity() {
     private val repo by lazy {
         EStoreRepositoryImpl.getInstance(
             EStoreRemoteDataSourceImpl.getInstance(),
-            EStoreLocalDataSourceImpl()
         )
     }
     private  val customerPreferences by  lazy {
