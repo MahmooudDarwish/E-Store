@@ -17,11 +17,9 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.PriceRuleResponse
 import com.example.e_store.utils.shared_models.DraftOrderRequest
-import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.SingleDraftOrderResponse
 import com.example.e_store.utils.shared_models.SinglePriceRuleResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
-import kotlinx.coroutines.flow.Flow
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
@@ -55,7 +53,7 @@ interface ShopifyAPIServices {
     ): OrderResponse
 
     @PUT(APIKeys.COMPLETE_DRAFT_ORDERS_ENDPOINT)
-    fun updateDraftOrderToCompleteDraftOrder(
+    suspend fun updateDraftOrderToCompleteDraftOrder(
         @Path(APIKeys.DRAFT_ORDER_ID_PARAM) draftOrderId: Long
     )
 
