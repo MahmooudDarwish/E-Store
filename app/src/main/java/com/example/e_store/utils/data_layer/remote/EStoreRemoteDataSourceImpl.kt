@@ -31,7 +31,8 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.api
 
-    private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
+    private val exchangeRateApiService: ExchangeRateApi =
+        ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
 
     private val TAG = "EShopRemoteDataSourceImpl"
 
@@ -145,7 +146,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails> {
-        return flow{
+        return flow {
             val response = apiService.fetchDraftOrderByID(draftOrderId).draft_order
             emit(response)
         }
@@ -231,7 +232,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     override suspend fun fetchCustomerByEmail(email: String): Customer {
         Log.d("fetchCustomerByEmail", "fetchCustomerByEmail: $email")
         val response = apiService.fetchAllCustomers().customers.first { it.email == email }
-        Log.d( "fetchCustomerByEmail", "fetchCustomerByEmail: $response")
+        Log.d("fetchCustomerByEmail", "fetchCustomerByEmail: $response")
         return response
     }
 
@@ -256,7 +257,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                         emit(null) // Emit null if no price rules are found
                     }
                 } else {
-                    Log.e(TAG, "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}")
+                    Log.e(
+                        TAG,
+                        "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}"
+                    )
                     emit(null) // Emit null in case of failure
                 }
             } catch (e: Exception) {
@@ -268,7 +272,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
 
     override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> {
-        var appliedDiscount : AppliedDiscount? = null
+        var appliedDiscount: AppliedDiscount? = null
         fetchDiscountCodes().collect { discountResponse ->
             if (discountResponse != null) {
                 val discountCode = discountResponse.discount_codes.find {
@@ -286,15 +290,12 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                     }
                     Log.d("fetchDiscountCodesByCode", "priceRuleDetails: $priceRuleDetails")
                     if (priceRuleDetails != null) {
-                        if (priceRuleDetails != null) {
-                            // Create an AppliedDiscount object with the fetched data
-                            appliedDiscount = AppliedDiscount(
-                                description = priceRuleDetails.price_rule.title,
-                                value = (priceRuleDetails.price_rule.value.toDouble()*-1).toString(),
-                                title = priceRuleDetails.price_rule.title,
-                                value_type = priceRuleDetails.price_rule.value_type
-                            )
-                        }
+                        appliedDiscount = AppliedDiscount(
+                            description = priceRuleDetails.price_rule.title,
+                            value = (priceRuleDetails.price_rule.value.toDouble() * -1).toString(),
+                            title = priceRuleDetails.price_rule.title,
+                            value_type = priceRuleDetails.price_rule.value_type
+                        )
                         Log.d("fetchDiscountCodesByCode", "appliedDiscount: $appliedDiscount")
 
                     }
@@ -303,7 +304,6 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
         return flowOf(appliedDiscount)
     }
-
 
 
     /*
@@ -368,7 +368,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun createCustomerAddress(customerId: Long, address: AddNewAddress) {
-                apiService.createCustomerAddress(customerId, address)
+        apiService.createCustomerAddress(customerId, address)
 
     }
 
@@ -378,17 +378,18 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     override suspend fun fetchDefaultAddress(customerId: Long): Flow<Address> {
 
-           var defaultAddress :Address?= null
+        var defaultAddress: Address? = null
 
-                fetchCustomerAddresses(customerId).collect { addresses ->
-                    defaultAddress= addresses.addresses.first {
-                        it.default == true
-                    }
-                }
-           return flow {
-               defaultAddress?.let { emit(it) }
-           }
+        fetchCustomerAddresses(customerId).collect { addresses ->
+            defaultAddress = addresses.addresses.first {
+                it.default == true
+            }
         }
+        return flow {
+            defaultAddress?.let { emit(it) }
+        }
+    }
+
 
     override suspend fun updateCustomerAddress(
         customerId: Long,
