@@ -42,7 +42,7 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
     }
 
     override suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return flowOf(ProductMockModel.collections[brandId] ?: emptyList())
     }
 
     override suspend fun fetchCategoriesProducts(): Flow<List<Product>> {

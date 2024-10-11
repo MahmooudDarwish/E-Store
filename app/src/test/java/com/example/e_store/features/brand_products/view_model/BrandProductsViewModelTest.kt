@@ -1,69 +1,77 @@
 package com.example.e_store.features.brand_products.view_model
 
 import com.example.e_store.utils.data_layer.FakeEStoreRepositoryEmp
-import com.example.e_store.utils.shared_models.Brand
-import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 
 class BrandProductsViewModelTest{
-    lateinit var repository : FakeEStoreRepositoryEmp
+    lateinit var fakeRepository : FakeEStoreRepositoryEmp
     lateinit var viewModel: BrandProductsViewModel
 
     @Before
     fun createRepository() {
-        repository = FakeEStoreRepositoryEmp()
-        viewModel = BrandProductsViewModel(repository)
-    }
-
-
-    @Test
-    fun fetchBrands_returnsAllBrands() = runTest {
-        // Given brands contains the expected data
-        val expectedBrands = BrandsMockModel.brands
-
-        //When fetching brands
-        val result = repository.fetchBrands()
-
-        //Then the result contains all brands
-        assertEquals(expectedBrands, result.first())
+        fakeRepository = FakeEStoreRepositoryEmp()
+        viewModel = BrandProductsViewModel(fakeRepository)
     }
 
     @Test
-    fun fetchBrands_returnsNonEmptyList() = runTest {
-        //When fetching brands
-        val result = repository.fetchBrands()
+    fun testFetchBrandProducts_existingBrandId_returnsExpectedProductList() = runTest {
+        // Given
+        val brandId = "1"
+        val expectedProducts = listOf(ProductMockModel.product1, ProductMockModel.product3)
 
-        //Then the result is not empty
-        assert(result.first().isNotEmpty())
+        // When
+        val result = fakeRepository.fetchBrandProducts(brandId)
+
+        // Then
+        assertEquals(expectedProducts, result.first())
     }
 
     @Test
-    fun fetchBrands_returnsExpectedNumberOfBrands() = runTest {
-        //Given you have a way to determine the expected size
-        val expectedSize = BrandsMockModel.brands.size
+    fun testFetchBrandProducts_nonExistingBrandId_returnsEmptyList() = runTest {
+        // Given
+        val brandId = "non-existent-brand-id"
 
-        //When fetching brands
-        val result = repository.fetchBrands()
+        // When
+        val result = fakeRepository.fetchBrandProducts(brandId)
 
-        // Then Check if the size of the emitted list matches the expected size
-        assertEquals(expectedSize, result.first().size)
+        // Then
+        assertTrue(result.first().isEmpty())
     }
 
     @Test
-    fun fetchBrands_returnsEmptyList_whenNoBrandsAvailable() = runTest {
-        // Given brands is empty
-        BrandsMockModel.brands = emptyList()
+    fun testFetchBrandProducts_emptyBrandId_returnsEmptyList() = runTest {
+        // Given
+        val brandId = ""
 
-        //When fetching brands
-        val result = repository.fetchBrands()
+        // When
+        val result = fakeRepository.fetchBrandProducts(brandId)
 
-        // Check that the result is an empty list
-        assertEquals(emptyList<Brand>(), result.first())
+        // Then
+        assertTrue(result.first().isEmpty())
     }
+
+
+    @Test(expected = NullPointerException::class)
+    fun testFetchBrandProducts_nullBrandId_throwsIllegalArgumentException() = runTest {
+        // Given
+        val brandId: String? = null
+
+        // When
+        fakeRepository.fetchBrandProducts(brandId!!)
+
+        //Then throw error
+    }
+
+
+
+
+
 
 }
