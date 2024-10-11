@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.airbnb.lottie.LottieComposition
@@ -226,7 +225,7 @@ fun PaymentScreen(navController: NavController, viewModel: PaymentViewModel) {
                     isLoading = true
                     showPopup = true
 
-                    viewModel.deleteDraftOrder()
+                    viewModel.sendEmailAnddeleteDraftOrder()
 
 
                 } else {

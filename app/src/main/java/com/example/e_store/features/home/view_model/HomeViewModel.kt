@@ -8,6 +8,9 @@ import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.DiscountCodesResponse
+import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +19,6 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeoutException
-import com.example.e_store.utils.shared_models.DiscountCodesResponse
-import com.example.e_store.utils.shared_models.Product
-import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
@@ -144,5 +144,18 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
         }
     }
 
+    fun fetchCurrency() {
+        viewModelScope.launch {
+            try {
+                repository.fetchConversionRates().collect { response ->
+                    UserSession.conversionRates = response.conversion_rates
+                }
+            } catch (e: Exception) {
+                DataState.Error(R.string.network_error)
 
+            }
+        }
+
+
+    }
 }

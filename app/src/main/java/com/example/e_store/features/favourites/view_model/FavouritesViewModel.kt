@@ -1,4 +1,4 @@
-package com.example.e_store.features.favourites
+package com.example.e_store.features.favourites.view_model
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

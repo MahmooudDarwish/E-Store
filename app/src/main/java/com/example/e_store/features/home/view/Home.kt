@@ -125,6 +125,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
     }
 
     LaunchedEffect(Unit) {
+        viewModel.fetchCurrency()
         viewModel.refreshAllData()
     }
 

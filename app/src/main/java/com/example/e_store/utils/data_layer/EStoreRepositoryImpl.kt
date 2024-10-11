@@ -106,7 +106,7 @@ class EStoreRepositoryImpl private constructor(
         eStoreRemoteDataSource.updateDraftOrderToCompleteDraftOrder(draftOrderId = draftOrderId)
     }
 
-    override suspend fun fetchProduct(productId: Long): Flow<SingleProductResponse> {
+    override suspend fun fetchProduct(productId: Long):  Flow<SingleProductResponse> {
         return eStoreRemoteDataSource.fetchProduct(productId)
 
     }
