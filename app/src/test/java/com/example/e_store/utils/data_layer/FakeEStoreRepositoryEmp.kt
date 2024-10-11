@@ -17,13 +17,16 @@ import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.SingleProductResponse
+import com.example.e_store.utils.test_utils.BrandsMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
-class FakeEStoreRepositoryEmp:EStoreRepository {
+class FakeEStoreRepositoryEmp : EStoreRepository {
     override suspend fun fetchBrands(): Flow<List<Brand>> {
-        TODO("Not yet implemented")
+        val brandList = BrandsMockModel.brands
+        return flowOf(brandList)
     }
 
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
@@ -39,7 +42,7 @@ class FakeEStoreRepositoryEmp:EStoreRepository {
     }
 
     override suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return flowOf(ProductMockModel.collections[brandId] ?: emptyList())
     }
 
     override suspend fun fetchCategoriesProducts(): Flow<List<Product>> {
@@ -47,7 +50,7 @@ class FakeEStoreRepositoryEmp:EStoreRepository {
     }
 
     override suspend fun fetchProducts(): Flow<List<Product>> = flow {
-        val productList =  ProductMockModel.products
+        val productList = ProductMockModel.products
         emit(productList)
     }
 
@@ -62,7 +65,7 @@ class FakeEStoreRepositoryEmp:EStoreRepository {
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        shoppingCartDraftOrder: DraftOrderRequest
+        shoppingCartDraftOrder: DraftOrderRequest,
     ) {
         TODO("Not yet implemented")
     }
@@ -134,7 +137,7 @@ class FakeEStoreRepositoryEmp:EStoreRepository {
     override suspend fun updateCustomerAddress(
         customerId: Long,
         addressId: Long,
-        address: AddNewAddress
+        address: AddNewAddress,
     ) {
         TODO("Not yet implemented")
     }

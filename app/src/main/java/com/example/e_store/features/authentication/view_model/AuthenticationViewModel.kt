@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
+import com.example.e_store.utils.constants.CurrencyKeys
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.data_layer.local.shared_pref.CustomerSharedPreferencesHelper
 import com.example.e_store.utils.shared_models.Customer
@@ -333,14 +334,19 @@ class AuthenticationViewModel(
 
     private fun getUserData(context: Context, userId: String, onAuthSuccess: () -> Unit) {
         db.collection("users").document(userId).get().addOnSuccessListener { document ->
+            Log.d("AuthenticationViewModel", "User data retrieved successfully")
             if (document != null) {
                 UserSession.name = document.getString("name")
                 UserSession.phone = document.getString("phoneNumber")
                 UserSession.email = document.getString("email")
                 UserSession.Uid = userId
                 UserSession.isGuest = false
-                UserSession.currency =
-                    document.getString("currency").toString()
+                if (document.getString("currency") != null){
+                    UserSession.currency = document.getString("currency").toString()
+
+                }else{
+                    UserSession.currency = CurrencyKeys.USD
+                }
                 onAuthSuccess()
             } else {
                 Toast.makeText(context, "No such document", Toast.LENGTH_SHORT).show()
