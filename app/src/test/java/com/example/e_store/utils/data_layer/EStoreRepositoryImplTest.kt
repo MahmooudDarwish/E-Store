@@ -2,7 +2,9 @@ package com.example.e_store.utils.data_layer
 
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImplTest
+import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -40,7 +42,6 @@ class EStoreRepositoryImplTest {
         assertEquals("brand-1", result[0].handle)
         assertEquals("Brand 1", result[0].title)
     }
-
     @Test
     fun fetchBrands_withSingleBrand_returnsSingleItemList() = runTest {
         // Given: Set list with a single brand
@@ -53,7 +54,6 @@ class EStoreRepositoryImplTest {
         assertEquals(1, result.size)
         assertEquals(BrandsMockModel.brand1.handle, result[0].handle)
     }
-
     @Test
     fun fetchBrands_withZeroBrands_returnsEmptyList() = runTest {
         // Given: Set list with a single brand
@@ -65,7 +65,6 @@ class EStoreRepositoryImplTest {
         // Then Assert
         assertEquals(0, result.size)
     }
-
     @Test
     fun fetchBrands_withDuplicateTitle_returnsFilteredBrandList() = runTest {
         // Given: Set brands with duplicate IDs
@@ -78,6 +77,53 @@ class EStoreRepositoryImplTest {
         assertEquals(1, result.size)
         assertEquals(BrandsMockModel.brand4.id, result[0].id)
     }
+
+    //fetchBrandProducts()
+    @Test
+    fun fetchBrandProducts_validBrandId1_returnsExpectedProducts() = runTest {
+        //When
+        val result = repository.fetchBrandProducts("brand-1")
+
+        //Then Assert
+        val expected = ProductMockModel.collections["brand-1"] ?: emptyList()
+        assertEquals(expected, result.first())
+    }
+    @Test
+    fun fetchBrandProducts_validBrandId2_returnsExpectedProducts() = runTest {
+        //When
+        val result = repository.fetchBrandProducts("brand-2")
+
+        //Then Assert
+        val expected = ProductMockModel.collections["brand-2"] ?: emptyList()
+        assertEquals(expected, result.first())
+    }
+    @Test
+    fun fetchBrandProducts_nonExistingBrandId_returnsEmptyList() = runTest {
+        //When
+        val result = repository.fetchBrandProducts("non-existing-brand")
+
+        //Then Assert
+        assertEquals(emptyList<Product>(), result.first())
+    }
+    @Test
+    fun fetchBrandProducts_emptyBrandId_returnsEmptyList() = runTest {
+        //When
+        val result = repository.fetchBrandProducts("")
+
+        //Then Assert
+        assertEquals(emptyList<Product>(), result.first())
+    }
+    @Test
+    fun fetchBrandProducts_validBrandId3_returnsProductsFromFlow() = runTest {
+        //When
+        val result = repository.fetchBrandProducts("brand-3")
+
+        //Then Assert
+        val expected = ProductMockModel.collections["brand-3"] ?: emptyList()
+        assertEquals(expected, result.first())
+    }
+
+
 
 
 

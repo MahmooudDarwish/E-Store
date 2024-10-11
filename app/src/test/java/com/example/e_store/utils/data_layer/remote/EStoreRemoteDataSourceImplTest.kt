@@ -2,6 +2,7 @@ package com.example.e_store.utils.data_layer.remote
 
 import com.example.e_store.utils.shared_models.*
 import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -16,7 +17,7 @@ class EStoreRemoteDataSourceImplTest(
     }
 
     override suspend fun fetchBrandProducts(brandId: String): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return flowOf(ProductMockModel.collections[brandId] ?: emptyList())
     }
 
     override suspend fun fetchForUProducts(): Flow<List<Product>> {
@@ -30,7 +31,6 @@ class EStoreRemoteDataSourceImplTest(
     override suspend fun fetchCustomCollections(): Flow<List<CustomCollection>> {
         TODO("Not yet implemented")
     }
-
 
 
     override suspend fun fetchCategoriesProducts(): Flow<List<Product>> {
