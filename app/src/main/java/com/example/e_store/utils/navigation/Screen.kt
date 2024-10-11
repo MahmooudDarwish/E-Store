@@ -16,23 +16,6 @@ import com.example.e_store.features.brand_products.view.BrandProducts
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModel
 import com.example.e_store.features.brand_products.view_model.BrandProductsViewModelFactory
 import com.example.e_store.features.categories.view.CategoriesScreen
-import com.example.e_store.features.home.view.HomeScreen
-import com.example.e_store.features.home.view_model.HomeViewModel
-import com.example.e_store.features.home.view_model.HomeViewModelFactory
-import com.example.e_store.features.orders.view.OrdersScreen
-import com.example.e_store.features.orders.view_model.OrdersViewModel
-import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
-import com.example.e_store.features.product_info.view.ProductInfoScreen
-import com.example.e_store.features.profile.view.ProfileScreen
-import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
-import com.example.e_store.features.search.view.SearchScreen
-import com.example.e_store.features.search.view_model.SearchViewModel
-import com.example.e_store.features.search.view_model.SearchViewModelFactory
-import com.example.e_store.utils.constants.NavigationKeys
-import com.example.e_store.features.product_info.view_model.ProductInfoViewModel
-import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
-import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
-import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
 import com.example.e_store.features.categories.view_model.CategoriesViewModel
 import com.example.e_store.features.categories.view_model.CategoriesViewModelFactory
 import com.example.e_store.features.checkout.view.CheckoutScreen
@@ -41,34 +24,51 @@ import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
 import com.example.e_store.features.favourites.view.FavouritesScreen
 import com.example.e_store.features.favourites.view_model.FavouritesViewModel
 import com.example.e_store.features.favourites.view_model.FavouritesViewModelFactory
+import com.example.e_store.features.home.view.HomeScreen
+import com.example.e_store.features.home.view_model.HomeViewModel
+import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.location.view.AddLocationScreen
-import com.example.e_store.features.location.view.MapScreen
 import com.example.e_store.features.location.view.LocationScreen
+import com.example.e_store.features.location.view.MapScreen
 import com.example.e_store.features.location.view_model.AddLocationViewModel
 import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
 import com.example.e_store.features.location.view_model.LocationViewModel
 import com.example.e_store.features.location.view_model.LocationViewModelFactory
 import com.example.e_store.features.location.view_model.MapViewModel
 import com.example.e_store.features.location.view_model.MapViewModelFactory
+import com.example.e_store.features.orders.view.OrdersScreen
+import com.example.e_store.features.orders.view_model.OrdersViewModel
+import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.payment.view.PaymentScreen
 import com.example.e_store.features.payment.view_model.PaymentViewModel
 import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
+import com.example.e_store.features.product_info.view.ProductInfoScreen
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModel
+import com.example.e_store.features.product_info.view_model.ProductInfoViewModelFactory
+import com.example.e_store.features.profile.view.ProfileScreen
 import com.example.e_store.features.profile.view_model.ProfileViewModel
 import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
+import com.example.e_store.features.search.view.SearchScreen
+import com.example.e_store.features.search.view_model.SearchViewModel
+import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.settings.view.SettingsScreen
 import com.example.e_store.features.settings.view_model.SettingsViewModel
 import com.example.e_store.features.settings.view_model.SettingsViewModelFactory
+import com.example.e_store.features.shopping_cart.view.ShoppingCartScreen
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModel
+import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewModelFactory
+import com.example.e_store.utils.constants.NavigationKeys
 
 sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Checkout : Screen(NavigationKeys.CHECKOUT_ROUTE, R.string.checkout, 0)
 
-    object  AddLocation : Screen(NavigationKeys.ADD_LOCATION_ROUTE, R.string.add_location, 0)
-    object  Map : Screen(NavigationKeys.MAP_ROUTE, R.string.map, 0)
-    object  Location : Screen(NavigationKeys.LOCATION_ROUTE, R.string.location, 0)
-    object  Payment : Screen(NavigationKeys.PAYMENT_ROUTE, R.string.payment, 0)
+    object AddLocation : Screen(NavigationKeys.ADD_LOCATION_ROUTE, R.string.add_location, 0)
+    object Map : Screen(NavigationKeys.MAP_ROUTE, R.string.map, 0)
+    object Location : Screen(NavigationKeys.LOCATION_ROUTE, R.string.location, 0)
+    object Payment : Screen(NavigationKeys.PAYMENT_ROUTE, R.string.payment, 0)
 
-    object Settings : Screen(NavigationKeys.SETTINGS_ROUTE, R.string.settings,0)
+    object Settings : Screen(NavigationKeys.SETTINGS_ROUTE, R.string.settings, 0)
 
     object Splash : Screen(NavigationKeys.SPLASH_ROUTE, R.string.splash_title, 0)
     object Home : Screen(NavigationKeys.HOME_ROUTE, R.string.home_title, R.drawable.ic_home)
@@ -101,12 +101,18 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object FavouriteFromHome :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_HOME, R.string.favourite, 0)
+
     object FavouriteFromCategories :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_CATEGORIES, R.string.favourite, 0)
+
     object FavouriteFromProfile :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_PROFILE, R.string.favourite, 0)
-    object ProductInfoFromFavourite : Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
-    object ProductInfoFromProfile : Screen(NavigationKeys.PRODUCT_INFO_PROFILE_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromFavourite :
+        Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromProfile :
+        Screen(NavigationKeys.PRODUCT_INFO_PROFILE_ROUTE, R.string.product_info, 0)
 
 }
 
@@ -124,12 +130,12 @@ fun AppNavigation(
     ordersViewModelFactory: OrdersViewModelFactory,
     settingsViewModelFactory: SettingsViewModelFactory,
 
-    authenticationViewModelFactory : AuthenticationViewModelFactory,
+    authenticationViewModelFactory: AuthenticationViewModelFactory,
     checkoutViewModelFactory: CheckoutViewModelFactory,
     addLocationViewModelFactory: AddLocationViewModelFactory,
     mapViewModelFactory: MapViewModelFactory,
     locationViewModelFactory: LocationViewModelFactory,
-    paymentViewModelFactory : PaymentViewModelFactory,
+    paymentViewModelFactory: PaymentViewModelFactory,
 
     ) {
     NavHost(navController, startDestination = Screen.Home.route) {
@@ -198,11 +204,15 @@ fun AppNavigation(
 
 
         composable(route = Screen.SignIn.route) {
-            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
-            SignInScreen(navController, viewModel) }
+            val viewModel: AuthenticationViewModel =
+                viewModel(factory = authenticationViewModelFactory)
+            SignInScreen(navController, viewModel)
+        }
         composable(route = Screen.SignUp.route) {
-            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
-            SignUpScreen(navController,viewModel) }
+            val viewModel: AuthenticationViewModel =
+                viewModel(factory = authenticationViewModelFactory)
+            SignUpScreen(navController, viewModel)
+        }
 
         composable(route = Screen.Cart.route) {
             val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
@@ -236,10 +246,11 @@ fun AppNavigation(
         composable(route = Screen.Payment.route) {
 
             val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-            PaymentScreen(navController,viewModel)
+            PaymentScreen(navController, viewModel)
         }
         composable(route = Screen.Settings.route) {
             val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
-            SettingsScreen(viewModel, navController) }
+            SettingsScreen(viewModel, navController)
+        }
     }
 }
