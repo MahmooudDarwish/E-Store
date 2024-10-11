@@ -5,7 +5,7 @@ import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.ProductImage
 import com.example.e_store.utils.shared_models.Variant
 
-class ProductMockModel {
+object ProductMockModel {
     val product1 = Product(
         id = 1,
         title = "Product 1",

@@ -1,11 +1,9 @@
 package com.example.e_store.features.search.view_model
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
-import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
 import kotlinx.coroutines.Dispatchers

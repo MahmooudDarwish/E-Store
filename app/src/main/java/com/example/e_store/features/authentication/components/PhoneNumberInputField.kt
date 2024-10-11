@@ -15,10 +15,15 @@ fun PhoneNumberInputField(
     value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier
 ) {
 
-    OutlinedTextField(value = value, onValueChange = {
-        onValueChange(it)
-    }, label = { Text(text = stringResource(id = R.string.phone_label)) }, keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Phone
-    ), modifier = modifier
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            onValueChange(it)
+        },
+        label = { Text(text = stringResource(id = R.string.phone_label)) },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Phone
+        ),
+        modifier = modifier
     )
 }
