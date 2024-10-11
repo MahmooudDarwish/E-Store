@@ -24,6 +24,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
 class FakeEStoreRepositoryEmp : EStoreRepository {
+
+    var shouldThrowError = false
+
+    var listIsEmpty = false
+
+    var expectedProducts = ProductMockModel.products
+
+
     override suspend fun fetchBrands(): Flow<List<Brand>> {
         val brandList = BrandsMockModel.brands
         return flowOf(brandList)
@@ -49,9 +57,14 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchProducts(): Flow<List<Product>> = flow {
-        val productList = ProductMockModel.products
-        emit(productList)
+    override suspend fun fetchProducts(): Flow<List<Product>>  {
+        if (shouldThrowError) {
+            throw Exception("Error fetching products")
+            } else if (listIsEmpty) {
+            return flowOf(emptyList())
+        } else {
+            return flowOf(expectedProducts)
+        }
     }
 
 

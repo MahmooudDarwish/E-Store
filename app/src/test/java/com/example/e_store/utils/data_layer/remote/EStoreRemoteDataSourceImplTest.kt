@@ -3,13 +3,20 @@ package com.example.e_store.utils.data_layer.remote
 import com.example.e_store.utils.shared_models.*
 import com.example.e_store.utils.test_utils.BrandsMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
 
 class EStoreRemoteDataSourceImplTest(
 
 ) : EStoreRemoteDataSource {
+
+    var delayTime = 0
+    var expectedProducts = ProductMockModel.products
+    var emptyProducts = false
+
 
     override suspend fun fetchBrands(): Flow<List<Brand>> {
         val filteredBrands = BrandsMockModel.brands.distinctBy { it.title }
@@ -38,12 +45,20 @@ class EStoreRemoteDataSourceImplTest(
     }
 
     override suspend fun fetchProducts(): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        if (emptyProducts) {
+            return flowOf(emptyList())
+        }
+        return flowOf(expectedProducts)
     }
 
     override suspend fun fetchProduct(productId: Long): Flow<SingleProductResponse> {
-        TODO("Not yet implemented")
+
+
+        delay(delayTime.toLong())
+        val product = expectedProducts.find { it.id == productId }
+        return product?.let { flowOf(SingleProductResponse(it)) } ?: flow { }
     }
+
 
     override suspend fun createDraftOrder(shoppingCartDraftOrder: DraftOrderRequest) {
         TODO("Not yet implemented")
