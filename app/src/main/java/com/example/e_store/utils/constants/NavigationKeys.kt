@@ -1,12 +1,10 @@
 package com.example.e_store.utils.constants
 
-import com.example.e_store.utils.navigation.Screen
-
 object NavigationKeys {
 
     const val SETTINGS_ROUTE = "profile/settings"
     const val PRODUCT_INFO_PROFILE_ROUTE = "profile/product_info"
-    const val PRODUCT_INFO_FAVOURITE_ROUTE= "favourite/product_info"
+    const val PRODUCT_INFO_FAVOURITE_ROUTE = "favourite/product_info"
     const val FAVOURITE_ROUTE_FROM_HOME = "home/favourite"
     const val FAVOURITE_ROUTE_FROM_CATEGORIES = "categories/favourite"
     const val FAVOURITE_ROUTE_FROM_PROFILE = "profile/favourite"

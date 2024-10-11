@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,14 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getString
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.e_store.R
 import com.example.e_store.features.authentication.components.PasswordInputField
 import com.example.e_store.features.authentication.components.PhoneNumberInputField
 import com.example.e_store.features.authentication.components.WelcomeLabel
 import com.example.e_store.features.authentication.view_model.AuthenticationViewModel
-import com.example.e_store.features.authentication.view_model.AuthenticationViewModelFactory
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.AnimationImage
 import com.example.e_store.utils.shared_components.EShopButton
@@ -66,7 +62,8 @@ fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationView
             animationDuration = 2000
         )
 
-        OutlinedTextField(value = viewModel.name.value,
+        OutlinedTextField(
+            value = viewModel.name.value,
             onValueChange = {
                 viewModel.onNameChanged(it)
             },
@@ -80,7 +77,8 @@ fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationView
             }, modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(value = viewModel.email.value,
+        OutlinedTextField(
+            value = viewModel.email.value,
             onValueChange = {
                 viewModel.onEmailChanged(it)
             },
