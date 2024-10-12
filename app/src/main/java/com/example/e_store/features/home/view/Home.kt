@@ -164,6 +164,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             }
         }*/
 
+    Log.d("HomeScreen", "user session :${UserSession.shopifyCustomerID}")
+
     LaunchedEffect(Unit) {
         viewModel.fetchCurrency()
         viewModel.refreshAllData()

@@ -28,28 +28,22 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.e_store.BuildConfig
 import com.example.e_store.R
-import com.example.e_store.features.authentication.components.PhoneNumberInputField
-import com.example.e_store.features.location.view.components.SearchMapBox
+import com.example.e_store.features.location.components.SearchMapBox
 import com.example.e_store.features.location.view_model.MapViewModel
 import com.example.e_store.ui.theme.PrimaryColor
-import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.ElevationCard
-import com.example.e_store.utils.shared_models.Customer
-import com.example.e_store.utils.shared_models.Image
 import com.example.e_store.utils.shared_models.UserAddress
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -69,7 +63,9 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import com.example.e_store.BuildConfig
 import java.util.Locale
+
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -77,8 +73,8 @@ import java.util.Locale
 fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     LaunchedEffect(Unit) {
-    viewModel.fetchCustomerAddresses()
-}
+        viewModel.fetchCustomerAddresses()
+    }
 
     val context = LocalContext.current
 
@@ -90,6 +86,8 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     var showPhoneNumberDialog by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf(UserSession.phone) }
     var errorMessage by remember { mutableStateOf("") }
+
+    var isMapInitialized by remember { mutableStateOf(false) }
 
 
     // Initialize Places API
@@ -127,12 +125,73 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 inputValue = phoneNumber
                 showPhoneNumberDialog = false
 
+                currentLocation?.let { location ->
+                    // Perform reverse geocoding to get address details
+                    val geocoder = Geocoder(context, Locale.getDefault())
+                    val addresses: List<Address>? = geocoder.getFromLocation(
+                        location.latitude,
+                        location.longitude,
+                        1
+                    )
+
+                    addresses?.let {
+                        val address = it.firstOrNull()
+                        if (address != null) {
+                            // Update the Adresse object
+                            UserAddress.apply {
+                                address1 = address.getAddressLine(0)
+                                city = address.locality
+                                province = address.adminArea
+                                country = address.countryName
+                                zip = address.postalCode
+                            }
+
+                            Log.d("MapphoneNumber", "phoneNumber: ${isPhoneExist}")
+                            if (UserSession.phone == null || isPhoneExist) {
+                                showPhoneNumberDialog = true
+
+                            } else {
+                                Log.d("MapphoneNumber", "phoneNumber: ${UserSession.phone}")
+                                Log.d(" MapphoneNumber", "phoneNumber: ${inputValue}")
+                                viewModel.saveAddress(
+                                    com.example.e_store.utils.shared_models.Address(
+                                        address1 = UserAddress.address1,
+                                        city = UserAddress.city,
+                                        phone = inputValue,
+                                        firstName = UserSession.name,
+                                    )
+                                )
+
+                                Log.d("PhoneNumberTag", "phoneNumber: ${UserSession.phone}")
+                                //navController.navigate(NavigationKeys.LOCATION_ROUTE)
+
+                            }
+                            Log.d(
+                                "SaveLocation",
+                                "Location saved: ${UserAddress.address1}"
+                            )
+                        } else {
+                            Log.e(
+                                "SaveLocation",
+                                "No address found for the current location"
+                            )
+                        }
+                    } ?: run {
+                        Log.e(
+                            "SaveLocation",
+                            "Unable to retrieve address for current location"
+                        )
+                    }
+                } ?: run {
+                    Log.e("SaveLocation", "Current location is null")
+                }
+
+
             },
             context
         )
     }
     inputValue?.let { viewModel.isPhoneExistFUN(it) }
-
 
 
     // Intent launcher for Google Autocomplete
@@ -175,35 +234,37 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     }
 
 
-    // Check if permissions are granted and location services are enabled
-    LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
-        if (locationPermissionsState.allPermissionsGranted) {
-            // Check if GPS is enabled
-            val locationManager =
-                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                getCurrentLocation(fusedLocationClient) { location ->
-                    currentLocation = location
-                    Log.d("MapScreen", "Current Location: $location")
+    if (isMapInitialized) {
+        // Check if permissions are granted and location services are enabled
+        LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
+            if (locationPermissionsState.allPermissionsGranted) {
+                // Check if GPS is enabled
+                val locationManager =
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    getCurrentLocation(fusedLocationClient) { location ->
+                        currentLocation = location
+                        Log.d("MapScreen", "Current Location: $location")
 
-                    currentLocation?.let {
-                        cameraPositionState.position = CameraPosition(
-                            LatLng(it.latitude, it.longitude),
-                            10f,
-                            0f,
-                            0f
-                        )
-                        markerState.position = LatLng(it.latitude, it.longitude)
-                    } ?: run {
-                        Log.e("MapScreen", "Current location is null")
+                        currentLocation?.let {
+                            cameraPositionState.position = CameraPosition(
+                                LatLng(it.latitude, it.longitude),
+                                10f,
+                                0f,
+                                0f
+                            )
+                            markerState.position = LatLng(it.latitude, it.longitude)
+                        } ?: run {
+                            Log.e("MapScreen", "Current location is null")
+                        }
+
                     }
-
+                } else {
+                    showPermissionDialog = true
                 }
             } else {
                 showPermissionDialog = true
             }
-        } else {
-            showPermissionDialog = true
         }
     }
 
@@ -211,23 +272,31 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
         topBar = {
             Box(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(end = 16.dp)
             ) {
-                ElevationCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    SearchMapBox(
-                        query = query,
-                        onClick = {
-                            val intent = Autocomplete.IntentBuilder(
-                                AutocompleteActivityMode.FULLSCREEN,
-                                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
-                            ).build(context)
-                            autocompleteLauncher.launch(intent)
-                        }
-                    )
+                    BackButton {
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    }
+                    ElevationCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                    ) {
+                        SearchMapBox(
+                            query = query,
+                            onClick = {
+                                val intent = Autocomplete.IntentBuilder(
+                                    AutocompleteActivityMode.FULLSCREEN,
+                                    listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+                                ).build(context)
+                                autocompleteLauncher.launch(intent)
+                            }
+                        )
+                    }
                 }
             }
         },
@@ -240,7 +309,9 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 ) {
                     FloatingActionButton(
                         onClick = {
+                            Log.d("MapScreen", "Button clicked")
                             if (locationPermissionsState.allPermissionsGranted) {
+                                Log.d("MapScreen", "Location permissions granted")
                                 getCurrentLocation(fusedLocationClient) { location ->
                                     currentLocation = location
                                     Log.d("MapScreen", "Current Location: $location")
@@ -263,6 +334,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                 }
                             } else {
                                 showPermissionDialog = true
+                                Log.d("MapScreen", "Location permissions not granted")
                             }
                         },
                     ) {
@@ -304,13 +376,16 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                             zip = address.postalCode
                                         }
 
-                                        Log.d( "MapphoneNumber", "phoneNumber: ${isPhoneExist}")
+                                        Log.d("MapphoneNumber", "phoneNumber: ${isPhoneExist}")
                                         if (UserSession.phone == null || isPhoneExist) {
                                             showPhoneNumberDialog = true
 
                                         } else {
-                                            Log.d( "MapphoneNumber", "phoneNumber: ${UserSession.phone}")
-                                            Log.d( " MapphoneNumber", "phoneNumber: ${inputValue}")
+                                            Log.d(
+                                                "MapphoneNumber",
+                                                "phoneNumber: ${UserSession.phone}"
+                                            )
+                                            Log.d(" MapphoneNumber", "phoneNumber: ${inputValue}")
                                             viewModel.saveAddress(
                                                 com.example.e_store.utils.shared_models.Address(
                                                     address1 = UserAddress.address1,
@@ -319,8 +394,8 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                                     firstName = UserSession.name,
                                                 )
                                             )
+                                            //navController.navigate(NavigationKeys.LOCATION_ROUTE)
 
-                                            navController.navigate(NavigationKeys.LOCATION_ROUTE)
                                         }
                                         Log.d(
                                             "SaveLocation",
@@ -369,6 +444,10 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
                 ),
+                onMapLoaded = {
+                    // This callback triggers when the map has fully loaded
+                    isMapInitialized = true
+                },
                 onMapClick = { latLng ->
                     // Update currentLocation
                     currentLocation = Location("").apply {

@@ -1,4 +1,4 @@
-package com.example.e_store.features.location.view.components
+package com.example.e_store.features.location.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

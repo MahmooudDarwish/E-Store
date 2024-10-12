@@ -150,5 +150,9 @@
     <string name="warning">Warning</string>
     <string name="edit">Edit</string>
     <string name="no_locations_found">" No locations found"</string>
+    <string name="default_location">Default Location</string>
+    <string name="unknown_city">Unknown city</string>
+    <string name="phone">Phone:</string>
+    <string name="location_made_default">Location made default</string>
 
 </resources>

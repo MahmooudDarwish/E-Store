@@ -80,7 +80,7 @@ interface EStoreRemoteDataSource {
     suspend fun createCustomerAddress(customerId: Long, address: AddNewAddress)
     suspend fun deleteCustomerAddress(customerId: Long, addressId: Long)
 
-    suspend fun fetchDefaultAddress(customerId: Long): Flow<Address>
+    suspend fun fetchDefaultAddress(customerId: Long): Flow<Address?>
     suspend fun updateCustomerAddress(customerId: Long, addressId: Long, address: AddNewAddress)
     suspend fun fetchConversionRates(): Flow<CurrencyResponse>
     suspend fun fetchCustomerAddress(

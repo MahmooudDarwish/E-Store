@@ -11,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.e_store.R
 import com.example.e_store.utils.constants.CurrencyKeys
 import com.example.e_store.utils.data_layer.EStoreRepository
-import com.example.e_store.utils.data_layer.local.shared_pref.CustomerSharedPreferencesHelper
 import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.UserSession
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 class AuthenticationViewModel(
     private val auth: FirebaseAuth,
     private val repository: EStoreRepository,
-    private val customerSharedPreferences: CustomerSharedPreferencesHelper
 ) : ViewModel() {
 
     private val _name = mutableStateOf("")
@@ -272,6 +270,7 @@ class AuthenticationViewModel(
                     context, context.getString(R.string.email_verification_sent), Toast.LENGTH_SHORT
                 ).show()
 
+                Log.d("AuthenticationViewModel", "Email verification sent successfully")
                 createShopifyCustomer(
                     CustomerRequest(
                         Customer(
@@ -388,20 +387,11 @@ class AuthenticationViewModel(
     }
 
 
-    fun createShopifyCustomer(customer: CustomerRequest) {
+    private fun createShopifyCustomer(customer: CustomerRequest) {
         viewModelScope.launch {
+            Log.d("AuthenticationViewModel", "createShopifyCustomer: $customer")
             repository.createCustomer(customer)
         }
     }
 
-
-    fun fetchShopifyCustomer(email: String) {
-        viewModelScope.launch {
-            repository.fetchCustomerByEmail(email).let {
-                _customer.value = it
-            }
-        }
-
-
-    }
 }
