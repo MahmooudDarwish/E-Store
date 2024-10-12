@@ -63,10 +63,6 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object Checkout : Screen(NavigationKeys.CHECKOUT_ROUTE, R.string.checkout, 0)
 
-    object  Map : Screen(NavigationKeys.MAP_ROUTE, R.string.map, 0)
-    object  Location : Screen(NavigationKeys.LOCATION_ROUTE, R.string.location, 0)
-    object  Payment : Screen(NavigationKeys.PAYMENT_ROUTE, R.string.payment, 0)
-    object AddLocation : Screen(NavigationKeys.ADD_LOCATION_ROUTE, R.string.add_location, 0)
     object Map : Screen(NavigationKeys.MAP_ROUTE, R.string.map, 0)
     object Location : Screen(NavigationKeys.LOCATION_ROUTE, R.string.location, 0)
     object Payment : Screen(NavigationKeys.PAYMENT_ROUTE, R.string.payment, 0)
