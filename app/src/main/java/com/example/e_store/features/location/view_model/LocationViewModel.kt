@@ -45,7 +45,6 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
                     "At least one location is required."
                 }
                 deletionState.value = DeletionState.CannotDelete(message)
-                NavigationHolder.id = locationId
             }
         }
     }

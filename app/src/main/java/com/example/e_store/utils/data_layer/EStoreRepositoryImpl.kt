@@ -153,7 +153,7 @@ class EStoreRepositoryImpl private constructor(
         eStoreRemoteDataSource.deleteCustomerAddress(customerId, addressId)
     }
 
-    override suspend fun fetchDefaultAddress(customerId: Long): Flow<Address> {
+    override suspend fun fetchDefaultAddress(customerId: Long): Flow<Address?> {
         return eStoreRemoteDataSource.fetchDefaultAddress(customerId)
     }
 

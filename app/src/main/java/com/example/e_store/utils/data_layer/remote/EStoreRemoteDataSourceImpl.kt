@@ -1,34 +1,32 @@
 package com.example.e_store.utils.data_layer.remote
 
-import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
-import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
-import com.example.e_store.utils.shared_models.Brand
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import android.util.Log
-import com.example.e_store.utils.shared_models.DiscountCodesResponse
-import kotlinx.coroutines.flow.flow
-import com.example.e_store.utils.shared_models.Product
-import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.data_layer.remote.exchange_rate.ExchangeRateApi
 import com.example.e_store.utils.data_layer.remote.exchange_rate.ExchangeRateRetrofitHelper
+import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
+import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.AppliedDiscount
+import com.example.e_store.utils.shared_models.Brand
 import com.example.e_store.utils.shared_models.CurrencyResponse
+import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.CustomerResponse
+import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
-import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.Order
+import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
@@ -138,8 +136,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun updateDraftOrder(
-        draftOrderId: Long,
-        shoppingCartDraftOrder: DraftOrderRequest
+        draftOrderId: Long, shoppingCartDraftOrder: DraftOrderRequest
     ) {
         apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
@@ -215,7 +212,9 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
     }
 
-    override suspend fun fetchCustomerAddress(customerId: Long, addressId: Long): Flow<SingleAddressResponse> {
+    override suspend fun fetchCustomerAddress(
+        customerId: Long, addressId: Long
+    ): Flow<SingleAddressResponse> {
         return flowOf(apiService.fetchCustomerAddress(customerId, addressId))
     }
 
@@ -271,7 +270,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
                         emit(emptyList()) // Emit an empty list if no price rules are found
                     }
                 } else {
-                    Log.e(TAG, "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}")
+                    Log.e(
+                        TAG,
+                        "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}"
+                    )
                     emit(emptyList()) // Emit an empty list in case of failure
                 }
             } catch (e: Exception) {
@@ -280,13 +282,15 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             }
         }
     }
+
     override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> = flow {
         fetchDiscountCodes().collect { discountResponses ->
             // Check if discountResponses is not empty
             if (discountResponses.isNotEmpty()) {
                 // Find the discount code that matches the input code
-                val discountCode = discountResponses.flatMap { it.discount_codes } // Flattening the list of discount codes
-                    .find { it.code == code }
+                val discountCode =
+                    discountResponses.flatMap { it.discount_codes } // Flattening the list of discount codes
+                        .find { it.code == code }
 
                 if (discountCode != null) {
                     // Fetch price rule details based on the discount code's price rule ID
@@ -348,42 +352,41 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
             }
         }*/
 
-/*
-    override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> = flow {
-        fetchDiscountCodes().collect { discountResponse ->
-            if (discountResponse != null) {
-                val discountCode = discountResponse.discount_codes.find {
-                    Log.d("fetchDiscountCodesByCode", "code: ${it.code}")
-                    Log.d("fetchDiscountCodesByCode", "code: $code")
-                    it.code == code
+    /*
+        override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> = flow {
+            fetchDiscountCodes().collect { discountResponse ->
+                if (discountResponse != null) {
+                    val discountCode = discountResponse.discount_codes.find {
+                        Log.d("fetchDiscountCodesByCode", "code: ${it.code}")
+                        Log.d("fetchDiscountCodesByCode", "code: $code")
+                        it.code == code
 
-                }
-
-                if (discountCode != null) {
-                    val priceRuleDetails = discountCode.price_rule_id?.let {
-                        apiService.fetchPricingRuleByID(it)
                     }
 
-                    if (priceRuleDetails != null) {
-                        // Create an AppliedDiscount object with the fetched data
-                        val appliedDiscount = AppliedDiscount(
-                            description = priceRuleDetails.price_rule.title,
-                            value = (priceRuleDetails.price_rule.value.toDouble() * -1).toString(),
-                            title = priceRuleDetails.price_rule.title,
-                            value_type = priceRuleDetails.price_rule.value_type,
-                        )
+                    if (discountCode != null) {
+                        val priceRuleDetails = discountCode.price_rule_id?.let {
+                            apiService.fetchPricingRuleByID(it)
+                        }
+
+                        if (priceRuleDetails != null) {
+                            // Create an AppliedDiscount object with the fetched data
+                            val appliedDiscount = AppliedDiscount(
+                                description = priceRuleDetails.price_rule.title,
+                                value = (priceRuleDetails.price_rule.value.toDouble() * -1).toString(),
+                                title = priceRuleDetails.price_rule.title,
+                                value_type = priceRuleDetails.price_rule.value_type,
+                            )
 
 
-                        emit(appliedDiscount)  // Emit the applied discount
+                            emit(appliedDiscount)  // Emit the applied discount
+                        }
+                    } else {
+
+                        emit(null)  // Emit null if no discount code is found
                     }
-                } else {
-
-                    emit(null)  // Emit null if no discount code is found
                 }
             }
-        }
-    }*/
-
+        }*/
 
 
     /*
@@ -448,7 +451,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun createCustomerAddress(customerId: Long, address: AddNewAddress) {
-                apiService.createCustomerAddress(customerId, address)
+        apiService.createCustomerAddress(customerId, address)
 
     }
 
@@ -456,29 +459,32 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         apiService.deleteCustomerAddress(customerId, addressId)
     }
 
-    override suspend fun fetchDefaultAddress(customerId: Long): Flow<Address> {
+    override suspend fun fetchDefaultAddress(customerId: Long): Flow<Address?> {
+        var defaultAddress: Address? = null
 
-           var defaultAddress :Address?= null
-
-                fetchCustomerAddresses(customerId).collect { addresses ->
-                    defaultAddress= addresses.addresses.first {
-                        it.default == true
-                    }
-                }
-           return flow {
-               defaultAddress?.let { emit(it) }
-           }
+        fetchCustomerAddresses(customerId).collect { addresses ->
+            defaultAddress = addresses.addresses.firstOrNull {
+                it.default == true
+            }
         }
 
-    override suspend fun updateCustomerAddress(
-        customerId: Long,
-        addressId: Long,
-        address: AddNewAddress
-    ) {
-        apiService.updateCustomerAddress(customerId, addressId, address)
+        if (defaultAddress == null) {
+            return flowOf(null)
+        } else {
+            return flow {
+                defaultAddress?.let {
+                    emit(it)
+                }
+            }
+
+        }
     }
 
 
-
+    override suspend fun updateCustomerAddress(
+        customerId: Long, addressId: Long, address: AddNewAddress
+    ) {
+        apiService.updateCustomerAddress(customerId, addressId, address)
+    }
 }
 

@@ -1,7 +1,6 @@
 package com.example.e_store.features.location.view
 
-import android.location.Geocoder
-import android.util.Log
+
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -31,10 +29,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,11 +45,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.e_store.R
-import com.example.e_store.features.location.view.components.LoadingDialog
+import com.example.e_store.features.location.components.LoadingDialog
 import com.example.e_store.features.location.view_model.LocationViewModel
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.ConfirmNegativeActionDialog
@@ -63,14 +61,9 @@ import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DeletionState
-import com.example.e_store.utils.shared_models.DraftOrderDetails
-import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.NavigationHolder
-import com.example.e_store.utils.shared_models.UserAddress
-import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @Composable
 fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
@@ -80,6 +73,9 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
     var isLoading = remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var deletingLocation by remember { mutableStateOf(false) }
+    var deletionId by remember {
+        mutableStateOf<Long?>(null)
+    }
 
     val deletionState by viewModel.deletionState.collectAsStateWithLifecycle()
 
@@ -97,12 +93,14 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                 confirmButtonText = stringResource(R.string.edit),
                 onConfirm = {
                     // Navigate to edit address
+                    NavigationHolder.id = deletionId
                     navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
                     viewModel.deletionState.value = DeletionState.CanDelete // Reset state
                 },
                 dismissButtonText = stringResource(id = R.string.cancel)
             )
         }
+
         is DeletionState.CanDelete -> {
 
         }
@@ -126,6 +124,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
             message = (stringResource(R.string.are_you_sure_you_want_to_remove_this_location_from_your_list)),
             onConfirm = {
                 coroutineScope.launch {
+                    deletionId = locationToDelete!!.id!!
                     viewModel.deleteLocation(locationToDelete!!.id!!, locationToDelete!!.default!!)
                     deletingLocation = true
                     showDialog = false
@@ -167,26 +166,27 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 
     if (!isLoading.value) {
         addressDetails.value?.let { details ->
-            if (details.addresses.isNotEmpty()) {
-                Column {
-                    sharedHeader(navController, headerText = stringResource(id = R.string.location))
-                    Spacer(modifier = Modifier.height(16.dp))
+            Column {
+                sharedHeader(navController, headerText = stringResource(id = R.string.location))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    Scaffold(
-                        floatingActionButton = {
-                            AnimatedVisibility(
-                                visible = true,
-                                enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-                                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+                Scaffold(
+                    floatingActionButton = {
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+                            exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+                        ) {
+                            FloatingActionButton(
+                                onClick = { navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE) }
                             ) {
-                                FloatingActionButton(
-                                    onClick = { navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE) }
-                                ) {
-                                    Icon(Icons.Default.Add, contentDescription = "Add Location")
-                                }
+                                Icon(Icons.Default.Add, contentDescription = "Add Location")
                             }
                         }
-                    ) { padding ->
+                    }
+                ) { padding ->
+
+                    if (details.addresses.isNotEmpty()) {
                         LazyColumn(
                             contentPadding = padding,
                             modifier = Modifier.fillMaxSize()
@@ -205,13 +205,14 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                                 )
                             }
                         }
+                    } else {
+                        // Display the no data message with Lottie animation
+                        LottieWithText(
+                            displayText = stringResource(R.string.no_locations_found),
+                            lottieRawRes = R.raw.no_data_found
+                        )
                     }
                 }
-            }else{
-                LottieWithText(
-                    displayText = stringResource(R.string.no_locations_found),
-                    lottieRawRes = R.raw.no_data_found
-                )
             }
         }
     }
@@ -235,14 +236,37 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+
+                if (location.default == true) {
+                    Row (
+                        horizontalArrangement = Arrangement.Center,
+                        ){
+                        Image(
+                            painter = painterResource(
+                                id = R.drawable.icon_default_location
+                            ),
+                            contentDescription = stringResource(R.string.default_location),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.default_location),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding( 8.dp),
+                            fontSize = 16.sp
+                        )
+                    }
+
+                }
+
+
                 // City description and value
                 Text(
-                    text = "City:",
+                    text = stringResource(id = R.string.city),
                     style = MaterialTheme.typography.bodySmall, // Label style
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = location.city ?: "Unknown city",
+                    text = location.city ?: stringResource(R.string.unknown_city),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -252,7 +276,7 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
 
                 // Address description and value
                 Text(
-                    text = "Address:",
+                    text = stringResource(id = R.string.address),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -268,7 +292,7 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
                 // Phone description and value (if available)
                 location.phone?.let {
                     Text(
-                        text = "Phone:",
+                        text = stringResource(R.string.phone),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )

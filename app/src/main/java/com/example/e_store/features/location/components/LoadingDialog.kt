@@ -1,4 +1,4 @@
-package com.example.e_store.features.location.view.components
+package com.example.e_store.features.location.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable

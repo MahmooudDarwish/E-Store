@@ -47,12 +47,10 @@ import com.example.e_store.utils.shared_components.BackButton
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_components.HeaderText
-import com.example.e_store.utils.shared_models.ConversionRates
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +66,11 @@ fun SettingsScreen(
     when (currencyResponse) {
         is DataState.Success -> {
             val response = (currencyResponse as DataState.Success).data
-            SettingsComponents(navController,FirebaseAuth.getInstance().currentUser!!.uid,LocalContext.current)
+            SettingsComponents(
+                navController,
+                FirebaseAuth.getInstance().currentUser!!.uid,
+                LocalContext.current
+            )
         }
 
         is DataState.Error -> {
@@ -90,7 +92,6 @@ fun SettingsScreen(
 
 
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -213,9 +214,14 @@ fun SettingsComponents(
                                         expanded = false
 
                                         if (selectedCurrency != "Select Currency Type") {
-                                            val selectedCurrencyCode = currencyCodeMap[selectedCurrency]
+                                            val selectedCurrencyCode =
+                                                currencyCodeMap[selectedCurrency]
                                             if (selectedCurrencyCode != null) {
-                                                updateUserCurrency(context, userId, selectedCurrencyCode)
+                                                updateUserCurrency(
+                                                    context,
+                                                    userId,
+                                                    selectedCurrencyCode
+                                                )
                                             }
                                         }
                                     }
@@ -268,7 +274,6 @@ fun SettingsComponents(
 }
 
 
-
 @Composable
 fun SettingsHeader(navController: NavController) {
     Row(
@@ -295,7 +300,8 @@ private fun updateUserCurrency(context: Context, userId: String, newCurrency: St
             UserSession.currency = newCurrency
         }
         .addOnFailureListener { e ->
-            Toast.makeText(context, "Error updating currency: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error updating currency: ${e.message}", Toast.LENGTH_SHORT)
+                .show()
             Log.e("Firestore", "Error updating currency", e)
         }
 }

@@ -1,8 +1,6 @@
 package com.example.e_store.utils.shared_methods
 
-import android.util.Log
 import com.example.e_store.utils.constants.CurrencyKeys
-import com.example.e_store.utils.shared_models.ConversionRates
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.ProductDetails
 import com.example.e_store.utils.shared_models.UserSession
@@ -33,18 +31,16 @@ fun changeDateFormat(inputDate: String): String {
     }
 }
 
-fun convertCurrency(
-
-    price: Double
-): String {
-
+fun convertCurrency(price: Double): String {
 
     val rates = UserSession.conversionRates
     val newCurrency = UserSession.currency
-    val oldCurrency = CurrencyKeys.USD
-    if(oldCurrency == newCurrency) {
-        return "$price $newCurrency"
+    val oldCurrency = CurrencyKeys.EGP
+
+    if (oldCurrency == newCurrency) {
+        return String.format("%.2f %s", price, newCurrency)
     }
+
     val currencyToRate = mapOf(
         CurrencyKeys.USD to rates?.USD,
         CurrencyKeys.AUD to rates?.AUD,
@@ -63,8 +59,7 @@ fun convertCurrency(
     val priceInUSD = price / oldCurrencyRate
     val convertedPrice = priceInUSD * newCurrencyRate
 
-    var convertedPriceString = String.format("%d", convertedPrice.toInt())
-    convertedPriceString = "$convertedPriceString $newCurrency"
+    val convertedPriceString = String.format("%.2f", convertedPrice)
 
-    return convertedPriceString
+    return "$convertedPriceString $newCurrency"
 }

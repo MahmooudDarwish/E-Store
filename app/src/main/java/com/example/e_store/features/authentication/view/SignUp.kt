@@ -35,11 +35,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationViewModel) {
 
-    val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
-    /*val viewModel: AuthenticationViewModel =
-        viewModel(factory = AuthenticationViewModelFactory(auth))
-*/
 
     Column(
         modifier = Modifier
@@ -137,15 +133,3 @@ fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationView
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
