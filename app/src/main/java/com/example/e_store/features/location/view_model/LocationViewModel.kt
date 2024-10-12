@@ -29,12 +29,18 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
     val deletionState = MutableStateFlow<DeletionState>(DeletionState.CanDelete)
 
 
-
     fun deleteLocation(locationId: Long, isDefault: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (_locations.value is DataState.Success<AddressResponse> &&
-                (_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 && !isDefault) {
-                UserSession.shopifyCustomerID?.let { repository.deleteCustomerAddress(it, locationId) }
+                (_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 && !isDefault
+            ) {
+                UserSession.shopifyCustomerID?.let {
+                    repository.deleteCustomerAddress(
+                        it,
+                        locationId
+                    )
+                    fetchAllLocations()
+                }
                 deletionState.value = DeletionState.CanDelete
 
                 Log.d("LocationViewModel", "Location deleted successfully")
@@ -50,20 +56,20 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
     }
 
 
-/*
+    /*
 
-    fun deleteLocation(locationId: Long, isDefault:Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if ((_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 &&isDefault==false )
-            {
-                UserSession.shopifyCustomerID?.let { repository.deleteCustomerAddress(it, locationId) }
-            }else{
-                canNotDelete.value = true
-                NavigationHolder.id=locationId
+        fun deleteLocation(locationId: Long, isDefault:Boolean) {
+            viewModelScope.launch(Dispatchers.IO) {
+                if ((_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 &&isDefault==false )
+                {
+                    UserSession.shopifyCustomerID?.let { repository.deleteCustomerAddress(it, locationId) }
+                }else{
+                    canNotDelete.value = true
+                    NavigationHolder.id=locationId
+                }
             }
         }
-    }
-*/
+    */
 
     fun fetchAllLocations() {
         viewModelScope.launch {
@@ -71,15 +77,11 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
                 UserSession.shopifyCustomerID?.let {
                     repository.fetchCustomerAddresses(it).collect { dataState ->
                         Log.d("LocationViewModel", "DataState received: $dataState")
-                        if (dataState != null) {
-                            _locations.value = DataState.Success(dataState)
-                            Log.d("LocationViewModel", "Locations fetched successfully")
-                            Log.d("LocationViewModel", "Locations: $dataState")
+                        _locations.value = DataState.Success(dataState)
+                        Log.d("LocationViewModel", "Locations fetched successfully")
+                        Log.d("LocationViewModel", "Locations: $dataState")
 
-                            fetchAllLocations()
-                        } else {
-                            _locations.value = DataState.Error(R.string.unexpected_error)
-                        }
+                        //  fetchAllLocations()
 
                     }
                 }
@@ -91,15 +93,16 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
     }
 
-    fun makeDefaultLocation(addressId: Long,address: com.example.e_store.utils.shared_models.Address)
-    {
-        if ( address.default == false)
-        {
-            address.default=true
+    fun makeDefaultLocation(
+        addressId: Long,
+        address: com.example.e_store.utils.shared_models.Address,
+    ) {
+        if (address.default == false) {
+            address.default = true
 
             viewModelScope.launch(Dispatchers.IO) {
                 UserSession.shopifyCustomerID?.let {
-                    repository.updateCustomerAddress(it,addressId,AddNewAddress(address))
+                    repository.updateCustomerAddress(it, addressId, AddNewAddress(address))
                 }
             }
 

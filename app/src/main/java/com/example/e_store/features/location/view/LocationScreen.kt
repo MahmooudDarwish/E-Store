@@ -1,6 +1,7 @@
 package com.example.e_store.features.location.view
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -22,10 +23,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -48,10 +49,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.e_store.R
 import com.example.e_store.features.location.components.LoadingDialog
 import com.example.e_store.features.location.view_model.LocationViewModel
 import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.ConfirmNegativeActionDialog
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.ElevationCard
@@ -69,16 +72,15 @@ import kotlinx.coroutines.launch
 fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
     val context = LocalContext.current
     val locations by viewModel.locations.collectAsStateWithLifecycle()
-    var addressDetails = remember { mutableStateOf<AddressResponse?>(null) }
-    var isLoading = remember { mutableStateOf(true) }
+    val addressDetails = remember { mutableStateOf<AddressResponse?>(null) }
+    val isLoading = remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
     var deletingLocation by remember { mutableStateOf(false) }
     var deletionId by remember {
         mutableStateOf<Long?>(null)
     }
-
+    var locationToDelete by remember { mutableStateOf<Address?>(null) }
     val deletionState by viewModel.deletionState.collectAsStateWithLifecycle()
-
 
     when (deletionState) {
         is DeletionState.CannotDelete -> {
@@ -106,9 +108,20 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
         }
     }
 
-    var locationToDelete by remember { mutableStateOf<Address?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
+
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+    Log.d("LocationScreen", "currentBackStackEntry: ${Screen.Location.route}")
+    Log.d("LocationScreen", "currentBackStackEntry.value: ${currentBackStackEntry.value?.destination?.route}")
+
+    LaunchedEffect(currentBackStackEntry.value) {
+        if (currentBackStackEntry.value?.destination?.route == Screen.Location.route) {
+            Log.d("LocationScreen", "Fetching locations")
+            // Re-fetch locations when returning to this scree
+            viewModel.fetchAllLocations()
+        }
+    }
 
     if (deletingLocation) {
         LoadingDialog()
@@ -137,9 +150,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllLocations()
-    }
+
 
     when (locations) {
         is DataState.Loading -> {
@@ -150,6 +161,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
         is DataState.Success -> {
             val addressResponse = (locations as DataState.Success<AddressResponse?>).data
             addressResponse?.let {
+                Log.d("AddressResponse", it.toString())
                 addressDetails.value = it
                 isLoading.value = false
             }

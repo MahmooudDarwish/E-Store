@@ -4,12 +4,15 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -23,9 +26,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.e_store.R
 import com.example.e_store.features.location.components.SearchMapBox
@@ -55,7 +60,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.maps.android.compose.GoogleMap
@@ -66,44 +70,73 @@ import com.google.maps.android.compose.rememberMarkerState
 import com.example.e_store.BuildConfig
 import java.util.Locale
 
+private fun checkLocationPermissions(context: Context): Boolean {
+    val fineLocationGranted = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+    val coarseLocationGranted = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+    return fineLocationGranted && coarseLocationGranted
+
+}
+
+private fun GPSEnabled(context: Context): Boolean {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+    return gpsEnabled
+
+}
+
+private fun openAppSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+    }
+    context.startActivity(intent)
+}
+
+private fun openGPSSSettings(context: Context) {
+
+    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+    context.startActivity(intent)
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 
 fun MapScreen(navController: NavController, viewModel: MapViewModel) {
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchCustomerAddresses()
-    }
-
     val context = LocalContext.current
 
     val isPhoneExist by viewModel.isPhoneExist.collectAsState()
 
 
-    var phoneNumber by remember { mutableStateOf("") }
-
     var showPhoneNumberDialog by remember { mutableStateOf(false) }
     var inputValue by remember { mutableStateOf(UserSession.phone) }
-    var errorMessage by remember { mutableStateOf("") }
 
     var isMapInitialized by remember { mutableStateOf(false) }
 
 
-    // Initialize Places API
     Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
-    val placesClient: PlacesClient = Places.createClient(context)
     var query by remember { mutableStateOf(context.getString(R.string.search)) }
 
     var currentLocation by remember { mutableStateOf<Location?>(null) }
+
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     var showPermissionDialog by remember { mutableStateOf(false) }
-    var markerState = rememberMarkerState(position = LatLng(0.0, 0.0))
+    var showGPSPermissionDialog by remember { mutableStateOf(false) }
+
+    val markerState = rememberMarkerState(position = LatLng(0.0, 0.0))
 
     // Google Map state
+    val startLocation = LatLng(40.9971, 29.1007)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition(LatLng(0.0, 0.0), 10f, 0f, 0f)
+        position = CameraPosition.fromLatLngZoom(startLocation, 15f)
     }
+
     val locationPermissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -112,85 +145,97 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     )
 
 
-    // Request permissions
     LaunchedEffect(Unit) {
-        locationPermissionsState.launchMultiplePermissionRequest()
+        Log.d("MapScreen", "LaunchedEffect called")
+        if (checkLocationPermissions(context)) {
+            if (GPSEnabled(context)) {
+                viewModel.fetchCustomerAddresses()
+
+                Log.d("MapScreen", "Requesting permissions")
+            } else {
+                Log.d("MapScreen", "GPS is not enabled")
+                showGPSPermissionDialog = true
+            }
+        } else {
+            Log.d("MapScreen", "Permissions already granted")
+            locationPermissionsState.launchMultiplePermissionRequest()
+
+        }
     }
 
-    if (showPhoneNumberDialog) {
-        PhoneNumberInputDialog(
-            showDialog = showPhoneNumberDialog,
-            onDismiss = { showPhoneNumberDialog = false },
-            onConfirm = { phoneNumber ->
-                inputValue = phoneNumber
-                showPhoneNumberDialog = false
 
-                currentLocation?.let { location ->
-                    // Perform reverse geocoding to get address details
-                    val geocoder = Geocoder(context, Locale.getDefault())
-                    val addresses: List<Address>? = geocoder.getFromLocation(
-                        location.latitude,
-                        location.longitude,
-                        1
-                    )
 
-                    addresses?.let {
-                        val address = it.firstOrNull()
-                        if (address != null) {
-                            // Update the Adresse object
-                            UserAddress.apply {
-                                address1 = address.getAddressLine(0)
-                                city = address.locality
-                                province = address.adminArea
-                                country = address.countryName
-                                zip = address.postalCode
-                            }
 
-                            Log.d("MapphoneNumber", "phoneNumber: ${isPhoneExist}")
-                            if (UserSession.phone == null || isPhoneExist) {
-                                showPhoneNumberDialog = true
+    PhoneNumberInputDialog(
+        showDialog = showPhoneNumberDialog,
+        onDismiss = { showPhoneNumberDialog = false },
+        onConfirm = { phoneNumber ->
+            inputValue = phoneNumber
+            showPhoneNumberDialog = false
 
-                            } else {
-                                Log.d("MapphoneNumber", "phoneNumber: ${UserSession.phone}")
-                                Log.d(" MapphoneNumber", "phoneNumber: ${inputValue}")
-                                viewModel.saveAddress(
-                                    com.example.e_store.utils.shared_models.Address(
-                                        address1 = UserAddress.address1,
-                                        city = UserAddress.city,
-                                        phone = inputValue,
-                                        firstName = UserSession.name,
-                                    )
-                                )
+            currentLocation.let { location ->
+                // Perform reverse geocoding to get address details
+                val geocoder = Geocoder(context, Locale.getDefault())
+                val addresses: List<Address>? = geocoder.getFromLocation(
+                    location!!.latitude,
+                    location.longitude,
+                    1
+                )
 
-                                Log.d("PhoneNumberTag", "phoneNumber: ${UserSession.phone}")
-                                //navController.navigate(NavigationKeys.LOCATION_ROUTE)
-
-                            }
-                            Log.d(
-                                "SaveLocation",
-                                "Location saved: ${UserAddress.address1}"
-                            )
-                        } else {
-                            Log.e(
-                                "SaveLocation",
-                                "No address found for the current location"
-                            )
+                addresses?.let {
+                    val address = it.firstOrNull()
+                    if (address != null) {
+                        // Update the Adresse object
+                        UserAddress.apply {
+                            address1 = address.getAddressLine(0)
+                            city = address.locality
+                            province = address.adminArea
+                            country = address.countryName
+                            zip = address.postalCode
                         }
-                    } ?: run {
+
+
+                        Log.d("MapphoneNumber", "phoneNumber: ${UserSession.phone}")
+                        Log.d(" MapphoneNumber", "phoneNumber: $inputValue")
+                        viewModel.saveAddress(
+                            com.example.e_store.utils.shared_models.Address(
+                                address1 = UserAddress.address1,
+                                city = UserAddress.city,
+                                phone = inputValue,
+                                firstName = UserSession.name,
+                            )
+                        )
+
+                        Log.d("PhoneNumberTag", "phoneNumber: ${UserSession.phone}")
+                        Toast.makeText(
+                            context,
+                            "Location Saved",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        //navController.navigate(NavigationKeys.LOCATION_ROUTE)
+
+
+                        Log.d(
+                            "SaveLocation9512",
+                            "Location saved: ${UserAddress.address1}"
+                        )
+                    } else {
                         Log.e(
                             "SaveLocation",
-                            "Unable to retrieve address for current location"
+                            "No address found for the current location"
                         )
                     }
                 } ?: run {
-                    Log.e("SaveLocation", "Current location is null")
+                    Log.e(
+                        "SaveLocation",
+                        "Unable to retrieve address for current location"
+                    )
                 }
+            }
+        },
+        context
+    )
 
-
-            },
-            context
-        )
-    }
     inputValue?.let { viewModel.isPhoneExistFUN(it) }
 
 
@@ -236,33 +281,35 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     if (isMapInitialized) {
         // Check if permissions are granted and location services are enabled
-        LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
-            if (locationPermissionsState.allPermissionsGranted) {
+        LaunchedEffect(
+            checkLocationPermissions(context)
+        ) {
+            if (checkLocationPermissions(context)) {
                 // Check if GPS is enabled
-                val locationManager =
-                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    getCurrentLocation(fusedLocationClient) { location ->
+                if (GPSEnabled(context)) {
+                    getCurrentLocation(fusedLocationClient, context, onNoPermission = {
+                        showPermissionDialog = true
+                    }) { location ->
                         currentLocation = location
                         Log.d("MapScreen", "Current Location: $location")
 
-                        currentLocation?.let {
+                        currentLocation.let {
                             cameraPositionState.position = CameraPosition(
-                                LatLng(it.latitude, it.longitude),
+                                LatLng(it!!.latitude, it.longitude),
                                 10f,
                                 0f,
                                 0f
                             )
                             markerState.position = LatLng(it.latitude, it.longitude)
-                        } ?: run {
-                            Log.e("MapScreen", "Current location is null")
                         }
 
                     }
                 } else {
-                    showPermissionDialog = true
+                    Log.d("MapScreen", "GPS is not enabled11")
+                    showGPSPermissionDialog = true
                 }
             } else {
+                Log.d("MapScreen", "Permissions not granted22")
                 showPermissionDialog = true
             }
         }
@@ -310,29 +357,38 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                     FloatingActionButton(
                         onClick = {
                             Log.d("MapScreen", "Button clicked")
-                            if (locationPermissionsState.allPermissionsGranted) {
-                                Log.d("MapScreen", "Location permissions granted")
-                                getCurrentLocation(fusedLocationClient) { location ->
-                                    currentLocation = location
-                                    Log.d("MapScreen", "Current Location: $location")
-                                    currentLocation?.let {
-                                        cameraPositionState.position = CameraPosition(
-                                            LatLng(
-                                                it.latitude,
-                                                it.longitude
-                                            ), // Move to the new position
-                                            10f, // Zoom level
-                                            0f,
-                                            0f
-                                        )
-                                        // Update marker position to the current location
-                                        markerState.position = LatLng(it.latitude, it.longitude)
-                                    } ?: run {
-                                        Log.e("MapScreen", "Unable to get current location")
+                            if (checkLocationPermissions(context)) {
+                                if (GPSEnabled(context)) {
+                                    Log.d("MapScreen", "Location permissions granted")
+                                    getCurrentLocation(
+                                        fusedLocationClient,
+                                        context = context, onNoPermission = {
+                                            showPermissionDialog = true
+                                        }
+                                    ) { location ->
+                                        currentLocation = location
+                                        Log.d("MapScreen", "Current Location: $location")
+                                        currentLocation.let {
+                                            cameraPositionState.position = CameraPosition(
+                                                LatLng(
+                                                    it!!.latitude,
+                                                    it.longitude
+                                                ), // Move to the new position
+                                                10f, // Zoom level
+                                                0f,
+                                                0f
+                                            )
+                                            // Update marker position to the current location
+                                            markerState.position = LatLng(it.latitude, it.longitude)
+                                        }
+                                        query = context.getString(R.string.search)
                                     }
-                                    query = context.getString(R.string.search)
+                                } else {
+                                    Log.d("MapScreen", "GPS is not enabled")
+                                    showGPSPermissionDialog = true
                                 }
                             } else {
+
                                 showPermissionDialog = true
                                 Log.d("MapScreen", "Location permissions not granted")
                             }
@@ -355,11 +411,11 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 ) {
                     FloatingActionButton(
                         onClick = {
-                            currentLocation?.let { location ->
+                            currentLocation.let { location ->
                                 // Perform reverse geocoding to get address details
                                 val geocoder = Geocoder(context, Locale.getDefault())
                                 val addresses: List<Address>? = geocoder.getFromLocation(
-                                    location.latitude,
+                                    location!!.latitude,
                                     location.longitude,
                                     1
                                 )
@@ -394,12 +450,17 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                                     firstName = UserSession.name,
                                                 )
                                             )
+                                            Toast.makeText(
+                                                context,
+                                                "Location Saved",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                             //navController.navigate(NavigationKeys.LOCATION_ROUTE)
 
                                         }
                                         Log.d(
                                             "SaveLocation",
-                                            "Location saved: ${UserAddress.address1}"
+                                            "Location saved25: ${UserAddress.address1}"
                                         )
                                     } else {
                                         Log.e(
@@ -413,8 +474,6 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                         "Unable to retrieve address for current location"
                                     )
                                 }
-                            } ?: run {
-                                Log.e("SaveLocation", "Current location is null")
                             }
                         },
                     ) {
@@ -438,6 +497,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 .padding(paddingValues)
                 .border(BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(8.dp))
         ) {
+
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
@@ -477,11 +537,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 }
             ) {
                 // Only display marker if currentLocation is not null
-                currentLocation?.let { location ->
-                    Log.d(
-                        "MapScreen",
-                        "Marker Location: ${location.latitude}, ${location.longitude}"
-                    )
+                currentLocation.let { location ->
                     Marker(
                         state = markerState,
                         title = stringResource(R.string.your_location),
@@ -492,6 +548,26 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
         }
     }
+    if (showGPSPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showGPSPermissionDialog = false },
+            title = { Text(stringResource(R.string.location_permission_required)) },
+            text = { Text(stringResource(R.string.this_app_requires_location_permissions_to_function_correctly_please_enable_gps_in_settings)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    openGPSSSettings(context)
+                    showGPSPermissionDialog = false
+                }) {
+                    Text(stringResource(R.string.open_settings))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 
     if (showPermissionDialog) {
         AlertDialog(
@@ -501,7 +577,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
             confirmButton = {
                 TextButton(onClick = {
                     showPermissionDialog = false
-                    openGPSSettings(context)
+                    openAppSettings(context)
                 }) {
                     Text(stringResource(R.string.open_settings))
                 }
@@ -518,30 +594,48 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
 fun getCurrentLocation(
     fusedLocationClient: FusedLocationProviderClient,
-    onLocationReceived: (Location?) -> Unit
+    context: Context,
+    onNoPermission: () -> Unit,
+    onLocationReceived: (Location) -> Unit,
 ) {
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location: Location? ->
-            onLocationReceived(location)
-        }
-        .addOnFailureListener {
-            Log.e("MapScreen", "Failed to retrieve location: ${it.message}")
-        }
+
+
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        onNoPermission()
+        Toast.makeText(context, "Location Permission not granted", Toast.LENGTH_SHORT).show()
+        return
+    } else {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                onLocationReceived(location ?: Location("").apply {
+                    longitude = 0.0
+                    latitude = 0.0
+                })
+            }
+            .addOnFailureListener {
+                Log.e("MapScreen", "Failed to retrieve location: ${it.message}")
+            }
+    }
+
 }
 
 
 // Function to open GPS settings
-private fun openGPSSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-    context.startActivity(intent)
-}
+
 
 @Composable
 fun PhoneNumberInputDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
-    context: Context
+    context: Context,
 ) {
     var inputValue by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
