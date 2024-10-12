@@ -447,6 +447,12 @@ fun createDraftOrderItems(
     // Extract price and variantId from the found variant
     val price = variant?.price
     val variantId = variant?.id
+    Log.d("ProductInfoScreen", "variantId: $variantId")
+    Log.d("ProductInfoScreen", "price: ${price}")
+    Log.d("ProductInfoScreen", "variantId: $selectedSize")
+    Log.d("ProductInfoScreen", "variantId: $selectedColor")
+
+
     if (price != null && variantId != null) {
         val properties: List<Property> = listOf(
             Property("Size", selectedSize),    // Capitalized "Size"

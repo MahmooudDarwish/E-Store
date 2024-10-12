@@ -58,6 +58,8 @@ import com.example.e_store.features.profile.view_model.ProfileViewModelFactory
 import com.example.e_store.features.settings.view.SettingsScreen
 import com.example.e_store.features.settings.view_model.SettingsViewModel
 import com.example.e_store.features.settings.view_model.SettingsViewModelFactory
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
 
 sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
@@ -100,12 +102,18 @@ sealed class Screen(val route: String, val title: Int, val icon: Int) {
 
     object FavouriteFromHome :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_HOME, R.string.favourite, 0)
+
     object FavouriteFromCategories :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_CATEGORIES, R.string.favourite, 0)
+
     object FavouriteFromProfile :
         Screen(NavigationKeys.FAVOURITE_ROUTE_FROM_PROFILE, R.string.favourite, 0)
-    object ProductInfoFromFavourite : Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
-    object ProductInfoFromProfile : Screen(NavigationKeys.PRODUCT_INFO_PROFILE_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromFavourite :
+        Screen(NavigationKeys.PRODUCT_INFO_FAVOURITE_ROUTE, R.string.product_info, 0)
+
+    object ProductInfoFromProfile :
+        Screen(NavigationKeys.PRODUCT_INFO_PROFILE_ROUTE, R.string.product_info, 0)
 
     object AddLocation : Screen(NavigationKeys.ADD_LOCATION_ROUTE, R.string.add_location, 0)
 
@@ -125,22 +133,27 @@ fun AppNavigation(
     ordersViewModelFactory: OrdersViewModelFactory,
     settingsViewModelFactory: SettingsViewModelFactory,
 
-    authenticationViewModelFactory : AuthenticationViewModelFactory,
+    authenticationViewModelFactory: AuthenticationViewModelFactory,
     checkoutViewModelFactory: CheckoutViewModelFactory,
     addLocationViewModelFactory: AddLocationViewModelFactory,
     mapViewModelFactory: MapViewModelFactory,
     locationViewModelFactory: LocationViewModelFactory,
-    paymentViewModelFactory : PaymentViewModelFactory,
+    paymentViewModelFactory: PaymentViewModelFactory,
+    favouriteControllerViewModelFactory: FavouriteControllerViewModelFactory,
 
     ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             val viewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
-            HomeScreen(viewModel, navController)
+            val favouriteViewModel: FavouriteControllerViewModel =
+                viewModel(factory = favouriteControllerViewModelFactory)
+            HomeScreen(viewModel, favouriteControllerViewModel = favouriteViewModel, navController)
         }
         composable(route = Screen.Categories.route) {
             val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
-            CategoriesScreen(viewModel = viewModel, navController = navController)
+            val favouriteViewModel: FavouriteControllerViewModel =
+                viewModel(factory = favouriteControllerViewModelFactory)
+            CategoriesScreen(viewModel = viewModel, navController = navController, favouriteControllerViewModel = favouriteViewModel)
         }
         composable(route = Screen.Profile.route) {
             val viewModel: ProfileViewModel = viewModel(factory = profileViewModelFactory)
@@ -159,7 +172,15 @@ fun AppNavigation(
             val viewModel: BrandProductsViewModel =
                 viewModel(factory = brandProductsViewModelFactory)
             val brand = backStackEntry.arguments?.getString(NavigationKeys.BRAND_ID)
-            BrandProducts(brandID = brand, navController = navController, viewModel = viewModel)
+            val favouriteViewModel: FavouriteControllerViewModel =
+                viewModel(factory = favouriteControllerViewModelFactory)
+
+            BrandProducts(
+                brandID = brand,
+                navController = navController,
+                viewModel = viewModel,
+                favouriteControllerViewModel = favouriteViewModel
+            )
         }
 
         composable(route = Screen.ProductInfoFromHome.route) {
@@ -184,11 +205,15 @@ fun AppNavigation(
 
         composable(route = Screen.SearchFromHome.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
-            SearchScreen(viewModel, navController)
+            val favouriteViewModel: FavouriteControllerViewModel =
+                viewModel(factory = favouriteControllerViewModelFactory)
+            SearchScreen(viewModel, navController, favouriteControllerViewModel = favouriteViewModel)
         }
         composable(route = Screen.SearchFromCategories.route) {
             val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
-            SearchScreen(viewModel, navController)
+            val favouriteViewModel: FavouriteControllerViewModel =
+                viewModel(factory = favouriteControllerViewModelFactory)
+            SearchScreen(viewModel, navController,favouriteControllerViewModel = favouriteViewModel )
         }
         composable(route = Screen.Orders.route) {
             val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
@@ -199,11 +224,15 @@ fun AppNavigation(
 
 
         composable(route = Screen.SignIn.route) {
-            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
-            SignInScreen(navController, viewModel) }
+            val viewModel: AuthenticationViewModel =
+                viewModel(factory = authenticationViewModelFactory)
+            SignInScreen(navController, viewModel)
+        }
         composable(route = Screen.SignUp.route) {
-            val viewModel: AuthenticationViewModel = viewModel(factory = authenticationViewModelFactory)
-            SignUpScreen(navController,viewModel) }
+            val viewModel: AuthenticationViewModel =
+                viewModel(factory = authenticationViewModelFactory)
+            SignUpScreen(navController, viewModel)
+        }
 
         composable(route = Screen.Cart.route) {
             val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
@@ -237,10 +266,11 @@ fun AppNavigation(
         composable(route = Screen.Payment.route) {
 
             val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-            PaymentScreen(navController,viewModel)
+            PaymentScreen(navController, viewModel)
         }
         composable(route = Screen.Settings.route) {
             val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
-            SettingsScreen(viewModel, navController) }
+            SettingsScreen(viewModel, navController)
+        }
     }
 }

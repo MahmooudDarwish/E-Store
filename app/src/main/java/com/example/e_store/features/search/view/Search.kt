@@ -46,9 +46,10 @@ import com.example.e_store.utils.shared_components.ProductsStateHandler
 import com.example.e_store.utils.shared_methods.initializeProductDetails
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
+fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController, favouriteControllerViewModel: FavouriteControllerViewModel) {
     val productsUiState by viewModel.products.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var sliderMaxValue by remember { mutableFloatStateOf(1000F) }
@@ -116,7 +117,8 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavHostController) {
                 productsUiState = productsUiState,
                 route = if(currentRoute == NavigationKeys.SEARCH_HOME_ROUTE) NavigationKeys.PRODUCT_INFO_HOME_ROUTE else NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE,
                 navController = navController,
-                filterProducts = ::filterProducts
+                filterProducts = ::filterProducts,
+                viewModel = favouriteControllerViewModel
             )
         }
 

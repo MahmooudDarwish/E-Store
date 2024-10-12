@@ -1,6 +1,5 @@
 package com.example.e_store.features.categories.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,9 +33,10 @@ import com.example.e_store.utils.shared_components.PriceSlider
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.UserSession
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 
 @Composable
-fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostController) {
+fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostController, favouriteControllerViewModel: FavouriteControllerViewModel) {
     val categoriesProductsUiState by viewModel.categoriesProducts.collectAsStateWithLifecycle()
 
     var sliderMaxValue by remember { mutableFloatStateOf(1000F) }
@@ -161,7 +161,8 @@ fun CategoriesScreen(viewModel: CategoriesViewModel, navController: NavHostContr
                     productsUiState = categoriesProductsUiState,
                     navController = navController,
                     route = NavigationKeys.PRODUCT_INFO_CATEGORIES_ROUTE,
-                    filterProducts = ::filterProducts
+                    filterProducts = ::filterProducts,
+                    viewModel =  favouriteControllerViewModel
                 )
             }
         }

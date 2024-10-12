@@ -13,20 +13,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.e_store.utils.shared_methods.initializeProductDetails
+import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun ProductsGrid(
     navController: NavHostController,
     route: String,
-    products: List<Product>
+    products: List<Product>,
+    viewModel: FavouriteControllerViewModel,
 ) {
     var isVisible by remember { mutableStateOf(false) }
+    var draftOrderItems by remember { mutableStateOf<List<DraftOrderDetails>>(emptyList()) }
 
     LaunchedEffect(Unit) {
+        // Delay for animation
         delay(300)
         isVisible = true
+
+        // Fetch draft orders only once
+        viewModel.fetchFavouritesFromDraftOrder()
+        viewModel.draftOrderItems.collect { dataState ->
+            when (dataState) {
+                is DataState.Success -> {
+
+                    draftOrderItems = dataState.data.draft_orders
+                }
+
+                else -> {
+                    // Handle other states (Loading, Error)
+                }
+            }
+        }
     }
 
     AnimatedVisibility(
@@ -45,10 +66,16 @@ fun ProductsGrid(
                 ElevationCard(
                     modifier = Modifier.padding(bottom = 10.dp)
                 ) {
-                    RoundedRectangleItem(product = product, onClick = {
-                        initializeProductDetails(product)
-                        navController.navigate(route)
-                    })
+
+                    RoundedRectangleItem(
+                        product = product,
+                        viewModel = viewModel,
+                        navController =  navController,
+                        onClick = {
+                            initializeProductDetails(product)
+                            navController.navigate(route)
+                        }
+                    )
                 }
             }
         }

@@ -33,6 +33,8 @@ import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory
 import com.example.e_store.features.settings.view_model.SettingsViewModelFactory
 import com.example.e_store.utils.shared_components.NoInternetScreen
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
 import com.example.weather.utils.managers.InternetChecker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,14 +48,15 @@ fun MainHomeScreen(
     categoriesViewModelFactory: CategoriesViewModelFactory,
     favouritesViewModelFactory: FavouritesViewModelFactory,
     profileViewModelFactory: ProfileViewModelFactory,
-    ordersViewModelFactory : OrdersViewModelFactory,
+    ordersViewModelFactory: OrdersViewModelFactory,
     authenticationViewModelFactory: AuthenticationViewModelFactory,
     checkoutViewModelFactory: CheckoutViewModelFactory,
     addLocationFactory: AddLocationViewModelFactory,
     locationViewModelFactory: LocationViewModelFactory,
     mapViewModelFactory: MapViewModelFactory,
-    paymentViewModelFactory : PaymentViewModelFactory,
+    paymentViewModelFactory: PaymentViewModelFactory,
     settingsViewModelFactory: SettingsViewModelFactory,
+    favouriteControllerViewModelFactory: FavouriteControllerViewModelFactory,
 
 
     ) {
@@ -63,7 +66,7 @@ fun MainHomeScreen(
         Screen.Cart,
         Screen.Profile,
 
-    )
+        )
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -118,45 +121,46 @@ fun MainHomeScreen(
                         || currentRoute.startsWith(Screen.Home.route)
                         || currentRoute.startsWith(Screen.Categories.route)
                         || currentRoute.startsWith(Screen.Cart.route)
-                        || currentRoute.startsWith(Screen.Profile.route))) {
+                        || currentRoute.startsWith(Screen.Profile.route))
+            ) {
 
-                    BottomNavigationBar(
-                        items = items,
-                        currentRoute = selectedRoute,
-                        navController = navController,
-                    )
+                BottomNavigationBar(
+                    items = items,
+                    currentRoute = selectedRoute,
+                    navController = navController,
+                )
 
             }
         }
     ) { paddingValues ->
-                if (isInternetAvailable) {
-                    Box(modifier = Modifier.padding(paddingValues)) {
-                        AppNavigation(
-                            navController = navController,
-                            homeViewModelFactory = homeViewModelFactory,
-                            brandProductsViewModelFactory = brandProductsViewModelFactory,
-                            categoriesViewModelFactory = categoriesViewModelFactory,
-                            searchViewModelFactory = searchViewModelFactory,
-                            profileViewModelFactory = profileViewModelFactory,
-                            productInfoViewModelFactory = productInfoViewModelFactory,
-                            favouritesViewModelFactory = favouritesViewModelFactory,
-                            shoppingCartViewModelFactory = shoppingCartViewModelFactory,
-                            ordersViewModelFactory = ordersViewModelFactory,
-                            authenticationViewModelFactory = authenticationViewModelFactory,
-                            checkoutViewModelFactory = checkoutViewModelFactory,
-                            locationViewModelFactory = locationViewModelFactory,
-                            mapViewModelFactory = mapViewModelFactory,
-                            addLocationViewModelFactory = addLocationFactory,
-                            paymentViewModelFactory = paymentViewModelFactory,
-                            settingsViewModelFactory = settingsViewModelFactory,
-
-                        )
-                    }
-                } else {
-                    NoInternetScreen()
-                }
-
+        if (isInternetAvailable) {
+            Box(modifier = Modifier.padding(paddingValues)) {
+                AppNavigation(
+                    navController = navController,
+                    homeViewModelFactory = homeViewModelFactory,
+                    brandProductsViewModelFactory = brandProductsViewModelFactory,
+                    categoriesViewModelFactory = categoriesViewModelFactory,
+                    searchViewModelFactory = searchViewModelFactory,
+                    profileViewModelFactory = profileViewModelFactory,
+                    productInfoViewModelFactory = productInfoViewModelFactory,
+                    favouritesViewModelFactory = favouritesViewModelFactory,
+                    shoppingCartViewModelFactory = shoppingCartViewModelFactory,
+                    ordersViewModelFactory = ordersViewModelFactory,
+                    authenticationViewModelFactory = authenticationViewModelFactory,
+                    checkoutViewModelFactory = checkoutViewModelFactory,
+                    locationViewModelFactory = locationViewModelFactory,
+                    mapViewModelFactory = mapViewModelFactory,
+                    addLocationViewModelFactory = addLocationFactory,
+                    paymentViewModelFactory = paymentViewModelFactory,
+                    settingsViewModelFactory = settingsViewModelFactory,
+                    favouriteControllerViewModelFactory = favouriteControllerViewModelFactory
+                )
+            }
+        } else {
+            NoInternetScreen()
         }
+
+    }
 
 
 }
