@@ -139,6 +139,10 @@
     <string name="please_enter_a_valid_phone_number_10_digits">Please enter a valid phone number (10 digits)</string>
     <string name="open_settings">Open Settings</string>
     <string name="this_app_requires_location_permissions_to_function_correctly_please_enable_them_in_settings">This app requires location permissions to function correctly. Please enable them in settings.</string>
+    <string name="this_app_requires_location_permissions_to_function_correctly_please_enable_gps_in_settings">This app requires location permissions to function correctly. Please enable GPS in settings.</string>
+    <string name="please_enable_gps">This app Please enable GPS.</string>
+    <string name="please_give_permission_to_location">Please give permission to location</string>
+
     <string name="location_permission_required">Location Permission Required</string>
     <string name="current_location">Current Location</string>
     <string name="your_location">Your Location</string>
