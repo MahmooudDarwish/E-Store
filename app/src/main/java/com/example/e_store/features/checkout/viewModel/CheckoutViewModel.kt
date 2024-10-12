@@ -13,6 +13,7 @@ import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -66,6 +67,46 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
         }
     }
 
+    fun addDeliveryAddress(address: Address) {
+        val currentState = _draftOrder.value
+
+        // Check if the current state is Success
+        if (currentState is DataState.Success) {
+            val draftOrderDetails = currentState.data
+
+            // Set the addresses
+            if (draftOrderDetails != null) {
+                draftOrderDetails.shipping_address = address
+            }
+            if (draftOrderDetails != null) {
+                draftOrderDetails.billing_address = address
+            }
+
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    if (draftOrderDetails != null) {
+                        draftOrderDetails.id?.let {
+                            draftOrderDetails?.let { it1 -> DraftOrderRequest(it1) }?.let { it2 ->
+                                repo.updateDraftOrder(it,
+                                    it2
+                                )
+                            }
+                        }
+                    }
+                    fetchDefaultAddress() // Fetch updated addresses
+                } catch (ex: Exception) {
+                    // Handle the exception (log it, show a message to the user, etc.)
+                    Log.e("CheckoutViewModel", "Error updating draft order: ${ex.message}")
+                }
+            }
+        } else if (currentState is DataState.Loading) {
+            // Handle loading state if necessary, maybe show a loading spinner
+            Log.d("CheckoutViewModel", "Draft order is loading, please wait...")
+        } else if (currentState is DataState.Error) {
+            // Handle error state (show error message)
+            Log.e("CheckoutViewModel", "Error fetching draft order: ${currentState.message}")
+        }
+    }
 
     fun fetchDraftOrderByID(draftOrderId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -127,17 +168,20 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
             repo.removeDraftOrder(DraftOrderIDHolder.draftOrderId!!)
         }
     }
+/*
 
     fun applyDiscount(code: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repo.fetchDiscountCodesByCode(code).collect { discountCodesResponse ->
                     if (discountCodesResponse != null) {
+                        Log.d(TAG, "Coupon Code: ${discountCodesResponse}")
                         _discountCodes.value = DataState.Success(discountCodesResponse)
-
-
-
                         if (DraftOrderIDHolder.draftOrderId != null && discountCodesResponse != null) {
+                            Log.d(
+                                TAG,
+                                "Coupon Code: ${DataState.Success(discountCodesResponse)}"
+                            )
 
 
                             DraftOrderIDHolder.draftOrderId?.let {
@@ -167,6 +211,46 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
         }
 
     }
+*/
+
+
+
+    fun applyDiscount(code: String, onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repo.fetchDiscountCodesByCode(code).collect { discountCodesResponse ->
+                    if (discountCodesResponse != null ) {
+                        Log.d(TAG, "Coupon Code: $discountCodesResponse")
+                        _discountCodes.value = DataState.Success(discountCodesResponse)
+
+                        // Check if draftOrderId is available and update the order
+                        DraftOrderIDHolder.draftOrderId?.let {
+                            updateDraftOrder(it, discountCodesResponse)
+                        } ?: run {
+                            Log.d(TAG, "Error updating draft order: $DraftOrderIDHolder.draftOrderId")
+                        }
+                        delay(500)
+                        // Notify success only if we have processed the response successfully
+                        onComplete(true)
+                    } else {
+                        Log.d(TAG, "No discount code found.")
+                        onComplete(false) // Notify failure if discount code is null
+                    }
+                }
+            } catch (ex: Exception) {
+                _discountCodes.value = DataState.Error(R.string.unexpected_error)
+                Log.e(TAG, "Error fetching discount codes", ex)
+                onComplete(false) // Notify failure on exception
+            } finally {
+                // Removed onComplete(true) from here
+                if (DraftOrderIDHolder.draftOrderId != null && _discountCodes.value is DataState.Success) {
+                    fetchDraftOrderByID(DraftOrderIDHolder.draftOrderId!!)
+                    Log.d("CheckoutScreen", "Coupon Code: ${DraftOrderIDHolder.draftOrderId}")
+                }
+            }
+        }
+    }
+
 
 }
 

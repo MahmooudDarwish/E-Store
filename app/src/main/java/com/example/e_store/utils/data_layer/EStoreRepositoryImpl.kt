@@ -20,6 +20,7 @@ import com.example.e_store.utils.shared_models.CustomerResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
 
 class EStoreRepositoryImpl private constructor(
@@ -70,7 +71,7 @@ class EStoreRepositoryImpl private constructor(
         return eStoreRemoteDataSource.fetchProducts()
     }
 
-    override suspend fun fetchDiscountCodes(): Flow<DiscountCodesResponse?> {
+    override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse?>> {
         return eStoreRemoteDataSource.fetchDiscountCodes()
     }
 
@@ -170,4 +171,11 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
         return eStoreRemoteDataSource.fetchConversionRates()
         }
+
+    override suspend fun fetchCustomerAddress(customerId: Long, addressId: Long): Flow<SingleAddressResponse> {
+        return eStoreRemoteDataSource.fetchCustomerAddress(customerId, addressId)
+
+    }
+
+
 }

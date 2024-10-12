@@ -46,6 +46,7 @@ fun ShoppingCartContent(
                 ShoppingCartItem(item = item, viewModel = viewModel, onItemDeleted = {
                     viewModel.removeShoppingCartDraftOrder(
                         productId = item.product_id!!, variantId = item.variant_id.toLong()
+
                     )
                 })
             }

@@ -17,6 +17,7 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.PriceRuleResponse
 import com.example.e_store.utils.shared_models.DraftOrderRequest
+import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.SingleDraftOrderResponse
 import com.example.e_store.utils.shared_models.SinglePriceRuleResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
@@ -116,18 +117,25 @@ interface ShopifyAPIServices {
     )
 
 
-    @DELETE(APIKeys.DELETE_CUSTOMER_ADDRESS_ENDPOINT)
+    @DELETE(APIKeys.DELETE_UPDATE_GET_CUSTOMER_ADDRESS_ENDPOINT)
     suspend fun deleteCustomerAddress(
         @Path(APIKeys.CUSTOMER_ID_PARAM) customerId: Long,
         @Path(APIKeys.ADDRESS_ID_PARAM) addressId: Long
     )
 
 
-    @PUT(APIKeys.DELETE_CUSTOMER_ADDRESS_ENDPOINT)
+    @PUT(APIKeys.DELETE_UPDATE_GET_CUSTOMER_ADDRESS_ENDPOINT)
     suspend fun updateCustomerAddress(
         @Path(APIKeys.CUSTOMER_ID_PARAM) customerId: Long,
         @Path(APIKeys.ADDRESS_ID_PARAM) addressId: Long,
         @Body address: AddNewAddress
     )
+
+    @GET(APIKeys.DELETE_UPDATE_GET_CUSTOMER_ADDRESS_ENDPOINT)
+    suspend fun fetchCustomerAddress (
+        @Path(APIKeys.CUSTOMER_ID_PARAM) customerId: Long,
+        @Path(APIKeys.ADDRESS_ID_PARAM) addressId: Long
+    ): SingleAddressResponse
+
 
 }

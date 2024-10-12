@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -28,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.e_store.R
+import com.example.e_store.utils.shared_components.sharedHeader
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModel
 import com.example.e_store.features.payment.view.PaymentSuccessPopup
 import com.example.e_store.ui.theme.PrimaryColor
@@ -40,6 +40,7 @@ import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderIDHolder
+import com.example.e_store.utils.shared_models.NavigationHolder
 import kotlinx.coroutines.delay
 
 @Composable
@@ -61,9 +62,11 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
     if (showPopup) {
         PaymentSuccessPopup(
             composition = compositionSuccess,
-            message = "Thank you!"
+            message = stringResource(R.string.thank_you)
         )
     }
+
+
     // Fetch draft order when the screen loads
     LaunchedEffect(Unit) {
         if (DraftOrderIDHolder.draftOrderId != null) {
@@ -90,9 +93,12 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
 
         is DataState.Success -> {
             val draftOrder = (draftAddress as DataState.Success<Address?>).data
+
             draftOrder?.let {
                 addressDetails.value =
                     it // Directly update the value without re-creating mutableStateOf
+                viewModel.addDeliveryAddress(it)
+
                 Log.d("CheckoutScreen", "Order Details: $it")
 
 
@@ -143,30 +149,27 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
 
     orderDetails.value?.let { details ->
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "Check Out") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                )
-            }
-        ) { contentPadding ->
-
             // Apply contentPadding to the Column
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(contentPadding)
-                    .padding(16.dp, 30.dp, 16.dp, 16.dp), // Additional padding for the content
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Column {
+                sharedHeader(
+                    navController = navController,
+                    headerText = stringResource(id = R.string.checkout)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                Column (
+                    modifier = Modifier
+                    .padding(16.dp, 30.dp, 16.dp, 16.dp), // Additional padding for the content
+
+                ){
                     // Address Section
 
                     ElevationCard {
@@ -178,7 +181,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                         )
                         {
                             Text(
-                                text = "Choose Your Delivery Address",
+                                text = stringResource(R.string.choose_your_delivery_address),
                                 style = MaterialTheme.typography.h6,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
@@ -197,18 +200,21 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 verticalArrangement = Arrangement.Center
 
                             ) {
-                                /*        TextButton(onClick = { *//* Handle manual address edit *//* }) {
+                                TextButton(onClick = {
+                                    NavigationHolder.id = addressDetails.value?.id
+                                    navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
+                                }) {
                                     Text(
                                         text = "Update Current Address",
                                         fontSize = 18.sp,
                                         color = PrimaryColor
                                     )
-                                }*/
+                                }
                                 TextButton(onClick = {
                                     navController.navigate(NavigationKeys.LOCATION_ROUTE)
                                 }) {
                                     Text(
-                                        text = "Choose Another Address",
+                                        text = stringResource(R.string.choose_another_address),
                                         fontSize = 18.sp,
                                         color = PrimaryColor
                                     )
@@ -221,31 +227,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
 
                     Spacer(modifier = Modifier.height(30.dp))
 
-                    // Coupon Code Section
-                    TextField(
-                        value = couponCode,
-                        onValueChange = { couponCode = it },
-                        placeholder = { Text("Enter Coupon Code") },
-                        modifier = Modifier.fillMaxWidth(),
-                        trailingIcon = {
-                            Button(
-                                modifier = Modifier.padding(end = 16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = colorResource(id = R.color.colorPrimaryButton),
-                                    contentColor = Color.White
-                                ),
-                                shape = MaterialTheme.shapes.small,
-
-                                onClick = {
-                                    viewModel.applyDiscount(couponCode.text)
-                                    Log.d("CheckotextutScreen", "Coupon Code: ${couponCode.text}")
-
-
-                                }) {
-                                Text(text = "Apply")
-                            }
-                        }
-                    )
+                    CouponCodeSection (viewModel = viewModel)
 
                     Spacer(modifier = Modifier.height(30.dp))
 
@@ -255,7 +237,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Order Summary",
+                                text = stringResource(R.string.order_summary),
                                 fontSize = 18.sp,
                                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                             )
@@ -265,7 +247,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Items", fontSize = 16.sp)
+                                Text(text = stringResource(R.string.items), fontSize = 16.sp)
                                 Text(
                                     text = details.line_items.size.toString(),
                                     fontSize = 16.sp
@@ -277,9 +259,9 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Subtotal", fontSize = 16.sp)
+                                Text(text = stringResource(R.string.subtotal), fontSize = 16.sp)
                                 Text(
-                                    text = "${ details.subtotal_price?.let { convertCurrency(it.toDouble()) } }",
+                                    text = "${details.subtotal_price?.let { convertCurrency(it.toDouble()) }}",
                                     fontSize = 16.sp
                                 )
                             }
@@ -289,9 +271,11 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Discount", fontSize = 16.sp)
+                                Text(text = stringResource(R.string.discount), fontSize = 16.sp)
                                 Text(
-                                    text = convertCurrency(details.applied_discount?.value?.toDouble() ?: 0.0 ),
+                                    text = convertCurrency(
+                                        details.applied_discount?.value?.toDouble() ?: 0.0
+                                    ),
                                     fontSize = 16.sp
                                 )
                             }
@@ -301,7 +285,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "Total Tax", fontSize = 16.sp)
+                                Text(text = stringResource(R.string.total_tax), fontSize = 16.sp)
                                 Text(
                                     text = convertCurrency(details.total_tax?.toDouble() ?: 0.0),
                                     fontSize = 16.sp
@@ -315,12 +299,13 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Total",
+                                    text = stringResource(R.string.total),
                                     fontSize = 18.sp,
                                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                                 )
                                 Text(
-                                    text = details.total_price?.let { convertCurrency(it.toDouble()) } ?: "N/A",
+                                    text = details.total_price?.let { convertCurrency(it.toDouble()) }
+                                        ?: "0.0",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -339,7 +324,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                         ) {
                             // Payment Method Section
                             Text(
-                                text = "Choose Payment Method",
+                                text = stringResource(R.string.choose_payment_method),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 16.dp) // Spacing below the title
@@ -353,15 +338,18 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 verticalAlignment = Alignment.CenterVertically // Align vertically in the center
                             ) {
                                 RadioButton(
-                                    selected = selectedPaymentMethod == "Cash on delivery",
-                                    onClick = { selectedPaymentMethod = "Cash on delivery" }
+                                    selected = selectedPaymentMethod == stringResource(id = R.string.cash_on_delivery),
+                                    onClick = { selectedPaymentMethod = "Cash on delivery" },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = PrimaryColor,
+                                    )
                                 )
                                 Spacer(modifier = Modifier.width(8.dp)) // Space between radio button and text
 
                                 // Icon for Cash on delivery
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_cash_on_delivery),
-                                    contentDescription = "Cash on delivery icon",
+                                    contentDescription = stringResource(R.string.cash_on_delivery_icon),
                                     modifier = Modifier.size(24.dp)
                                 )
 
@@ -379,21 +367,24 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 verticalAlignment = Alignment.CenterVertically // Align vertically in the center
                             ) {
                                 RadioButton(
-                                    selected = selectedPaymentMethod == "Credit or Debit Card",
-                                    onClick = { selectedPaymentMethod = "Credit or Debit Card" }
+                                    selected = selectedPaymentMethod == stringResource(id =  R.string.credit_or_debit_card),
+                                    onClick = { selectedPaymentMethod = "Credit or Debit Card" },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = PrimaryColor,
+                                    )
                                 )
                                 Spacer(modifier = Modifier.width(8.dp)) // Space between radio button and text
 
                                 // Icon for Credit or Debit Card
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_debit_card), // Use your resource icon
-                                    contentDescription = "Credit or Debit Card icon",
+                                    contentDescription = stringResource(R.string.credit_or_debit_card_icon),
                                     modifier = Modifier.size(24.dp) // Set icon size
                                 )
                                 Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
 
                                 Text(
-                                    text = "Credit or Debit Card",
+                                    text = stringResource(R.string.credit_or_debit_card),
                                     style = MaterialTheme.typography.body1
                                 )
                             }
@@ -404,7 +395,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                     // Place Order Button
                     EShopButton(
                         onClick = {
-                            if (selectedPaymentMethod == "Cash on delivery") {
+                            if (selectedPaymentMethod == context.getString(R.string.cash_on_delivery)) {
                                 showPopup = true
                                 viewModel.sendEmailAnddeleteDraftOrder()
 
@@ -412,11 +403,90 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 navController.navigate(NavigationKeys.PAYMENT_ROUTE)
                             }
 
+
                         },
-                        text = "Place Order",
+                        text = stringResource(R.string.place_order),
                     )
                 }
             }
+        }
+    }
+
+@Composable
+fun CouponCodeSection(viewModel: CheckoutViewModel) {
+    val context = LocalContext.current
+    var couponCode by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
+
+    Column {
+        TextField(
+            value = couponCode,
+            onValueChange = {
+                couponCode = it
+                // Clear error message on input change
+                if (errorMessage.isNotEmpty()) {
+                    errorMessage = ""
+                }
+                successMessage = "" // Clear success message on new input
+            },
+            placeholder = { Text(stringResource(R.string.enter_coupon_code)) },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                Button(
+                    modifier = Modifier.padding(end = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(id = R.color.colorPrimaryButton),
+                        contentColor = Color.White
+                    ),
+                    shape = MaterialTheme.shapes.small,
+                    onClick = {
+                        // Validate the coupon code here
+                        if (couponCode.isEmpty()) {
+                            errorMessage = context.getString(R.string.coupon_code_cannot_be_empty)
+                            successMessage = "" // Clear success message
+                        } else {
+                            errorMessage = "" // Clear previous error
+                            isLoading = true // Start loading
+
+                            // Call applyDiscount with the coupon code and a callback
+                            viewModel.applyDiscount(couponCode) { success ->
+                                isLoading = false // Stop loading
+                                if (success) {
+                                    errorMessage = ""
+                                    successMessage =
+                                        context.getString(R.string.coupon_code_applied_successfully) // Success message
+                                } else {
+                                    successMessage = ""
+                                    errorMessage =
+                                        context.getString(R.string.failed_to_apply_coupon_code) // Set error message
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    Text(text = if (isLoading) stringResource(R.string.applying) else stringResource(
+                        R.string.apply
+                    )
+                    )
+                }
+            }
+        )
+
+        // Show error message if any
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red)
+        }
+
+        // Show success message if any
+        if (successMessage.isNotEmpty()) {
+            Text(text = successMessage, color = Color.Blue)
+        }
+
+        // Show loading indicator if isLoading is true
+        if (isLoading) {
+            EShopLoadingIndicator() // Your loading indicator
         }
     }
 }

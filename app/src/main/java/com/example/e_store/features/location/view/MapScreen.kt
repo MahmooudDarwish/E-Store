@@ -18,9 +18,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -30,16 +32,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.e_store.BuildConfig
 import com.example.e_store.R
+import com.example.e_store.features.authentication.components.PhoneNumberInputField
 import com.example.e_store.features.location.view.components.SearchMapBox
 import com.example.e_store.features.location.view_model.MapViewModel
+import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_models.Customer
+import com.example.e_store.utils.shared_models.Image
 import com.example.e_store.utils.shared_models.UserAddress
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -60,16 +70,32 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.util.Locale
+
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 
-fun MapScreen( navController: NavController,viewModel: MapViewModel) {
+fun MapScreen(navController: NavController, viewModel: MapViewModel) {
+
+    LaunchedEffect(Unit) {
+    viewModel.fetchCustomerAddresses()
+}
+
     val context = LocalContext.current
+
+    val isPhoneExist by viewModel.isPhoneExist.collectAsState()
+
+
+    var phoneNumber by remember { mutableStateOf("") }
+
+    var showPhoneNumberDialog by remember { mutableStateOf(false) }
+    var inputValue by remember { mutableStateOf(UserSession.phone) }
+    var errorMessage by remember { mutableStateOf("") }
+
 
     // Initialize Places API
     Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
     val placesClient: PlacesClient = Places.createClient(context)
-    var query by remember { mutableStateOf("Search") }
+    var query by remember { mutableStateOf(context.getString(R.string.search)) }
 
     var currentLocation by remember { mutableStateOf<Location?>(null) }
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -92,6 +118,21 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
     LaunchedEffect(Unit) {
         locationPermissionsState.launchMultiplePermissionRequest()
     }
+
+    if (showPhoneNumberDialog) {
+        PhoneNumberInputDialog(
+            showDialog = showPhoneNumberDialog,
+            onDismiss = { showPhoneNumberDialog = false },
+            onConfirm = { phoneNumber ->
+                inputValue = phoneNumber
+                showPhoneNumberDialog = false
+
+            },
+            context
+        )
+    }
+    inputValue?.let { viewModel.isPhoneExistFUN(it) }
+
 
 
     // Intent launcher for Google Autocomplete
@@ -124,7 +165,7 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                     }
 
                     // Update the query with the place's name
-                    query = place.name ?: "Search"
+                    query = place.name ?: context.getString(R.string.search)
                 }
             }
         } else if (result.resultCode == Activity.RESULT_CANCELED) {
@@ -132,8 +173,6 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
             println("Autocomplete canceled: $status")
         }
     }
-
-
 
 
     // Check if permissions are granted and location services are enabled
@@ -147,17 +186,17 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                     currentLocation = location
                     Log.d("MapScreen", "Current Location: $location")
 
-                    cameraPositionState.position = CameraPosition(
-                        LatLng(
-                            currentLocation!!.latitude,
-                            currentLocation!!.longitude
-                        ),
-                        10f,
-                        0f,
-                        0f
-                    )
-                    markerState.position =
-                        LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
+                    currentLocation?.let {
+                        cameraPositionState.position = CameraPosition(
+                            LatLng(it.latitude, it.longitude),
+                            10f,
+                            0f,
+                            0f
+                        )
+                        markerState.position = LatLng(it.latitude, it.longitude)
+                    } ?: run {
+                        Log.e("MapScreen", "Current location is null")
+                    }
 
                 }
             } else {
@@ -207,7 +246,10 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                                     Log.d("MapScreen", "Current Location: $location")
                                     currentLocation?.let {
                                         cameraPositionState.position = CameraPosition(
-                                            LatLng(it.latitude, it.longitude), // Move to the new position
+                                            LatLng(
+                                                it.latitude,
+                                                it.longitude
+                                            ), // Move to the new position
                                             10f, // Zoom level
                                             0f,
                                             0f
@@ -217,16 +259,16 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                                     } ?: run {
                                         Log.e("MapScreen", "Unable to get current location")
                                     }
-                                    query = "Search"
+                                    query = context.getString(R.string.search)
                                 }
                             } else {
                                 showPermissionDialog = true
                             }
                         },
                     ) {
-                        Icon(
-                            ImageVector.vectorResource(id = R.drawable.ic_gps),
-                            contentDescription = "Get Current Location",
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_gps),
+                            contentDescription = stringResource(R.string.get_current_location),
                             modifier = Modifier.size(30.dp)
                         )
                     }
@@ -244,7 +286,11 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                             currentLocation?.let { location ->
                                 // Perform reverse geocoding to get address details
                                 val geocoder = Geocoder(context, Locale.getDefault())
-                                val addresses: List<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                                val addresses: List<Address>? = geocoder.getFromLocation(
+                                    location.latitude,
+                                    location.longitude,
+                                    1
+                                )
 
                                 addresses?.let {
                                     val address = it.firstOrNull()
@@ -258,33 +304,51 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                                             zip = address.postalCode
                                         }
 
+                                        Log.d( "MapphoneNumber", "phoneNumber: ${isPhoneExist}")
+                                        if (UserSession.phone == null || isPhoneExist) {
+                                            showPhoneNumberDialog = true
 
-                                        viewModel.saveAddress(  com.example.e_store.utils.shared_models.Address(
-                                            address1 = UserAddress.address1,
-                                            city = UserAddress.city,
-                                            phone = UserSession.phone,
-                                            firstName = UserSession.name,
-                                        ))
+                                        } else {
+                                            Log.d( "MapphoneNumber", "phoneNumber: ${UserSession.phone}")
+                                            Log.d( " MapphoneNumber", "phoneNumber: ${inputValue}")
+                                            viewModel.saveAddress(
+                                                com.example.e_store.utils.shared_models.Address(
+                                                    address1 = UserAddress.address1,
+                                                    city = UserAddress.city,
+                                                    phone = inputValue,
+                                                    firstName = UserSession.name,
+                                                )
+                                            )
 
-                                        navController.navigate( NavigationKeys.CHECKOUT_ROUTE)
-
-                                        Log.d("SaveLocation", "Location saved: ${UserAddress.address1}")
+                                            navController.navigate(NavigationKeys.LOCATION_ROUTE)
+                                        }
+                                        Log.d(
+                                            "SaveLocation",
+                                            "Location saved: ${UserAddress.address1}"
+                                        )
                                     } else {
-                                        Log.e("SaveLocation", "No address found for the current location")
+                                        Log.e(
+                                            "SaveLocation",
+                                            "No address found for the current location"
+                                        )
                                     }
                                 } ?: run {
-                                    Log.e("SaveLocation", "Unable to retrieve address for current location")
+                                    Log.e(
+                                        "SaveLocation",
+                                        "Unable to retrieve address for current location"
+                                    )
                                 }
                             } ?: run {
                                 Log.e("SaveLocation", "Current location is null")
                             }
                         },
                     ) {
-                        Icon(
-                            ImageVector.vectorResource(id = R.drawable.ic_save_location),
-                            contentDescription = "Save Location",
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_save_location),
+                            contentDescription = stringResource(R.string.save_location),
                             modifier = Modifier.size(30.dp)
                         )
+
                     }
 
                 }
@@ -323,7 +387,7 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                         0f,
                         0f
                     )
-                    query="Search"
+                    query = context.getString(R.string.search)
 
                     Log.d("MapScreen", "Clicked Location: $latLng")
                     Log.d("MapScreen", "currentLocation: $currentLocation")
@@ -341,8 +405,8 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
                     )
                     Marker(
                         state = markerState,
-                        title = "Your Location",
-                        snippet = "Current Location"
+                        title = stringResource(R.string.your_location),
+                        snippet = stringResource(R.string.current_location)
                     )
                 }
             }
@@ -353,41 +417,39 @@ fun MapScreen( navController: NavController,viewModel: MapViewModel) {
     if (showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog = false },
-            title = { Text("Location Permission Required") },
-            text = { Text("This app requires location permissions to function correctly. Please enable them in settings.") },
+            title = { Text(stringResource(R.string.location_permission_required)) },
+            text = { Text(stringResource(R.string.this_app_requires_location_permissions_to_function_correctly_please_enable_them_in_settings)) },
             confirmButton = {
                 TextButton(onClick = {
                     showPermissionDialog = false
                     openGPSSettings(context)
                 }) {
-                    Text("Open Settings")
+                    Text(stringResource(R.string.open_settings))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
     }
 }
 
-private fun getCurrentLocation(
+
+fun getCurrentLocation(
     fusedLocationClient: FusedLocationProviderClient,
-    onLocationResult: (Location?) -> Unit
+    onLocationReceived: (Location?) -> Unit
 ) {
-    val locationTask = fusedLocationClient.lastLocation
-    locationTask.addOnSuccessListener { location ->
-        if (location != null) {
-            onLocationResult(location)
-        } else {
-            onLocationResult(null) // No location available
+    fusedLocationClient.lastLocation
+        .addOnSuccessListener { location: Location? ->
+            onLocationReceived(location)
         }
-    }.addOnFailureListener { exception ->
-        Log.e("MapScreen", "Error fetching location: ${exception.message}")
-        onLocationResult(null) // If there's an error, return null
-    }
+        .addOnFailureListener {
+            Log.e("MapScreen", "Failed to retrieve location: ${it.message}")
+        }
 }
+
 
 // Function to open GPS settings
 private fun openGPSSettings(context: Context) {
@@ -395,3 +457,83 @@ private fun openGPSSettings(context: Context) {
     context.startActivity(intent)
 }
 
+@Composable
+fun PhoneNumberInputDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    context: Context
+) {
+    var inputValue by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    // Phone number regex: Only digits, with a length of 10 digits (you can adjust this)
+    val phoneNumberRegex = Regex("^[+]?[0-9]{10,13}\$")
+
+    if (showDialog) {
+        AlertDialog(
+            shape = RoundedCornerShape(16.dp),
+            containerColor = Color.White,
+            modifier = Modifier.padding(16.dp),
+            onDismissRequest = { onDismiss() },
+
+            title = { Text(stringResource(R.string.enter_your_phone_number)) },
+            text = {
+                Column {
+                    TextField(
+                        value = inputValue,
+                        onValueChange = {
+                            inputValue = it
+                            errorMessage = "" // Reset error message on input change
+                        },
+                        label = { Text(stringResource(R.string.enter_a_valid_phone_number)) },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Phone
+                        ),
+                        isError = errorMessage.isNotEmpty()
+                    )
+                    if (errorMessage.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.White
+                    ),
+                    border = BorderStroke(1.dp, PrimaryColor),
+                    onClick = {
+                        // Validation: Check if input matches the phone number regex
+                        if (!phoneNumberRegex.matches(inputValue)) {
+                            errorMessage =
+                                context.getString(R.string.please_enter_a_valid_phone_number_10_digits)
+                        } else {
+                            onConfirm(inputValue)
+                            onDismiss()
+                        }
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryColor,
+                        contentColor = Color.White
+                    ),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}

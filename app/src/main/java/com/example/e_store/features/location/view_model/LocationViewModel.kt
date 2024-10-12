@@ -11,6 +11,8 @@ import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.AppliedDiscount
 import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.DeletionState
+import com.example.e_store.utils.shared_models.NavigationHolder
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,16 +26,45 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
     val locations = _locations.asStateFlow()
 
+    val deletionState = MutableStateFlow<DeletionState>(DeletionState.CanDelete)
+
+
+
+    fun deleteLocation(locationId: Long, isDefault: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_locations.value is DataState.Success<AddressResponse> &&
+                (_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 && !isDefault) {
+                UserSession.shopifyCustomerID?.let { repository.deleteCustomerAddress(it, locationId) }
+                deletionState.value = DeletionState.CanDelete
+
+                Log.d("LocationViewModel", "Location deleted successfully")
+            } else {
+                val message = if (isDefault) {
+                    "You cannot delete the default location. Please edit it instead."
+                } else {
+                    "At least one location is required."
+                }
+                deletionState.value = DeletionState.CannotDelete(message)
+                NavigationHolder.id = locationId
+            }
+        }
+    }
+
+
+/*
 
     fun deleteLocation(locationId: Long, isDefault:Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if ((_locations.value as DataState.Success<AddressResponse>).data.addresses.size > 1 &&isDefault==false )
             {
                 UserSession.shopifyCustomerID?.let { repository.deleteCustomerAddress(it, locationId) }
+            }else{
+                canNotDelete.value = true
+                NavigationHolder.id=locationId
             }
         }
     }
-
+*/
 
     fun fetchAllLocations() {
         viewModelScope.launch {
