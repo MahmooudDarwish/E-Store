@@ -1,6 +1,5 @@
 package com.example.e_store.utils.data_layer.remote
 
-import Order
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
 import com.example.e_store.utils.shared_models.Brand
@@ -23,10 +22,10 @@ import com.example.e_store.utils.shared_models.Customer
 import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.CustomerResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
-import com.example.e_store.utils.shared_models.DraftOrderIDHolder
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.SingleAddressResponse
+import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.SingleProductResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,7 +34,8 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.api
 
-    private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
+    private val exchangeRateApiService: ExchangeRateApi =
+        ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
 
     private val TAG = "EShopRemoteDataSourceImpl"
 
@@ -52,7 +52,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
 
     override suspend fun fetchBrands(): Flow<List<Brand>> {
         val response = apiService.fetchBrands().smart_collections
-        return flowOf(response)
+
+        val filteredBrands = response.distinctBy { it.title }
+
+        return flowOf(filteredBrands)
     }
 
     override suspend fun fetchProducts(): Flow<List<Product>> {
@@ -146,7 +149,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails> {
-        return flow{
+        return flow {
             val response = apiService.fetchDraftOrderByID(draftOrderId).draft_order
             emit(response)
         }
@@ -237,7 +240,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     override suspend fun fetchCustomerByEmail(email: String): Customer {
         Log.d("fetchCustomerByEmail", "fetchCustomerByEmail: $email")
         val response = apiService.fetchAllCustomers().customers.first { it.email == email }
-        Log.d( "fetchCustomerByEmail", "fetchCustomerByEmail: $response")
+        Log.d("fetchCustomerByEmail", "fetchCustomerByEmail: $response")
         return response
     }
 
@@ -350,7 +353,10 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         fetchDiscountCodes().collect { discountResponse ->
             if (discountResponse != null) {
                 val discountCode = discountResponse.discount_codes.find {
+                    Log.d("fetchDiscountCodesByCode", "code: ${it.code}")
+                    Log.d("fetchDiscountCodesByCode", "code: $code")
                     it.code == code
+
                 }
 
                 if (discountCode != null) {

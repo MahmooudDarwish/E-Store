@@ -38,8 +38,8 @@ fun PriceSlider(
             text = "Max Price: ${ convertCurrency(ceil(maxPrice.toDouble()))} ",        ///todo change currency
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 20.dp),
-            textAlign = TextAlign.End,
+                .padding(start = 20.dp),
+            textAlign = TextAlign.Start,
             color = Color.Gray
         )
     }

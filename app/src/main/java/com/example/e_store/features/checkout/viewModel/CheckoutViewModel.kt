@@ -162,7 +162,7 @@ class CheckoutViewModel(val repo: EStoreRepository) : ViewModel() {
     }
 
 
-    fun sendEmailAnddeleteDraftOrder() {
+    fun sendEmailAndDeleteDraftOrder() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.updateDraftOrderToCompleteDraftOrder(DraftOrderIDHolder.draftOrderId!!)
             repo.removeDraftOrder(DraftOrderIDHolder.draftOrderId!!)

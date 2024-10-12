@@ -397,7 +397,7 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                         onClick = {
                             if (selectedPaymentMethod == context.getString(R.string.cash_on_delivery)) {
                                 showPopup = true
-                                viewModel.sendEmailAnddeleteDraftOrder()
+                                viewModel.sendEmailAndDeleteDraftOrder()
 
                             } else {
                                 navController.navigate(NavigationKeys.PAYMENT_ROUTE)

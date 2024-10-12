@@ -1,6 +1,5 @@
 package com.example.e_store.utils.data_layer.remote.shopify
 
-import OrderResponse
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.AddressResponse
@@ -18,6 +17,7 @@ import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.PriceRuleResponse
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.SingleAddressResponse
+import com.example.e_store.utils.shared_models.OrderResponse
 import com.example.e_store.utils.shared_models.SingleDraftOrderResponse
 import com.example.e_store.utils.shared_models.SinglePriceRuleResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse

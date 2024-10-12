@@ -1,7 +1,5 @@
 package com.example.e_store.utils.data_layer.remote
 
-import Order
-import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
@@ -20,11 +18,9 @@ import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
 import com.example.e_store.utils.shared_models.ProductResponse
 import com.example.e_store.utils.shared_models.SingleAddressResponse
+import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.SingleProductResponse
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+
 
 interface EStoreRemoteDataSource {
     suspend fun fetchBrands(): Flow<List<Brand>>
@@ -40,11 +36,13 @@ interface EStoreRemoteDataSource {
     suspend fun fetchProduct(productId: Long): Flow<SingleProductResponse>
 
 
+
     //shop cart draft order
     suspend fun createDraftOrder(shoppingCartDraftOrder: DraftOrderRequest)
 
     suspend fun updateDraftOrder(
-        draftOrderId: Long, shoppingCartDraftOrder: DraftOrderRequest
+        draftOrderId: Long,
+        shoppingCartDraftOrder: DraftOrderRequest
     )
 
     suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails>
@@ -66,6 +64,7 @@ interface EStoreRemoteDataSource {
     suspend fun fetchProductById(productId: Long): SingleProductResponse
 
 
+
     suspend fun fetchAllCustomers(): Flow<CustomerResponse>
     suspend fun createCustomer(customer: CustomerRequest)
 
@@ -74,6 +73,7 @@ interface EStoreRemoteDataSource {
     suspend fun fetchCustomerByEmail(email: String): Customer
 
     suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?>
+
 
 
     suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse>
