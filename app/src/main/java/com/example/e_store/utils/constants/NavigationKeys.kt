@@ -24,12 +24,16 @@ object NavigationKeys {
     const val CHECKOUT_ROUTE = "checkout"
 
     const val ADD_LOCATION_ROUTE = "add_location"
+
     const val MAP_ROUTE = "map"
     const val LOCATION_ROUTE = "location"
     const val PAYMENT_ROUTE = "payment"
 
     // Passed Values
     const val BRAND_ID = "brandId"
+
+
+    const val EDIT_ADDRESS_ROUTE = "edit_address"
 
 }
 

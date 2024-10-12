@@ -32,7 +32,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
     val customer = _customer.asStateFlow()
 
     private val _discountCodes =
-        MutableStateFlow<DataState<DiscountCodesResponse?>>(DataState.Loading)
+        MutableStateFlow<DataState<List<DiscountCodesResponse?>>>(DataState.Loading)
     val discountCodes = _discountCodes.asStateFlow()
 
     private val _forUProducts = MutableStateFlow<DataState<List<Product>>>(DataState.Loading)

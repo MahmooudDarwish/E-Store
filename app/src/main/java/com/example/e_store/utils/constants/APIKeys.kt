@@ -32,7 +32,7 @@ object APIKeys {
     const val CUSTOMER_ENDPOINT_ID = "customers/{customer_id}.json"
 
     const val CUSTOMER_ADDRESS_ENDPOINT = "customers/{customer_id}/addresses.json"
-    const val DELETE_CUSTOMER_ADDRESS_ENDPOINT = "customers/{customer_id}/addresses/{address_id}.json"
+    const val DELETE_UPDATE_GET_CUSTOMER_ADDRESS_ENDPOINT = "customers/{customer_id}/addresses/{address_id}.json"
 
 
     //EndPoints Params

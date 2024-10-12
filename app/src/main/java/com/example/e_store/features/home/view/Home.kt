@@ -87,6 +87,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
         }
     }
 
+
+
     when (discountCodesUiState) {
         DataState.Loading -> {
             EShopLoadingIndicator()
@@ -94,8 +96,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
 
         is DataState.Success -> {
             (discountCodesUiState as DataState.Success).data?.let { data ->
-
-               val newSliderItems = data.discount_codes.map { discountCode ->
+                val codesToProcess = data.flatMap { it?.discount_codes!! }.take(5)
+                val newSliderItems = codesToProcess.map { discountCode ->
                     val codeLower = discountCode.code.lowercase()
                     val imageId = when (codeLower) {
                         "fivepercentoff" -> R.drawable.fivepercentoff
@@ -123,6 +125,44 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
             }
         }
     }
+
+
+    /*    when (discountCodesUiState) {
+            DataState.Loading -> {
+                EShopLoadingIndicator()
+            }
+
+            is DataState.Success -> {
+                (discountCodesUiState as DataState.Success).data?.let { data ->
+
+                   val newSliderItems = data.discount_codes.map { discountCode ->
+                        val codeLower = discountCode.code.lowercase()
+                        val imageId = when (codeLower) {
+                            "fivepercentoff" -> R.drawable.fivepercentoff
+                            "tenpercentoff" -> R.drawable.tenpercentoff
+                            "fifteenpercentoff" -> R.drawable.fifteenpercentoff
+                            "twentypercentoff" -> R.drawable.twentypercentoff
+                            "twentyfivepercentoff" -> R.drawable.twentyfivepercentoff
+                            "thirtypercentoff" -> R.drawable.thirtypercentoff
+                            "freeship" -> R.drawable.freeship
+                            else -> 0
+                        }
+                        SliderItem(imageId, discountCode.code)
+                    }
+                    Log.d("HomeScreen", "newSliderItems: $newSliderItems")
+                    updateSliderImages(sliderImages, newSliderItems)
+                }
+
+            }
+
+            is DataState.Error -> {
+                val errorMsg = (discountCodesUiState as DataState.Error).message
+                Log.e("HomeScreen", "Error fetching discount codes: $errorMsg")
+                LaunchedEffect(errorMsg) {
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }*/
 
     LaunchedEffect(Unit) {
         viewModel.fetchCurrency()

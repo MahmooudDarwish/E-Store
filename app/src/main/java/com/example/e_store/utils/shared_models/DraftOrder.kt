@@ -13,7 +13,6 @@ data class AppliedDiscount(
     val description: String? = null,
     var value: String? = null,         // Assuming the value is a string for monetary values
     val title: String? = null,
-    val amount: String? = null,       // Assuming the amount is a string for monetary values
     val value_type: String? = null      // Assuming the value_type is a string
 )
 /*
@@ -54,6 +53,8 @@ data class DraftOrderDetails(
     val total_price: String? = null,
     val subtotal_price: String? = null,
     val total_tax: String? = null,
+    var shipping_address: Address? = null,
+    var billing_address: Address? = null,
 )
 
 object DraftOrderIDHolder{
@@ -75,6 +76,9 @@ data class DraftOrderRequest(
 )
 
 
+data class SingleAddressResponse(
+   val customer_address : Address
+)
 data class CustomerResponse(
     val customers: List<Customer>
 )

@@ -17,6 +17,8 @@ import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.CustomerResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
+import com.example.e_store.utils.shared_models.ProductResponse
+import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.SingleProductResponse
 
@@ -66,7 +68,7 @@ class EStoreRepositoryImpl private constructor(
         return eStoreRemoteDataSource.fetchProducts()
     }
 
-    override suspend fun fetchDiscountCodes(): Flow<DiscountCodesResponse?> {
+    override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse?>> {
         return eStoreRemoteDataSource.fetchDiscountCodes()
     }
 
@@ -77,12 +79,12 @@ class EStoreRepositoryImpl private constructor(
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        shoppingCartDraftOrder: DraftOrderRequest,
+        shoppingCartDraftOrder: DraftOrderRequest
     ) {
         eStoreRemoteDataSource.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
 
-    override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails> {
+    override suspend fun fetchDraftOrderByID(draftOrderId: Long): Flow<DraftOrderDetails>  {
         return eStoreRemoteDataSource.fetchDraftOrderByID(draftOrderId)
     }
 
@@ -124,7 +126,6 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun updateCustomer(customerId: Long, customer: CustomerRequest) {
         eStoreRemoteDataSource.updateCustomer(customerId, customer)
     }
-
     override suspend fun fetchAllCustomers(): Flow<CustomerResponse> {
         return eStoreRemoteDataSource.fetchAllCustomers()
     }
@@ -159,12 +160,19 @@ class EStoreRepositoryImpl private constructor(
     override suspend fun updateCustomerAddress(
         customerId: Long,
         addressId: Long,
-        address: AddNewAddress,
+        address: AddNewAddress
     ) {
         eStoreRemoteDataSource.updateCustomerAddress(customerId, addressId, address)
     }
 
     override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
         return eStoreRemoteDataSource.fetchConversionRates()
+        }
+
+    override suspend fun fetchCustomerAddress(customerId: Long, addressId: Long): Flow<SingleAddressResponse> {
+        return eStoreRemoteDataSource.fetchCustomerAddress(customerId, addressId)
+
     }
+
+
 }
