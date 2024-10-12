@@ -33,6 +33,8 @@ import com.example.e_store.features.shopping_cart.view_model.ShoppingCartViewMod
 import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 
 class LandingScreen : ComponentActivity() {
@@ -66,6 +68,7 @@ class LandingScreen : ComponentActivity() {
     private val locationViewModelFactory by lazy { LocationViewModelFactory(repo) }
     private val paymentViewModelFactory by lazy { PaymentViewModelFactory(repo) }
     private val settingsViewModelFactory by lazy { SettingsViewModelFactory(repo) }
+    private val favouriteControllerViewModelFactory by lazy { FavouriteControllerViewModelFactory(repo) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +101,7 @@ class LandingScreen : ComponentActivity() {
                                 locationViewModelFactory = locationViewModelFactory,
                                 paymentViewModelFactory = paymentViewModelFactory,
                                 settingsViewModelFactory = settingsViewModelFactory,
+                                favouriteControllerViewModelFactory = favouriteControllerViewModelFactory
                             )
                         }
                         composable(Screen.SignUp.route) {

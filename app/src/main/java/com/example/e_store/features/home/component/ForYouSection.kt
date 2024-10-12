@@ -21,18 +21,35 @@ import androidx.navigation.NavHostController
 import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.RoundedRectangleItem
 import com.example.e_store.utils.shared_methods.initializeProductDetails
+import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.DraftOrderDetails
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun ForUSection(
-    navController: NavHostController, products: List<Product>
+    navController: NavHostController, products: List<Product>, viewModel: FavouriteControllerViewModel
 ) {
     var isVisible by remember { mutableStateOf(false) }
+    var draftOrderItems by remember { mutableStateOf<List<DraftOrderDetails>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         delay(300)
         isVisible = true
+
+        viewModel.fetchFavouritesFromDraftOrder()
+        viewModel.draftOrderItems.collect { dataState ->
+            when (dataState) {
+                is DataState.Success -> {
+                    draftOrderItems = dataState.data.draft_orders
+                }
+                else -> {
+
+                }
+            }
+        }
     }
+
 
     AnimatedVisibility(
         visible = isVisible,
@@ -50,13 +67,17 @@ fun ForUSection(
                 ElevationCard(
                     modifier = Modifier.padding(bottom = 10.dp)
                 ) {
+
+
                     RoundedRectangleItem(
                         product = product,
                         onClick = {
                             ///TODO: Navigation to product details screen  @MahmoudDarwish @kk98989898})
                             initializeProductDetails(product)
                             navController.navigate(NavigationKeys.PRODUCT_INFO_HOME_ROUTE)
-                        },
+                        }, // Pass draft orders here
+                        navController = navController,
+                        viewModel =  viewModel,
                     )
                 }
             }

@@ -44,10 +44,11 @@ import com.example.e_store.utils.shared_models.DataState
 import androidx.compose.ui.res.stringResource
 import com.example.e_store.utils.shared_components.Popup
 import com.example.e_store.utils.shared_models.UserSession
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
+fun HomeScreen(viewModel: HomeViewModel, favouriteControllerViewModel: FavouriteControllerViewModel ,navController: NavHostController) {
     val context = LocalContext.current
 
     val brandsUiState by viewModel.brands.collectAsStateWithLifecycle()
@@ -258,7 +259,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavHostController) {
                         Gap(height = 16)
                         ForUSection(
                             navController = navController,
-                            products = forUProducts
+                            products = forUProducts,
+                            viewModel = favouriteControllerViewModel
                         )
                     }
 

@@ -20,12 +20,14 @@ import com.example.e_store.utils.constants.NavigationKeys
 import com.example.e_store.utils.shared_components.Gap
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 
 @Composable
 fun BrandProducts(
     brandID: String?,
     navController: NavHostController,
-    viewModel: BrandProductsViewModel
+    viewModel: BrandProductsViewModel,
+    favouriteControllerViewModel: FavouriteControllerViewModel
 ) {
     val brandProductsUiState by viewModel.brandProducts.collectAsStateWithLifecycle()
     var sliderMaxValue by remember { mutableFloatStateOf(1000F) }
@@ -76,7 +78,8 @@ fun BrandProducts(
             productsUiState = brandProductsUiState,
             navController = navController,
             route = NavigationKeys.PRODUCT_INFO_HOME_ROUTE,   /// TODO: add route to product info @MahmoudDariwsh @kk98989898
-            filterProducts = ::filterProducts
+            filterProducts = ::filterProducts,
+            viewModel = favouriteControllerViewModel
         )
     }
 }
