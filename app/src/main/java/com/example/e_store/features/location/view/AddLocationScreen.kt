@@ -71,7 +71,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
     var isMainAddress by remember { mutableStateOf(false) }  // Default to false ("No")
     var isDropdownExpanded by remember { mutableStateOf(false) }  // Dropdown state
-    val options = listOf("Yes", "No")
+    val options = listOf(stringResource(R.string.yes), stringResource(R.string.no))
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -104,13 +104,10 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
 
     }
-    Log.d("ddddd", "AddLocationScreen: ${viewModel.country.collectAsState().value}")
 
     LaunchedEffect(Unit) {
         viewModel.getCountries()
-        Log.d("TAG", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: ${viewModel.country.value}")
         if(viewModel.country.value != null){
-            Log.d("TAG", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: ${viewModel.country.value}")
 
             viewModel.getCities(viewModel.countryCode.value)
         }
@@ -255,7 +252,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
             OutlinedTextField(
                 enabled = false,
-                value = viewModel.city.collectAsState().value?: "City",
+                value = viewModel.city.collectAsState().value?: stringResource ( id = R.string.city),
                 onValueChange = {
 
                     Log.d("TAG", "AddLocationScreen: updateCity$it")
@@ -445,7 +442,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     horizontalAlignment = Alignment.Start
                 ) {
                     OutlinedTextField(
-                        value = if (isMainAddress) "Yes" else "No",
+                        value = if (isMainAddress) stringResource(R.string.yes) else stringResource( R.string.no),
                         onValueChange = {},
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -455,7 +452,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                             val imageResource = if (isMainAddress) R.drawable.yes else R.drawable.no
                             Image(
                                 painter = painterResource(id = imageResource),
-                                contentDescription = "Address Option Icon",
+                                contentDescription = stringResource(R.string.address_option_icon),
                                 modifier = Modifier.size(20.dp)
                             )
                         },
@@ -464,7 +461,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                 if (isDropdownExpanded) R.drawable.arrow_drop_up else R.drawable.arrowdropdown
                             Image(
                                 painter = painterResource(id = imageResource),
-                                contentDescription = "Arrow Drop Down",
+                                contentDescription = stringResource(R.string.arrow_drop_down),
                                 modifier = Modifier
                                     .size(16.dp)
                                     .clickable {
@@ -492,12 +489,12 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     ) {
                         options.forEach { option ->
                             DropdownMenuItem(onClick = {
-                                isMainAddress = option == "Yes"
+                                isMainAddress = option == context.getString(R.string.yes)
                                 isDropdownExpanded = false
                             }) {
                                 Text(
                                     text = option,
-                                    color = if (option == if (isMainAddress) "Yes" else "No") MaterialTheme.colors.primary else Color.Black // Highlight selected option
+                                    color = if (option == if (isMainAddress) context.getString(R.string.yes) else context.getString(R.string.no)) MaterialTheme.colors.primary else Color.Black // Highlight selected option
                                 )
                             }
                         }
