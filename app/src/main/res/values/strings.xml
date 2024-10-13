@@ -129,10 +129,13 @@
     <string name="use_this_address">Use This Address</string>
     <string name="go_to_map">Go To Map</string>
     <string name="name_is_required">Name is required.</string>
+    <string name="country_is_required">Country is required.</string>
+
     <string name="city_is_required">City is required.</string>
     <string name="valid_phone_number_is_required">Valid Phone Number is required.</string>
     <string name="address_is_required">" Address is required"</string>
     <string name="address_already_exist">" Address already exist"</string>
+
     <string name="phone_already_exist">"  Phone already exist"</string>
     <string name="enter_a_valid_phone_number">Enter a valid phone number</string>
     <string name="enter_your_phone_number">Enter Your Phone Number</string>
@@ -156,7 +159,12 @@
     <string name="no_locations_found">" No locations found"</string>
     <string name="default_location">Default Location</string>
     <string name="unknown_city">Unknown city</string>
+    <string name="search_country">Search Country</string>
+    <string name="search_city">Search City</string>
+    <string name="select_country">Select Country</string>
+    <string name="select_city">Select City</string>
     <string name="phone">Phone:</string>
     <string name="location_made_default">Location made default</string>
+    <string name="country">Country</string>
 
 </resources>

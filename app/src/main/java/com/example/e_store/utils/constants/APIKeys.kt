@@ -1,5 +1,8 @@
 package com.example.e_store.utils.constants
 
+import retrofit2.http.GET
+import retrofit2.http.Query
+
 object APIKeys {
     /// Shopify API Keys
     // Init setup
@@ -10,7 +13,6 @@ object APIKeys {
         "https://$SHOPIFY_API_KEY:$ADMIN_API_ACCESS_TOKEN@$STORE_URL/admin/api/2024-07/"
     const val SHOPIFY_API_SECRET_KEY = "2d54b067f29fe607ccecd2c91294acb3"
     const val STOREFRONT_API_ACCESS_TOKEN = "7d0ecff0b6c5a01e2350a2c44428ae0f"
-    const val EXCHANGE_RATE_API_KEY = "5c59b533af77272e758ab490"
     //Headers
     const val ACCESS_TOKEN_HEADER = "X-Shopify-Access-Token"
 
@@ -53,7 +55,36 @@ object APIKeys {
 
 
 
+    ///Exchange rate Api
+    // Init setup
+    const val EXCHANGE_RATE_API_URL = "https://v6.exchangerate-api.com/v6/"
+    const val EXCHANGE_RATE_API_KEY = "5c59b533af77272e758ab490"
 
+
+    //endpoint
+     const val LATEST_CURRENCY_ENDPOINT = "latest/{currency}"
+
+    //EndPoints Params
+    const val CURRENCY_PARAM = "currency"
+
+
+
+
+    ///GeoNames Api
+    // Init setup
+    const val GEONAMES_API_URL = "https://secure.geonames.org/"
+    const val USERNAME = "mahmouddarwish"
+
+    //endpoint
+    const val GEONAMES_SEARCH_ENDPOINT = "searchJSON"
+    const val GEONAMES_COUNTRY_INFO_ENDPOINT = "countryInfoJSON"
+
+
+    //EndPoints Params
+    const val USERNAME_PARAM = "username"
+    const val COUNTRY_PARAM = "country"
+    const val FEATURE_CLASS_PARAM = "featureClass"
+    const val MAX_ROWS_PARAM = "maxRows"
 
 }
 

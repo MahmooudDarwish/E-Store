@@ -5,6 +5,7 @@ import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.AppliedDiscount
 import com.example.e_store.utils.shared_models.Brand
+import com.example.e_store.utils.shared_models.CountryInfo
 import com.example.e_store.utils.shared_models.CurrencyResponse
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.Customer
@@ -14,8 +15,10 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
+import com.example.e_store.utils.shared_models.GeoNameLocation
 import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.Product
+import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
 import com.example.e_store.utils.test_utils.BrandsMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
@@ -41,7 +44,7 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchDiscountCodes(): Flow<DiscountCodesResponse?> {
+    override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse?>> {
         TODO("Not yet implemented")
     }
 
@@ -156,6 +159,21 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
     }
 
     override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun fetchCustomerAddress(
+        customerId: Long,
+        addressId: Long,
+    ): Flow<SingleAddressResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getCountries(): Flow<List<CountryInfo>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getCitiesByCountry(country: String): Flow<List<GeoNameLocation>> {
         TODO("Not yet implemented")
     }
 

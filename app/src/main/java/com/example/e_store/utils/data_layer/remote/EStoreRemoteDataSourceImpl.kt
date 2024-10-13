@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.data_layer.remote.exchange_rate.ExchangeRateApi
 import com.example.e_store.utils.data_layer.remote.exchange_rate.ExchangeRateRetrofitHelper
+import com.example.e_store.utils.data_layer.remote.geo_names.GeoNamesApi
+import com.example.e_store.utils.data_layer.remote.geo_names.GeoNamesRetrofitHelper
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyAPIServices
 import com.example.e_store.utils.data_layer.remote.shopify.ShopifyRetrofitHelper
 import com.example.e_store.utils.shared_models.AddNewAddress
@@ -11,6 +13,7 @@ import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.AddressResponse
 import com.example.e_store.utils.shared_models.AppliedDiscount
 import com.example.e_store.utils.shared_models.Brand
+import com.example.e_store.utils.shared_models.CountryInfo
 import com.example.e_store.utils.shared_models.CurrencyResponse
 import com.example.e_store.utils.shared_models.CustomCollection
 import com.example.e_store.utils.shared_models.Customer
@@ -20,6 +23,8 @@ import com.example.e_store.utils.shared_models.DiscountCodesResponse
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderRequest
 import com.example.e_store.utils.shared_models.DraftOrderResponse
+import com.example.e_store.utils.shared_models.GeoNameLocation
+import com.example.e_store.utils.shared_models.GeoNameLocationResponse
 import com.example.e_store.utils.shared_models.Order
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.SingleAddressResponse
@@ -31,9 +36,9 @@ import kotlinx.coroutines.flow.flowOf
 class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
 
     private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.api
+    private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.api
+    private val geoNamesApiService: GeoNamesApi = GeoNamesRetrofitHelper.api
 
-    private val exchangeRateApiService: ExchangeRateApi =
-        ExchangeRateRetrofitHelper.getInstance().create(ExchangeRateApi::class.java)
 
     private val TAG = "EShopRemoteDataSourceImpl"
 
@@ -136,7 +141,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun updateDraftOrder(
-        draftOrderId: Long, shoppingCartDraftOrder: DraftOrderRequest
+        draftOrderId: Long, shoppingCartDraftOrder: DraftOrderRequest,
     ) {
         apiService.updateDraftOrder(draftOrderId, shoppingCartDraftOrder)
     }
@@ -213,7 +218,7 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
     }
 
     override suspend fun fetchCustomerAddress(
-        customerId: Long, addressId: Long
+        customerId: Long, addressId: Long,
     ): Flow<SingleAddressResponse> {
         return flowOf(apiService.fetchCustomerAddress(customerId, addressId))
     }
@@ -321,128 +326,6 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
     }
 
-    /* override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?> {
-            return flow {
-                try {
-                    val priceRuleResponse = apiService.fetchPricingRules()
-
-                    if (priceRuleResponse.isSuccessful) {
-                        priceRuleResponse.body()?.let { body ->
-                            for (priceRule in body.price_rules) {
-                                Log.d(TAG, "priceRuleID: ${priceRule.id}")
-
-                                // Fetch discount codes for each price rule
-                                val discountCodeResponse = apiService.fetchDiscountCodes(priceRule.id)
-                            }
-                            // Emit the discount code response
-                            emit(discountCodeResponse)
-
-                        } ?: run {
-                            Log.e(TAG, "No price rules found.")
-                            emit(null) // Emit null if no price rules are found
-                        }
-                    } else {
-                        Log.e(TAG, "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}")
-                        emit(null) // Emit null in case of failure
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching discount codes: ${e.message}")
-                    emit(null) // Emit null in case of an exception
-                }
-            }
-        }*/
-
-    /*
-        override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> = flow {
-            fetchDiscountCodes().collect { discountResponse ->
-                if (discountResponse != null) {
-                    val discountCode = discountResponse.discount_codes.find {
-                        Log.d("fetchDiscountCodesByCode", "code: ${it.code}")
-                        Log.d("fetchDiscountCodesByCode", "code: $code")
-                        it.code == code
-
-                    }
-
-                    if (discountCode != null) {
-                        val priceRuleDetails = discountCode.price_rule_id?.let {
-                            apiService.fetchPricingRuleByID(it)
-                        }
-
-                        if (priceRuleDetails != null) {
-                            // Create an AppliedDiscount object with the fetched data
-                            val appliedDiscount = AppliedDiscount(
-                                description = priceRuleDetails.price_rule.title,
-                                value = (priceRuleDetails.price_rule.value.toDouble() * -1).toString(),
-                                title = priceRuleDetails.price_rule.title,
-                                value_type = priceRuleDetails.price_rule.value_type,
-                            )
-
-
-                            emit(appliedDiscount)  // Emit the applied discount
-                        }
-                    } else {
-
-                        emit(null)  // Emit null if no discount code is found
-                    }
-                }
-            }
-        }*/
-
-
-    /*
-    * return flow {
-            try {
-                // Collect the discount codes flow
-                fetchDiscountCodes().collect { discountCodesList ->
-
-                    Log.d("testtttt", "Discount Codes List: ${discountCodesList}")
-
-                    var priceID:Long?
-                    // Check if the list is not null or empty
-                    if (!discountCodesList.isNullOrEmpty()) {
-                        for (discountCode in discountCodesList) {
-                            Log.d("testtttt1", "Discount Code: ${discountCode}")
-
-                             priceID = discountCode.discount_codes.firstOrNull { it.code == code }
-
-                        }
-                        // Find the discount code that matches the given code
-
-                        Log.d("testtttt2", "Coupon Code: ${discountCodeResponse}")
-
-                        if (priceID != null) {
-                            // Fetch pricing rule details by price rule ID
-                            val priceRuleDetails = apiService.fetchPricingRuleByID(priceID)
-
-                            Log.d("testtttt3", "Pricing Rule Details: ${priceRuleDetails}")
-
-                            if (priceRuleDetails != null) {
-                                // Create an AppliedDiscount object with the fetched data
-                                val appliedDiscount = AppliedDiscount(
-                                    description = priceRuleDetails.price_rule.title,
-                                    value = priceRuleDetails.price_rule.value,
-                                    title = priceRuleDetails.price_rule.title,
-                                    amount = priceRuleDetails.price_rule.value,
-                                    valueType = priceRuleDetails.price_rule.value_type
-                                )
-
-                                Log.d("testtttt4", "Applied Discount: $appliedDiscount")
-
-                                // Emit the applied discount
-                                emit(appliedDiscount)
-                                return@collect  // Exit the collection after finding the match
-                            }
-                        }
-                    }
-                    // Emit null if no matching discount code was found
-                    emit(null)
-                }
-            } catch (e: Exception) {
-                Log.e("fetchDiscountCodesByCode", "Error: ${e.message}")
-                emit(null) // Emit null in case of an error
-            }
-        }
-    * */
     override suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse> {
         return flow {
 
@@ -480,11 +363,144 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         }
     }
 
-
     override suspend fun updateCustomerAddress(
-        customerId: Long, addressId: Long, address: AddNewAddress
+        customerId: Long, addressId: Long, address: AddNewAddress,
     ) {
         apiService.updateCustomerAddress(customerId, addressId, address)
     }
+
+    override suspend fun getCountries(): Flow<List<CountryInfo>> {
+        return flowOf(geoNamesApiService.getCountries().geonames)
+    }
+
+    override suspend fun getCitiesByCountry(country: String): Flow<List<GeoNameLocation>> {
+        return flowOf(geoNamesApiService.getCitiesByCountry(country = country).geonames)
+
+    }
+
+
 }
 
+
+/* override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse>?> {
+        return flow {
+            try {
+                val priceRuleResponse = apiService.fetchPricingRules()
+
+                if (priceRuleResponse.isSuccessful) {
+                    priceRuleResponse.body()?.let { body ->
+                        for (priceRule in body.price_rules) {
+                            Log.d(TAG, "priceRuleID: ${priceRule.id}")
+
+                            // Fetch discount codes for each price rule
+                            val discountCodeResponse = apiService.fetchDiscountCodes(priceRule.id)
+                        }
+                        // Emit the discount code response
+                        emit(discountCodeResponse)
+
+                    } ?: run {
+                        Log.e(TAG, "No price rules found.")
+                        emit(null) // Emit null if no price rules are found
+                    }
+                } else {
+                    Log.e(TAG, "Failed to fetch pricing rules: ${priceRuleResponse.errorBody()?.string()}")
+                    emit(null) // Emit null in case of failure
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching discount codes: ${e.message}")
+                emit(null) // Emit null in case of an exception
+            }
+        }
+    }*/
+
+/*
+    override suspend fun fetchDiscountCodesByCode(code: String): Flow<AppliedDiscount?> = flow {
+        fetchDiscountCodes().collect { discountResponse ->
+            if (discountResponse != null) {
+                val discountCode = discountResponse.discount_codes.find {
+                    Log.d("fetchDiscountCodesByCode", "code: ${it.code}")
+                    Log.d("fetchDiscountCodesByCode", "code: $code")
+                    it.code == code
+
+                }
+
+                if (discountCode != null) {
+                    val priceRuleDetails = discountCode.price_rule_id?.let {
+                        apiService.fetchPricingRuleByID(it)
+                    }
+
+                    if (priceRuleDetails != null) {
+                        // Create an AppliedDiscount object with the fetched data
+                        val appliedDiscount = AppliedDiscount(
+                            description = priceRuleDetails.price_rule.title,
+                            value = (priceRuleDetails.price_rule.value.toDouble() * -1).toString(),
+                            title = priceRuleDetails.price_rule.title,
+                            value_type = priceRuleDetails.price_rule.value_type,
+                        )
+
+
+                        emit(appliedDiscount)  // Emit the applied discount
+                    }
+                } else {
+
+                    emit(null)  // Emit null if no discount code is found
+                }
+            }
+        }
+    }*/
+
+
+/*
+* return flow {
+        try {
+            // Collect the discount codes flow
+            fetchDiscountCodes().collect { discountCodesList ->
+
+                Log.d("testtttt", "Discount Codes List: ${discountCodesList}")
+
+                var priceID:Long?
+                // Check if the list is not null or empty
+                if (!discountCodesList.isNullOrEmpty()) {
+                    for (discountCode in discountCodesList) {
+                        Log.d("testtttt1", "Discount Code: ${discountCode}")
+
+                         priceID = discountCode.discount_codes.firstOrNull { it.code == code }
+
+                    }
+                    // Find the discount code that matches the given code
+
+                    Log.d("testtttt2", "Coupon Code: ${discountCodeResponse}")
+
+                    if (priceID != null) {
+                        // Fetch pricing rule details by price rule ID
+                        val priceRuleDetails = apiService.fetchPricingRuleByID(priceID)
+
+                        Log.d("testtttt3", "Pricing Rule Details: ${priceRuleDetails}")
+
+                        if (priceRuleDetails != null) {
+                            // Create an AppliedDiscount object with the fetched data
+                            val appliedDiscount = AppliedDiscount(
+                                description = priceRuleDetails.price_rule.title,
+                                value = priceRuleDetails.price_rule.value,
+                                title = priceRuleDetails.price_rule.title,
+                                amount = priceRuleDetails.price_rule.value,
+                                valueType = priceRuleDetails.price_rule.value_type
+                            )
+
+                            Log.d("testtttt4", "Applied Discount: $appliedDiscount")
+
+                            // Emit the applied discount
+                            emit(appliedDiscount)
+                            return@collect  // Exit the collection after finding the match
+                        }
+                    }
+                }
+                // Emit null if no matching discount code was found
+                emit(null)
+            }
+        } catch (e: Exception) {
+            Log.e("fetchDiscountCodesByCode", "Error: ${e.message}")
+            emit(null) // Emit null in case of an error
+        }
+    }
+* */
