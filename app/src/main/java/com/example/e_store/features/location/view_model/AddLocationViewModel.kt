@@ -1,13 +1,15 @@
 package com.example.e_store.features.location.view_model
 
+import android.provider.ContactsContract.Contacts.Data
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.Address
+import com.example.e_store.utils.shared_models.CountryInfo
 import com.example.e_store.utils.shared_models.DataState
+import com.example.e_store.utils.shared_models.GeoNameLocation
 import com.example.e_store.utils.shared_models.NavigationHolder
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
@@ -16,12 +18,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddLocationViewModel (val repository : EStoreRepository): ViewModel() {
+class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
     // MutableStateFlow for each field
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
 
+    private val _countries = MutableStateFlow<DataState<List<CountryInfo?>>>(DataState.Loading)
+    val countries = _countries.asStateFlow()
+
+    private val _cities = MutableStateFlow<DataState<List<GeoNameLocation?>>>(DataState.Loading)
+    val cities = _cities.asStateFlow()
+
+    private val _selectedCountry = MutableStateFlow<CountryInfo?>(null)
+    val selectedCountry = _selectedCountry.asStateFlow()
+
+    private val _selectedCity = MutableStateFlow<GeoNameLocation?>(null)
+    val selectedCity = _selectedCity.asStateFlow()
 
     private val _phoneNumber = MutableStateFlow("")
     val phoneNumber: StateFlow<String> = _phoneNumber
@@ -29,8 +42,11 @@ class AddLocationViewModel (val repository : EStoreRepository): ViewModel() {
     private val _streetName = MutableStateFlow("")
     val streetName: StateFlow<String> = _streetName
 
-    private val _city = MutableStateFlow("")
-    val city: StateFlow<String> = _city
+    private val _country = MutableStateFlow("")
+    val country: StateFlow<String> = _country
+
+    private val _city = MutableStateFlow<String?>(null)
+    val city: StateFlow<String?> = _city
 
     private val _saveToAddress = MutableStateFlow(false)
     val saveToAddress: StateFlow<Boolean> = _saveToAddress
@@ -64,8 +80,11 @@ class AddLocationViewModel (val repository : EStoreRepository): ViewModel() {
         _streetName.value = newStreetName
     }
 
+    fun updateCountry(newCountry: String) {
+        _country.value = newCountry
+    }
 
-    fun updateCity(newCity: String) {
+    fun updateCity(newCity: String?) {
         _city.value = newCity
     }
 
@@ -136,16 +155,42 @@ class AddLocationViewModel (val repository : EStoreRepository): ViewModel() {
     }
 
 
-    fun updateDefaultLocation(address:Address)
-    {
-            viewModelScope.launch(Dispatchers.IO) {
-                UserSession.shopifyCustomerID?.let {
-                    NavigationHolder.id?.let { it1 ->
-                        repository.updateCustomerAddress(it,
-                            it1,AddNewAddress(address))
-                    }
+    fun updateDefaultLocation(address: Address) {
+        viewModelScope.launch(Dispatchers.IO) {
+            UserSession.shopifyCustomerID?.let {
+                NavigationHolder.id?.let { it1 ->
+                    repository.updateCustomerAddress(
+                        it,
+                        it1, AddNewAddress(address)
+                    )
                 }
             }
+        }
+    }
+
+    fun getCountries() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getCountries().collect { countryList ->
+                _countries.value = DataState.Success(countryList)
+            }
+        }
+    }
+
+    fun getCities(countryCode: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getCitiesByCountry(countryCode).collect { cityList ->
+                _cities.value = DataState.Success(cityList)
+            }
+        }
+    }
+
+    fun selectCountry(country: CountryInfo) {
+        _selectedCountry.value = country
+        getCities(country.countryCode)
+    }
+
+    fun selectCity(city: GeoNameLocation?) {
+        _selectedCity.value = city
     }
 
 

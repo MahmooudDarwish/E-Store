@@ -1,15 +1,14 @@
-package com.example.e_store.utils.data_layer.remote.exchange_rate
+package com.example.e_store.utils.data_layer.remote.geo_names
 
 import com.example.e_store.utils.constants.APIKeys
-import com.example.e_store.utils.data_layer.remote.geo_names.GeoNamesApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object ExchangeRateRetrofitHelper {
+object GeoNamesRetrofitHelper {
 
-    val api: ExchangeRateApi by lazy {
+    val api: GeoNamesApi by lazy {
         val clientBuilder = OkHttpClient.Builder()
 
         val logging = HttpLoggingInterceptor()
@@ -19,11 +18,10 @@ object ExchangeRateRetrofitHelper {
         val client = clientBuilder.build()
 
         Retrofit.Builder()
-            .baseUrl("${APIKeys.EXCHANGE_RATE_API_URL}${APIKeys.EXCHANGE_RATE_API_KEY}/")
+            .baseUrl(APIKeys.GEONAMES_API_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ExchangeRateApi::class.java)
+            .create(GeoNamesApi::class.java)
     }
-
 }
