@@ -1,12 +1,14 @@
 package com.example.e_store.utils.data_layer.remote
 
 import com.example.e_store.utils.shared_models.*
+import com.example.e_store.utils.test_utils.AddressMockModel
 import com.example.e_store.utils.test_utils.BrandsMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runBlockingTest
 
 
 class EStoreRemoteDataSourceImplTest(
@@ -31,7 +33,7 @@ class EStoreRemoteDataSourceImplTest(
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchDiscountCodes(): Flow<DiscountCodesResponse?> {
+    override suspend fun fetchDiscountCodes(): Flow<List<DiscountCodesResponse?>> {
         TODO("Not yet implemented")
     }
 
@@ -119,9 +121,6 @@ class EStoreRemoteDataSourceImplTest(
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun createCustomerAddress(customerId: Long, address: AddNewAddress) {
         TODO("Not yet implemented")
@@ -135,6 +134,7 @@ class EStoreRemoteDataSourceImplTest(
         TODO("Not yet implemented")
     }
 
+
     override suspend fun updateCustomerAddress(
         customerId: Long,
         addressId: Long,
@@ -147,5 +147,56 @@ class EStoreRemoteDataSourceImplTest(
         TODO("Not yet implemented")
     }
 
+  /*  override suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse> {
+        return AddressMockModel.getAddressesByCustomerId(customerId).let {
+            flowOf(AddressResponse(it))
+        }
+    }
 
+    override suspend fun fetchCustomerAddress(
+        customerId: Long,
+        addressId: Long
+    ): Flow<SingleAddressResponse> {
+        try {
+            fetchCustomerAddresses(customerId).collect(
+                return AddressMockModel.getAddressById(addressId, customerId)?.let {
+                    flowOf(SingleAddressResponse(it))
+                } ?: throw Exception("Address not found")
+            )
+        } catch (e: Exception) {
+            throw e
+        }
+
+
+    }
+*/
+
+
+    override suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse> {
+        return flow {
+             delay(100)
+            val customerAddresses = AddressMockModel.addresses.filter { it.id == customerId }
+            emit(AddressResponse(customerAddresses))
+        }
+    }
+
+    override suspend fun fetchCustomerAddress(customerId: Long, addressId: Long): Flow<SingleAddressResponse> {
+        return flow {
+            delay(100)
+            val address = AddressMockModel.addresses.find { it.id == addressId && it.id == customerId }
+            if (address != null) {
+                emit(SingleAddressResponse(address))
+            } else {
+                throw Exception("Address not found")
+            }
+        }
+    }
+
+    override suspend fun getCountries(): Flow<List<CountryInfo>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getCitiesByCountry(country: String): Flow<List<GeoNameLocation>> {
+        TODO("Not yet implemented")
+    }
 }

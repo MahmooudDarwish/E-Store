@@ -71,7 +71,9 @@ fun SignInScreen(navController: NavHostController , viewModel: AuthenticationVie
         PasswordInputField(
             value = viewModel.password.value,
             onValueChange = { viewModel.onPasswordChanged(it) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            label = R.string.password_label
+
         )
 
         EShopButton(

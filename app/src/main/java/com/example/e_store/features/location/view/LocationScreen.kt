@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -96,6 +98,18 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                 onConfirm = {
                     // Navigate to edit address
                     NavigationHolder.id = deletionId
+
+                    NavigationHolder.address1 = locationToDelete!!.address1
+                    NavigationHolder.city = locationToDelete!!.city
+                    NavigationHolder.phone = locationToDelete!!.phone
+                    NavigationHolder.firstName = locationToDelete!!.first_name
+                    NavigationHolder.country = locationToDelete!!.country
+                    NavigationHolder.default = locationToDelete!!.default!!
+
+                    NavigationHolder.country_code= locationToDelete!!.country_code
+                    Log.d("country_code", "dddd : ${locationToDelete!!.country_code}")
+
+
                     navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
                     viewModel.deletionState.value = DeletionState.CanDelete // Reset state
                 },
@@ -113,7 +127,10 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     Log.d("LocationScreen", "currentBackStackEntry: ${Screen.Location.route}")
-    Log.d("LocationScreen", "currentBackStackEntry.value: ${currentBackStackEntry.value?.destination?.route}")
+    Log.d(
+        "LocationScreen",
+        "currentBackStackEntry.value: ${currentBackStackEntry.value?.destination?.route}"
+    )
 
     LaunchedEffect(currentBackStackEntry.value) {
         if (currentBackStackEntry.value?.destination?.route == Screen.Location.route) {
@@ -178,7 +195,8 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 
     if (!isLoading.value) {
         addressDetails.value?.let { details ->
-            Column {
+            Column (
+            ){
                 sharedHeader(navController, headerText = stringResource(id = R.string.location))
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -203,26 +221,55 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                             contentPadding = padding,
                             modifier = Modifier.fillMaxSize()
                         ) {
+
                             items(details.addresses) { location ->
+                                Log.d("LocationScreen", "Location: $location")
+
                                 LocationItem(
                                     location = location,
                                     onDelete = {
                                         locationToDelete = location
                                         showDialog = true
                                     },
+                                    onEdit = {
+
+                                        NavigationHolder.id = location.id!!
+
+                                        NavigationHolder.default = location.default!!
+                                        NavigationHolder.address1 = location.address1
+                                        NavigationHolder.city = location.city
+                                        NavigationHolder.phone = location.phone
+                                        NavigationHolder.firstName = location.first_name
+                                        NavigationHolder.country = location.country
+                                        NavigationHolder.country_code= location.country_code
+
+                                        navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
+                                    },
                                     onMakeDefault = {
                                         viewModel.makeDefaultLocation(location.id!!, location)
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.default_location_updated),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         navController.popBackStack()
                                     }
                                 )
                             }
                         }
                     } else {
-                        // Display the no data message with Lottie animation
-                        LottieWithText(
-                            displayText = stringResource(R.string.no_locations_found),
-                            lottieRawRes = R.raw.no_data_found
-                        )
+                        Column (
+                            modifier =  Modifier
+                                .fillMaxSize()
+                                .background( Color.White)
+                        ) {
+                            // Display the no data message with Lottie animation
+                            LottieWithText(
+                                displayText = stringResource(R.string.no_locations_found),
+                                lottieRawRes = R.raw.no_data_found
+
+                            )
+                        }
                     }
                 }
             }
@@ -231,7 +278,12 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 }
 
 @Composable
-fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> Unit) {
+fun LocationItem(
+    location: Address,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit,
+    onMakeDefault: () -> Unit
+) {
     ElevationCard(
         modifier = Modifier
             .clickable(onClick = { onMakeDefault() })
@@ -250,9 +302,9 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
             ) {
 
                 if (location.default == true) {
-                    Row (
+                    Row(
                         horizontalArrangement = Arrangement.Center,
-                        ){
+                    ) {
                         Image(
                             painter = painterResource(
                                 id = R.drawable.icon_default_location
@@ -263,7 +315,7 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
                         Text(
                             text = stringResource(R.string.default_location),
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding( 8.dp),
+                            modifier = Modifier.padding(8.dp),
                             fontSize = 16.sp
                         )
                     }
@@ -317,22 +369,43 @@ fun LocationItem(location: Address, onDelete: () -> Unit, onMakeDefault: () -> U
                 }
             }
 
-            // Delete button icon
-            IconButton(
-                onClick = { onDelete() },
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.errorContainer,
-                        shape = CircleShape
+            Column {
+                // Delete button icon
+                IconButton(
+                    onClick = { onDelete() },
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            shape = CircleShape
+                        )
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete_location),
+                        tint = MaterialTheme.colorScheme.onErrorContainer
                     )
-                    .size(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Location",
-                    tint = MaterialTheme.colorScheme.onErrorContainer
-                )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                IconButton(
+                    onClick = { onEdit() },
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            shape = CircleShape
+                        )
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.edit_location),
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+
             }
+
         }
     }
 }

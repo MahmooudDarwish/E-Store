@@ -45,6 +45,10 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     private val _country = MutableStateFlow("")
     val country: StateFlow<String> = _country
 
+    private val _countryCode = MutableStateFlow("")
+    val countryCode: StateFlow<String> = _countryCode
+
+
     private val _city = MutableStateFlow<String?>(null)
     val city: StateFlow<String?> = _city
 
@@ -86,6 +90,9 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
     fun updateCity(newCity: String?) {
         _city.value = newCity
+    }
+    fun updateCountryCode(newCountryCode: String) {
+        _countryCode.value = newCountryCode
     }
 
 
@@ -180,12 +187,16 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getCitiesByCountry(countryCode).collect { cityList ->
                 _cities.value = DataState.Success(cityList)
+                Log.d("getCities", "getCities: $cityList")
             }
         }
     }
 
     fun selectCountry(country: CountryInfo) {
         _selectedCountry.value = country
+        _countryCode.value= country.countryCode
+        Log.d("country_code", "LocationScreen: ${country.countryCode}")
+
         getCities(country.countryCode)
     }
 

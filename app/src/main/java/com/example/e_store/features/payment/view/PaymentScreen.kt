@@ -69,8 +69,9 @@ fun PaymentScreen(navController: NavController, viewModel: PaymentViewModel) {
         val nameRegex = "^[a-zA-Z ]+$".toRegex() // Allow letters and spaces
         return name.length in 10..20 && nameRegex.matches(name)
     }
-
+    
     fun isValidMonth(inputMonth: String): Boolean {
+        if (inputMonth.length != 2) return false
         val monthInt = inputMonth.toIntOrNull() ?: return false
         return monthInt in 1..12
     }

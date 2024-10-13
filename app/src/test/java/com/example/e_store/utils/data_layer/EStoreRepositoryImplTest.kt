@@ -4,14 +4,17 @@ import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSource
 import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImplTest
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.SingleProductResponse
+import com.example.e_store.utils.test_utils.AddressMockModel
 import com.example.e_store.utils.test_utils.BrandsMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +33,8 @@ class EStoreRepositoryImplTest {
     lateinit var remoteDataSource: EStoreRemoteDataSourceImplTest
     lateinit var repository: EStoreRepository
     val expectedProducts = ProductMockModel.products
+
+
 
     @Before
     fun createRepository() {
@@ -275,19 +280,86 @@ class EStoreRepositoryImplTest {
     }
 
 
+    val  expectedAddresse = AddressMockModel.addresses.get(0)
+
+
+    @Test
+    fun  fetchCustomerAddress_validCustomerIdAndAddressIdReturnsCorrectAddress() = runTest{
+        val addressId = 1L
+        val customerId = 1L
+
+        //When
+        val resultFlow = repository.fetchCustomerAddress(customerId, addressId)
+
+        //Then
+        resultFlow.collect{response ->
+            assertEquals(expectedAddresse, response.customer_address)
+        }
+
+
+    }
 
 
 
+    @Test
+    fun fetchCustomerAddress_validCustomerIdButInvalidAddressIdThrowsException() = runTest {
+        val customerId = 1L
+        val invalidAddressId = 999L // Assuming this ID does not exist
 
+        // When & Then
+        assertThrows(Exception::class.java) {
+            runTest {
+                repository.fetchCustomerAddress(customerId, invalidAddressId).collect{
+                    throw Exception("Address not found")
+                }
+            }
+        }
+    }
 
+    @Test
+    fun fetchCustomerAddress_invalidCustomerIdThrowsException() = runTest {
+        val invalidCustomerId = 999L
+        val addressId = 1L
 
+        // When & Then
+        assertThrows(Exception::class.java) {
+            runTest {
+                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect{
+                    throw Exception("Customer not found")
+                }
+            }
+        }
+    }
 
+    @Test
+    fun fetchCustomerAddress_invalidCustomerIdAndValidAddressIdThrowsException() = runTest {
+        val invalidCustomerId = 999L
+        val addressId = 1L
 
-
-
-
-
-
-
-
+        // When & Then
+        assertThrows(Exception::class.java) {
+            runTest {
+                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect{
+                    throw Exception("Customer not found")
+                }
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
