@@ -70,6 +70,8 @@ class AuthenticationViewModel(
         _confirmPasswordError.value =
             _confirmPassword.value.isEmpty() || _confirmPassword.value != _password.value
     }
+    // Regex for validating a basic phone number format
+    val phoneNumberPattern = "^[+]?[0-9]{10,13}\$".toRegex()
 
     private fun checkSignUpTextValues(context: Context): Boolean {
         if (_nameError.value) {
@@ -85,6 +87,10 @@ class AuthenticationViewModel(
                     context, context.getString(R.string.phone_empty_error), Toast.LENGTH_SHORT
                 ).show()
             } else if (_phone.value.length != 11) {
+                Toast.makeText(
+                    context, context.getString(R.string.phone_invalid_error), Toast.LENGTH_SHORT
+                ).show()
+            }else if ( !_phone.value.matches(phoneNumberPattern)) {
                 Toast.makeText(
                     context, context.getString(R.string.phone_invalid_error), Toast.LENGTH_SHORT
                 ).show()
