@@ -192,6 +192,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                             province = address.adminArea
                             country = address.countryName
                             zip = address.postalCode
+                            country_code = address.countryCode
                         }
 
 
@@ -202,7 +203,11 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                 address1 = UserAddress.address1,
                                 city = UserAddress.city,
                                 phone = inputValue,
-                                firstName = UserSession.name,
+                                first_name = UserSession.name,
+                                country = UserAddress.country,
+                                country_code = UserAddress.country_code
+
+
                             )
                         )
 
@@ -447,7 +452,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                                     address1 = UserAddress.address1,
                                                     city = UserAddress.city,
                                                     phone = inputValue,
-                                                    firstName = UserSession.name,
+                                                    first_name = UserSession.name,
                                                 )
                                             )
                                             Toast.makeText(
@@ -679,7 +684,7 @@ fun PhoneNumberInputDialog(
                 Button(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
-                        contentColor = Color.White
+                        contentColor = Color.Black
                     ),
                     border = BorderStroke(1.dp, PrimaryColor),
                     onClick = {

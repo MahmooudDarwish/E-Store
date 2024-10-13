@@ -85,14 +85,15 @@ fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationView
         PasswordInputField(
             value = viewModel.password.value, onValueChange = { newValue ->
                 viewModel.onPasswordChanged(newValue)
-            }, modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth(),
+            label = R.string.password_label
         )
 
         PasswordInputField(
             value = viewModel.confirmPassword.value, onValueChange = { newValue ->
                 viewModel.onConfirmPasswordChanged(newValue)
-
-            }, modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth(),
+            label =  R.string.confirm_password_label
         )
 
         EShopButton(

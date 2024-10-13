@@ -51,6 +51,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
                     val brandsJob = launch { getBrands() }
                     val forUProductsJob = launch { getForUProducts() }
                     val discountCodesJob = launch { fetchDiscountCodes() }
+
                     delay(500)  //to show the animation xDD
 
                     joinAll(brandsJob, forUProductsJob, discountCodesJob)

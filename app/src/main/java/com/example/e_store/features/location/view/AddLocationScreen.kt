@@ -3,27 +3,34 @@ package com.example.e_store.features.location.view
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.e_store.features.location.view_model.AddLocationViewModel
 import com.example.e_store.utils.shared_components.EShopButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.e_store.R
 import com.example.e_store.utils.shared_components.sharedHeader
 import com.example.e_store.utils.constants.NavigationKeys
+import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_components.LottieWithText
 import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.CountryInfo
@@ -37,10 +44,13 @@ import kotlinx.coroutines.launch
 fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewModel) {
     val countriesState by viewModel.countries.collectAsState()
     val citiesState by viewModel.cities.collectAsState()
+
     val selectedCountry by viewModel.selectedCountry.collectAsState()
 
-    val isAddressExist by viewModel.isAddressExist.collectAsState()
     val isPhoneExist by viewModel.isPhoneExist.collectAsState()
+
+    var isOldAddressSet by remember { mutableStateOf(false) }
+    var isWantUpdateCity by remember { mutableStateOf(false) }
 
     var nameError by remember { mutableStateOf("") }
     var phoneError by remember { mutableStateOf("") }
@@ -57,46 +67,98 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
     var filteredCityList by remember { mutableStateOf(emptyList<GeoNameLocation>()) }
 
     var showCountryDialog by remember { mutableStateOf(false) }
-
-
     var isFormValid by remember { mutableStateOf(false) }
 
+    var isMainAddress by remember { mutableStateOf(false) }  // Default to false ("No")
+    var isDropdownExpanded by remember { mutableStateOf(false) }  // Dropdown state
+    val options = listOf("Yes", "No")
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+
+
+    // Handle navigation state based on NavigationHolder
+    val isEditing = NavigationHolder.id != null
+
+    if (isEditing) {
+        Log.d(
+            "AddLocationScreen",
+            "AddLocationScreen:  ${NavigationHolder.country}, ${NavigationHolder.city}"
+        )
+
+        if (!isOldAddressSet) {
+            // Assuming NavigationHolder stores Address or similar data
+            viewModel.updateName(NavigationHolder.firstName ?: "M/A")
+            viewModel.updatePhoneNumber(NavigationHolder.phone ?: "M/A")
+            viewModel.updateStreetName(NavigationHolder.address1 ?: "M/A")
+            viewModel.updateCountry(NavigationHolder.country ?: "M/A")
+            viewModel.updateCity(NavigationHolder.city ?: "M/A")
+            isMainAddress = NavigationHolder.default?.let { it } ?: false
+            viewModel.updateCountryCode(NavigationHolder.country_code ?: "M/A")
+            Log.d("country_code", "LocationScreen: ${NavigationHolder.country_code}")
+
+            isOldAddressSet = true
+        }
+
+
+
+    }
+    Log.d("ddddd", "AddLocationScreen: ${viewModel.country.collectAsState().value}")
+
     LaunchedEffect(Unit) {
         viewModel.getCountries()
+        Log.d("TAG", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: ${viewModel.country.value}")
+        if(viewModel.country.value != null){
+            Log.d("TAG", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: ${viewModel.country.value}")
+
+            viewModel.getCities(viewModel.countryCode.value)
+        }
         viewModel.fetchCustomerAddresses()
-
-
     }
     LaunchedEffect(countriesState) {
         Log.d("TAG", "AddLocationScreen: $countriesState")
         if (countriesState is DataState.Success) {
             val countryList = (countriesState as DataState.Success<List<CountryInfo>>).data
             filteredCountryList = countryList
+
         }
     }
-
-    // Handle navigation state based on NavigationHolder
-    val isEditing = NavigationHolder.id != null
+    Log.d("AddLocationScreen", "AddLocationScreen: ${viewModel.country.collectAsState().value}")
     DisposableEffect(Unit) {
         onDispose {
             NavigationHolder.id = null
+            NavigationHolder.address1 = null
+            NavigationHolder.city = null
+            NavigationHolder.firstName = null
+            NavigationHolder.country = null
+            NavigationHolder.default = false
+            NavigationHolder.phone = null
+            NavigationHolder.pageName = null
+            NavigationHolder.country_code = null
+
+
         }
     }
+
     Column {
         // Change header text based on whether we are editing or adding
         val headerText = if (isEditing) {
             stringResource(id = R.string.edit_your_location)
+
+
         } else {
             stringResource(id = R.string.add_location)
         }
         sharedHeader(navController, headerText = headerText)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+
+            ) {
             // Name TextField
             OutlinedTextField(
                 value = viewModel.name.collectAsState().value,
@@ -125,6 +187,8 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     } else {
                         phoneError = context.getString(R.string.valid_phone_number_is_required)
                     }
+                    phoneError =
+                        if (it.isEmpty()) context.getString(R.string.phone_number_is_required) else ""
                 },
                 label = { Text(stringResource(R.string.phone_number)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -132,7 +196,11 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                 isError = phoneError.isNotEmpty() || isPhoneExist
             )
             if (isPhoneExist) {
+                phoneError = ""
                 Text(text = stringResource(R.string.phone_already_exist), color = Color.Red)
+            }
+            if (phoneError.isNotEmpty()) {
+                Text(text = phoneError, color = Color.Red)
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -147,20 +215,24 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                 },
                 label = { Text(stringResource(R.string.address)) },
                 modifier = Modifier.fillMaxWidth(),
-                isError = addressError.isNotEmpty() || isAddressExist
+                isError = addressError.isNotEmpty()
             )
             if (addressError.isNotEmpty()) {
                 Text(text = addressError, color = Color.Red)
             }
-            if (isAddressExist) {
-                Text(text = stringResource(id = R.string.address_already_exist), color = Color.Red)
-            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Log.d("TAG", "AddLocationScreen: ${viewModel.country.collectAsState().value}")
+            
             OutlinedTextField(
                 enabled = false,
-                value = viewModel.selectedCountry.collectAsState().value?.countryName ?: "Country",
+                value = viewModel.country.collectAsState().value ?: "Country",
                 onValueChange = {
+                    viewModel.updateCountry(it)
 
                     if (viewModel.selectedCountry.value!!.countryName.isEmpty()) {
                         countryError =
@@ -175,6 +247,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     },
                 isError = countryError.isNotEmpty(),
             )
+
             if (countryError.isNotEmpty()) {
                 Text(text = countryError, color = Color.Red)
             }
@@ -182,8 +255,9 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
             OutlinedTextField(
                 enabled = false,
-                value = viewModel.selectedCity.collectAsState().value?.name ?: "City",
+                value = viewModel.city.collectAsState().value?: "City",
                 onValueChange = {
+
                     Log.d("TAG", "AddLocationScreen: updateCity$it")
                     if (viewModel.selectedCity.value!!.name.isEmpty()) {
                         cityError =
@@ -195,7 +269,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     .fillMaxWidth()
                     .clickable {
                         Log.d("TAG", "AddLocationScreen: ")
-                        if (selectedCountry != null) {
+                        if (viewModel.country.value != null) {
                             showCityDialog = true
 
                         } else {
@@ -216,6 +290,9 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                 Text(text = cityError, color = Color.Red)
             }
 
+
+
+            Spacer(modifier = Modifier.height(8.dp))
             // City TextField
 
             if (showCountryDialog) {
@@ -229,6 +306,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                             OutlinedTextField(
                                 value = searchCountryText,
                                 onValueChange = {
+
                                     searchCountryText = it
                                 },
                                 label = { Text(stringResource(R.string.search_country)) },
@@ -294,6 +372,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     title = { Text(stringResource(R.string.select_city)) },
                     text = {
                         Column {
+
                             // Search Field
                             OutlinedTextField(
                                 value = searchCityText,
@@ -326,7 +405,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                             onClick = {
                                                 selectedCityName = city.name
                                                 viewModel.selectCity(city = city)
-                                                viewModel.updateCity(selectedCountryName)
+                                                viewModel.updateCity(selectedCityName)
                                                 showCityDialog = false
                                                 searchCityText =
                                                     ""
@@ -352,7 +431,79 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+            if (!isMainAddress) {
+                Text(
+                    text = "Do you want to make this your main address?",
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    OutlinedTextField(
+                        value = if (isMainAddress) "Yes" else "No",
+                        onValueChange = {},
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        readOnly = true,
+                        label = { Text(text = "Select Option") },
+                        leadingIcon = {
+                            val imageResource = if (isMainAddress) R.drawable.yes else R.drawable.no
+                            Image(
+                                painter = painterResource(id = imageResource),
+                                contentDescription = "Address Option Icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        trailingIcon = {
+                            val imageResource =
+                                if (isDropdownExpanded) R.drawable.arrow_drop_up else R.drawable.arrowdropdown
+                            Image(
+                                painter = painterResource(id = imageResource),
+                                contentDescription = "Arrow Drop Down",
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clickable {
+                                        isDropdownExpanded = !isDropdownExpanded
+                                    }
+                            )
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colors.primary,
+                            unfocusedBorderColor = Color.Gray,
+                            backgroundColor = Color.Transparent
+                        )
+                    )
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false },
+                        modifier = Modifier
+                            .width(200.dp)
+                            .background(
+                                Color.White,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .shadow(4.dp)
+                    ) {
+                        options.forEach { option ->
+                            DropdownMenuItem(onClick = {
+                                isMainAddress = option == "Yes"
+                                isDropdownExpanded = false
+                            }) {
+                                Text(
+                                    text = option,
+                                    color = if (option == if (isMainAddress) "Yes" else "No") MaterialTheme.colors.primary else Color.Black // Highlight selected option
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
 
             // Button to save the address
@@ -367,15 +518,19 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                             cityError = errors["city"].orEmpty()
                             countryError = errors["country"].orEmpty()
 
-                            if (isFormValid && !isAddressExist && !isPhoneExist) {
+                            if (isFormValid && !isPhoneExist) {
                                 if (isEditing) {
                                     viewModel.updateDefaultLocation(
                                         Address(
                                             address1 = viewModel.streetName.value,
                                             city = viewModel.city.value,
                                             phone = viewModel.phoneNumber.value,
-                                            firstName = viewModel.name.value,
-                                        )
+                                            first_name = viewModel.name.value,
+                                            default = isMainAddress,
+                                            country = viewModel.country.value,
+                                            country_code = viewModel.countryCode.value
+
+                                            )
                                     )
 
                                 } else {
@@ -384,7 +539,12 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                             address1 = viewModel.streetName.value,
                                             city = viewModel.city.value,
                                             phone = viewModel.phoneNumber.value,
-                                            firstName = viewModel.name.value,
+                                            first_name = viewModel.name.value,
+                                            default = isMainAddress,
+                                            country = viewModel.country.value,
+                                            country_code = viewModel.countryCode.value
+
+
                                         )
                                     )
                                 }
@@ -436,6 +596,7 @@ fun validateForm(
     if (city.isNullOrEmpty()) {
         errors["city"] = context.getString(R.string.city_is_required)
     }
+
     if (viewModel.streetName.value.isEmpty()) {
         errors["address"] = context.getString(R.string.address_is_required)
     }

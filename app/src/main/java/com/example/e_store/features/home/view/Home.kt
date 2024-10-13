@@ -88,7 +88,7 @@ fun HomeScreen(viewModel: HomeViewModel, favouriteControllerViewModel: Favourite
         }
     }
 
-
+if (!UserSession.isGuest) {
 
     when (discountCodesUiState) {
         DataState.Loading -> {
@@ -126,7 +126,7 @@ fun HomeScreen(viewModel: HomeViewModel, favouriteControllerViewModel: Favourite
             }
         }
     }
-
+}
 
     /*    when (discountCodesUiState) {
             DataState.Loading -> {

@@ -6,4 +6,7 @@ object UserAddress {
     val phone: String?=null
     var zip: String?=null
     var country: String?=null
+    var firstName: String?=null
+    var country_code : String?=null
+
 }

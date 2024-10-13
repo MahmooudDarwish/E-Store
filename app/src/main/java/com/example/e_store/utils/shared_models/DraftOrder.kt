@@ -93,11 +93,10 @@ data class Customer(
     val email: String? = null,
     val phone: String? = null,
     val id: Long? = null,
-
-
     val last_name: String? = null,
     val verified_email: Boolean = true,
     val send_email_welcome: Boolean = true,
+    val addresses : List<Address>? = null
 )
 
 data class AddNewAddress(
@@ -116,10 +115,12 @@ data class Address(
     val province: String? = null,
     val phone: String? = null,
     val zip: String? = null,
-    val lastName: String? = null,
-    val firstName: String? = null,
+    val last_name: String? = null,
+    val first_name: String? = null,
     val country: String? = null,
-    var default: Boolean? = null
+    var default: Boolean? = null,
+    val customer_id : Long? = null,
+    var country_code : String? = null
 )
 /*
 // Create a list of LineItem objects (cart items)

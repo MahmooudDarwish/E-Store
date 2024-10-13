@@ -18,14 +18,14 @@ import com.example.e_store.R
 
 @Composable
 fun PasswordInputField(
-    value: String, onValueChange: (String) -> Unit, modifier: Modifier
+    value: String, onValueChange: (String) -> Unit, modifier: Modifier, label: Int
 ) {
     val passwordVisible = remember { mutableStateOf(false) }
     OutlinedTextField(value = value,
         onValueChange = {
             onValueChange(it)
         },
-        label = { Text(text = stringResource(id = R.string.password_label)) },
+        label = { Text(text = stringResource(id =label)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
