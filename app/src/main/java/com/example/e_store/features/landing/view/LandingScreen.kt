@@ -35,6 +35,7 @@ import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
 class LandingScreen : ComponentActivity() {
@@ -73,6 +74,7 @@ class LandingScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             MaterialTheme {
                 Surface {

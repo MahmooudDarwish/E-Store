@@ -220,6 +220,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                         LazyColumn(
                             contentPadding = padding,
                             modifier = Modifier.fillMaxSize()
+                                .padding(0.dp, 0.dp, 0.dp, 60.dp)
                         ) {
 
                             items(details.addresses) { location ->

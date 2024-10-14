@@ -1,6 +1,8 @@
 package com.example.e_store.features.authentication.view_model
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
@@ -16,6 +18,7 @@ import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AuthenticationViewModel(
@@ -267,6 +270,7 @@ class AuthenticationViewModel(
             Log.e("AuthenticationViewModel", "Error saving user credentials and currency", e)
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
         }
+
     }
 
     private fun sendEmailVerificationAndCreateShopifyCustomer(context: Context) {
@@ -277,6 +281,8 @@ class AuthenticationViewModel(
                 ).show()
 
                 Log.d("AuthenticationViewModel", "Email verification sent successfully")
+
+
                 createShopifyCustomer(
                     CustomerRequest(
                         Customer(
@@ -286,6 +292,8 @@ class AuthenticationViewModel(
                         )
                     )
                 )
+
+
             } else {
                 Toast.makeText(
                     context,
