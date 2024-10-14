@@ -50,7 +50,6 @@ The app follows the **MVVM (Model-View-ViewModel)** architectural pattern to ens
 ### Libraries & Tools
 - **Retrofit:** For API communication with Shopify and other services.
 - **Firebase:** For authentication (Email/Password, Social Login) and email verification.
-- **Room Database:** For local storage of user data, shopping carts, and preferences.
 - **WorkManager:** For handling background tasks (like sending confirmation emails, updating currency rates).
 - **Coil:** For loading product images.
 - **Navigation Component:** To manage navigation between screens.
