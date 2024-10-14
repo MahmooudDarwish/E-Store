@@ -201,6 +201,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Scaffold(
+                    containerColor = Color.White,
                     floatingActionButton = {
                         AnimatedVisibility(
                             visible = true,
@@ -220,7 +221,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                         LazyColumn(
                             contentPadding = padding,
                             modifier = Modifier.fillMaxSize()
-                                .padding(0.dp, 0.dp, 0.dp, 60.dp)
+                                .padding(bottom = 60.dp)
                         ) {
 
                             items(details.addresses) { location ->

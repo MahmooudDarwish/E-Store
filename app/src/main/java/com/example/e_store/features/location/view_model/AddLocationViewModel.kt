@@ -1,6 +1,5 @@
 package com.example.e_store.features.location.view_model
 
-import android.provider.ContactsContract.Contacts.Data
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,7 +42,7 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     val streetName: StateFlow<String> = _streetName
 
     private val _country = MutableStateFlow("")
-    val country: StateFlow<String> = _country
+    val country: StateFlow<String?> = _country
 
     private val _countryCode = MutableStateFlow("")
     val countryCode: StateFlow<String> = _countryCode
@@ -184,6 +183,7 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     }
 
     fun getCities(countryCode: String) {
+        _cities.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             repository.getCitiesByCountry(countryCode).collect { cityList ->
                 _cities.value = DataState.Success(cityList)

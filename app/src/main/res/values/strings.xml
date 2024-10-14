@@ -173,7 +173,7 @@
     <string name="default_location_updated"> Default Location Updated </string>
     <string name="edit_location">Edit Location</string>
     <string name="delete_location">Delete Location</string>
-    <string name="country">Country</string>
+    <string name="country">Country*</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="arrow_drop_down">Arrow Drop Down</string>
