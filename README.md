@@ -119,7 +119,7 @@ Users can authenticate via:
 
 ## Payment Methods
 - **Cash on Delivery (COD):** Available for orders under a specified limit. Users must provide an address and phone number.
-- **Online Payment:** Integrated with secure payment gateways to allow credit card payments.
+- **Online Payment:** Develpoed payment operations to complete order placment.
 - **Discounts:** Users can apply promo codes at checkout.
 
 ## Project Management
