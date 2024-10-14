@@ -1,4 +1,4 @@
-# Mobile Commerce App
+# E-store
 
 This is a comprehensive mobile commerce (m-commerce) application that enables users to browse products from various vendors, add/remove items from their shopping cart, and complete their shopping cycle online. The app integrates Shopify's API for product data and provides seamless user authentication, shopping cart management, and payment processing.
 
