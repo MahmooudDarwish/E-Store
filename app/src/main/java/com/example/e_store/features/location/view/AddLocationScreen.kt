@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import com.example.e_store.R
 import com.example.e_store.utils.shared_components.sharedHeader
 import com.example.e_store.utils.constants.NavigationKeys
-import com.example.e_store.utils.shared_components.ElevationCard
 import com.example.e_store.utils.shared_components.LottieWithText
 import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.CountryInfo
@@ -77,7 +76,6 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
     val coroutineScope = rememberCoroutineScope()
 
 
-
     // Handle navigation state based on NavigationHolder
     val isEditing = NavigationHolder.id != null
 
@@ -102,12 +100,11 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
         }
 
 
-
     }
 
     LaunchedEffect(Unit) {
         viewModel.getCountries()
-        if(viewModel.country.value != null){
+        if (viewModel.country.value != null) {
 
             viewModel.getCities(viewModel.countryCode.value)
         }
@@ -224,39 +221,44 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
             Spacer(modifier = Modifier.height(8.dp))
             Log.d("TAG", "AddLocationScreen: ${viewModel.country.collectAsState().value}")
-            
-            OutlinedTextField(
-                enabled = false,
-                value = viewModel.country.collectAsState().value ?: "Country",
-                onValueChange = {
-                    viewModel.updateCountry(it)
 
-                    if (viewModel.selectedCountry.value!!.countryName.isEmpty()) {
-                        countryError =
-                            if (it.isEmpty()) context.getString(R.string.country_is_required) else ""
-                    }
-                },
-                label = { Text(stringResource(R.string.country)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        showCountryDialog = true
+            (if (viewModel.country.collectAsState().value.isNullOrEmpty()) "Country" else viewModel.country.collectAsState().value)?.let {
+                OutlinedTextField(
+                    enabled = false,
+                    value = it,
+                    label = { Text(stringResource(R.string.country)) },
+
+                    onValueChange = {
+                        //viewModel.updateCountry(it)
+
+                        if (viewModel.country.value!!.isEmpty()) {
+                            countryError =
+                                if (it.isEmpty()) context.getString(R.string.country_is_required) else ""
+                        }
                     },
-                isError = countryError.isNotEmpty(),
-            )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            showCountryDialog = true
+                        },
+                    isError = countryError.isNotEmpty(),
+                )
+            }
 
             if (countryError.isNotEmpty()) {
                 Text(text = countryError, color = Color.Red)
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
 
             OutlinedTextField(
                 enabled = false,
-                value = viewModel.city.collectAsState().value?: stringResource ( id = R.string.city),
+                value = viewModel.city.collectAsState().value ?: stringResource(id = R.string.city),
                 onValueChange = {
 
                     Log.d("TAG", "AddLocationScreen: updateCity$it")
-                    if (viewModel.selectedCity.value!!.name.isEmpty()) {
+                    if (viewModel.city.value!!.isEmpty()) {
                         cityError =
                             if (it.isEmpty()) context.getString(R.string.city_is_required) else ""
                     }
@@ -265,8 +267,8 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Log.d("TAG", "AddLocationScreen: ")
-                        if (viewModel.country.value != null) {
+                        Log.d("TAG", "AddLocationScreen: ${viewModel.country.value}")
+                        if (!viewModel.country.value.isNullOrEmpty()) {
                             showCityDialog = true
 
                         } else {
@@ -380,44 +382,68 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                             Spacer(modifier = Modifier.height(8.dp))
 
                             // LazyColumn to display filtered cities
-                            if (citiesState is DataState.Success) {
-                                val cityList =
-                                    (citiesState as DataState.Success<List<GeoNameLocation>>).data
-
-                                // Update the filtered list based on search input
-                                filteredCityList = if (searchCityText.isEmpty()) {
-                                    cityList
-                                } else {
-                                    cityList.filter {
-                                        it.name.contains(
-                                            searchCityText,
-                                            ignoreCase = true
-                                        )
-                                    }
+                            when (citiesState) {
+                                is DataState.Loading -> {
+                                    LottieWithText(
+                                        lottieRawRes = R.raw.loading,
+                                        displayText = "Loading Cities"
+                                    )
                                 }
 
-                                LazyColumn {
-                                    items(filteredCityList) { city ->
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                selectedCityName = city.name
-                                                viewModel.selectCity(city = city)
-                                                viewModel.updateCity(selectedCityName)
-                                                showCityDialog = false
-                                                searchCityText =
-                                                    ""
+                                is DataState.Success -> {
+                                    val cityList =
+                                        (citiesState as DataState.Success<List<GeoNameLocation>>).data
+
+                                    // Update the filtered list based on search input
+                                    filteredCityList = if (searchCityText.isEmpty()) {
+                                        cityList
+                                    } else {
+                                        cityList.filter {
+                                            it.name.contains(
+                                                searchCityText,
+                                                ignoreCase = true
+                                            )
+                                        }
+                                    }
+
+                                    LazyColumn {
+                                        items(filteredCityList) { city ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    selectedCityName = city.name
+                                                    viewModel.selectCity(city = city)
+                                                    viewModel.updateCity(selectedCityName)
+                                                    showCityDialog = false
+                                                    searchCityText =
+                                                        ""
+                                                }
+                                            ) {
+                                                Text(city.name)
                                             }
-                                        ) {
-                                            Text(city.name)
                                         }
                                     }
                                 }
-                            } else {
-                                LottieWithText(
-                                    lottieRawRes = R.raw.no_data_found,
-                                    displayText = "No Cities Found"
-                                )
+
+                                is DataState.Error -> {
+                                    Column {
+                                        LottieWithText(
+                                            lottieRawRes = R.raw.no_data_found,
+                                            displayText = "No Cities Found"
+                                        )
+
+                                        EShopButton(
+                                            onClick = {
+                                                viewModel.getCountries()
+                                            },
+                                            text = "Retry",
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+
+
+                                }
                             }
+
                         }
                     },
                     confirmButton = {
@@ -442,7 +468,9 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     horizontalAlignment = Alignment.Start
                 ) {
                     OutlinedTextField(
-                        value = if (isMainAddress) stringResource(R.string.yes) else stringResource( R.string.no),
+                        value = if (isMainAddress) stringResource(R.string.yes) else stringResource(
+                            R.string.no
+                        ),
                         onValueChange = {},
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -494,7 +522,10 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                             }) {
                                 Text(
                                     text = option,
-                                    color = if (option == if (isMainAddress) context.getString(R.string.yes) else context.getString(R.string.no)) MaterialTheme.colors.primary else Color.Black // Highlight selected option
+                                    color = if (option == if (isMainAddress) context.getString(R.string.yes) else context.getString(
+                                            R.string.no
+                                        )
+                                    ) MaterialTheme.colors.primary else Color.Black // Highlight selected option
                                 )
                             }
                         }
@@ -527,7 +558,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                             country = viewModel.country.value,
                                             country_code = viewModel.countryCode.value
 
-                                            )
+                                        )
                                     )
 
                                 } else {
@@ -597,7 +628,7 @@ fun validateForm(
     if (viewModel.streetName.value.isEmpty()) {
         errors["address"] = context.getString(R.string.address_is_required)
     }
-    if (viewModel.country.value.isEmpty()) {
+    if (viewModel.country.value!!.isEmpty()) {
         errors["country"] = context.getString(R.string.country_is_required)
     }
 
