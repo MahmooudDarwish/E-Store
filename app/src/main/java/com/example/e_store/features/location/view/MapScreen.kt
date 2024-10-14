@@ -134,7 +134,12 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     // Google Map state
     val startLocation = LatLng(40.9971, 29.1007)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(startLocation, 15f)
+        position = CameraPosition(
+            startLocation,
+            20f,
+            0f,
+            0f
+        )
     }
 
     val locationPermissionsState = rememberMultiplePermissionsState(
@@ -321,6 +326,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     }
 
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             Box(
                 modifier = Modifier
@@ -527,7 +533,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                             currentLocation!!.latitude,
                             currentLocation!!.longitude
                         ), // Move to the new position
-                        10f, // Zoom level
+                        15f, // Zoom level
                         0f,
                         0f
                     )

@@ -548,6 +548,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
                             if (isFormValid && !isPhoneExist) {
                                 if (isEditing) {
+
                                     viewModel.updateDefaultLocation(
                                         Address(
                                             address1 = viewModel.streetName.value,
@@ -562,6 +563,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                     )
 
                                 } else {
+
                                     viewModel.saveAddress(
                                         Address(
                                             address1 = viewModel.streetName.value,
@@ -621,14 +623,14 @@ fun validateForm(
     if (phone.isEmpty() || !phone.matches(Regex("^[+]?[0-9]{10,13}\$"))) {
         errors["phone"] = context.getString(R.string.valid_phone_number_is_required)
     }
-    if (city.isNullOrEmpty()) {
+    if (city.isNullOrEmpty() || viewModel.country.value!! == "M/A") {
         errors["city"] = context.getString(R.string.city_is_required)
     }
 
     if (viewModel.streetName.value.isEmpty()) {
         errors["address"] = context.getString(R.string.address_is_required)
     }
-    if (viewModel.country.value!!.isEmpty()) {
+    if (viewModel.country.value!!.isEmpty() || viewModel.country.value!! == "M/A") {
         errors["country"] = context.getString(R.string.country_is_required)
     }
 
