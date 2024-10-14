@@ -16,7 +16,7 @@ import com.example.e_store.utils.navigation.Screen
 import com.example.e_store.utils.shared_components.Gap
 
 @Composable
-fun GuestLayout(navHostController: NavHostController){
+fun GuestLayout(navHostController: NavHostController) {
     Text(
         text = stringResource(id = R.string.hello_guest),
         fontSize = 20.sp,
@@ -30,7 +30,11 @@ fun GuestLayout(navHostController: NavHostController){
         text = stringResource(id = R.string.sign_in),
         icon = Icons.Default.AccountCircle,
         onClick = {
-            navHostController.navigate(Screen.SignIn.route)
+            navHostController.navigate(Screen.SignIn.route) {
+                popUpTo(0) {
+                    inclusive = true
+                }
+            }
         },
     )
 
@@ -38,7 +42,11 @@ fun GuestLayout(navHostController: NavHostController){
         text = stringResource(id = R.string.sign_up),
         icon = Icons.Default.AddCircle,
         onClick = {
-            navHostController.navigate(Screen.SignUp.route)
+            navHostController.navigate(Screen.SignUp.route) {
+                popUpTo(0) {
+                    inclusive = true
+                }
+            }
         },
     )
 }

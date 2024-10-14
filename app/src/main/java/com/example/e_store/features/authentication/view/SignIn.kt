@@ -112,7 +112,11 @@ fun SignInScreen(navController: NavHostController , viewModel: AuthenticationVie
             text = stringResource(id = R.string.continue_as_guest),
             onClick = {
                 viewModel.handleGuestModeSignIn(context)
-                navController.navigate(Screen.Home.route)
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                }
                 isProgressing.value = false
                 Toast.makeText(
                     context,

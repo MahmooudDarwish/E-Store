@@ -256,7 +256,7 @@ class AuthenticationViewModel(
             "uid" to userId,
             "name" to name,
             "phoneNumber" to phoneNumber,
-            "email" to email,
+            "email" to email.lowercase(),
             "currency" to currencyChoice
         )
 
@@ -286,7 +286,7 @@ class AuthenticationViewModel(
                     CustomerRequest(
                         Customer(
                             first_name = _name.value,
-                            email = _email.value,
+                            email = _email.value.lowercase(),
                             phone = _phone.value,
                         )
                     )

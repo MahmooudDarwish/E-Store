@@ -410,7 +410,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                                 }
                             } else {
 
-                                showPermissionDialog = true
+                                //showPermissionDialog = true
                                 Log.d("MapScreen", "Location permissions not granted")
                             }
                         },
@@ -738,4 +738,3 @@ fun PhoneNumberInputDialog(
         )
     }
 }
-
