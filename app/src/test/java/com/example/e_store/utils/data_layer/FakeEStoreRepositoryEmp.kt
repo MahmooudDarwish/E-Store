@@ -22,6 +22,7 @@ import com.example.e_store.utils.shared_models.SingleAddressResponse
 import com.example.e_store.utils.shared_models.SingleProductResponse
 import com.example.e_store.utils.test_utils.AddressMockModel
 import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.CurrencyResponseMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,6 +33,7 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
     var shouldThrowError = false
 
     var listIsEmpty = false
+    var IsEmpty = false
 
     var expectedProducts = ProductMockModel.products
 
@@ -61,10 +63,10 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchProducts(): Flow<List<Product>>  {
+    override suspend fun fetchProducts(): Flow<List<Product>> {
         if (shouldThrowError) {
             throw Exception("Error fetching products")
-            } else if (listIsEmpty) {
+        } else if (listIsEmpty) {
             return flowOf(emptyList())
         } else {
             return flowOf(expectedProducts)
@@ -159,11 +161,6 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
-        TODO("Not yet implemented")
-    }
-
-
 
     override suspend fun getCountries(): Flow<List<CountryInfo>> {
         TODO("Not yet implemented")
@@ -178,13 +175,17 @@ class FakeEStoreRepositoryEmp : EStoreRepository {
         addressId: Long
     ): Flow<SingleAddressResponse> {
 
-        val address = AddressMockModel.getAddressById(addressId, customerId)
+        TODO("Not yet implemented")
+    }
 
-        if (address != null) {
-            return flowOf(SingleAddressResponse(address))
+    override suspend fun fetchConversionRates(): Flow<CurrencyResponse> {
+        if (shouldThrowError) {
+            throw Exception("Error fetching conversion rates")
+        } else if (IsEmpty) {
+                throw Exception("Error fetching conversion rates")
+
         } else {
-            throw Exception("Address not found")
-
+            return flowOf(CurrencyResponseMockModel.currencyResponse1)
         }
     }
 

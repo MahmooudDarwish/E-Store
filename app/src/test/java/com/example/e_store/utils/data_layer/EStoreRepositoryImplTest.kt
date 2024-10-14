@@ -6,6 +6,7 @@ import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.SingleProductResponse
 import com.example.e_store.utils.test_utils.AddressMockModel
 import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.CustomerMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -33,8 +34,8 @@ class EStoreRepositoryImplTest {
     lateinit var remoteDataSource: EStoreRemoteDataSourceImplTest
     lateinit var repository: EStoreRepository
     val expectedProducts = ProductMockModel.products
-
-
+    val expectedAddresse = AddressMockModel.addresses.get(0)
+    val expectedCustomer = CustomerMockModel.customers.get(0)
 
     @Before
     fun createRepository() {
@@ -53,6 +54,7 @@ class EStoreRepositoryImplTest {
         assertEquals("brand-1", result[0].handle)
         assertEquals("Brand 1", result[0].title)
     }
+
     @Test
     fun fetchBrands_withSingleBrand_returnsSingleItemList() = runTest {
         // Given: Set list with a single brand
@@ -65,6 +67,7 @@ class EStoreRepositoryImplTest {
         assertEquals(1, result.size)
         assertEquals(BrandsMockModel.brand1.handle, result[0].handle)
     }
+
     @Test
     fun fetchBrands_withZeroBrands_returnsEmptyList() = runTest {
         // Given: Set list with a single brand
@@ -76,6 +79,7 @@ class EStoreRepositoryImplTest {
         // Then Assert
         assertEquals(0, result.size)
     }
+
     @Test
     fun fetchBrands_withDuplicateTitle_returnsFilteredBrandList() = runTest {
         // Given: Set brands with duplicate IDs
@@ -99,6 +103,7 @@ class EStoreRepositoryImplTest {
         val expected = ProductMockModel.collections["brand-1"] ?: emptyList()
         assertEquals(expected, result.first())
     }
+
     @Test
     fun fetchBrandProducts_validBrandId2_returnsExpectedProducts() = runTest {
         //When
@@ -108,6 +113,7 @@ class EStoreRepositoryImplTest {
         val expected = ProductMockModel.collections["brand-2"] ?: emptyList()
         assertEquals(expected, result.first())
     }
+
     @Test
     fun fetchBrandProducts_nonExistingBrandId_returnsEmptyList() = runTest {
         //When
@@ -116,6 +122,7 @@ class EStoreRepositoryImplTest {
         //Then Assert
         assertEquals(emptyList<Product>(), result.first())
     }
+
     @Test
     fun fetchBrandProducts_emptyBrandId_returnsEmptyList() = runTest {
         //When
@@ -124,6 +131,7 @@ class EStoreRepositoryImplTest {
         //Then Assert
         assertEquals(emptyList<Product>(), result.first())
     }
+
     @Test
     fun fetchBrandProducts_validBrandId3_returnsProductsFromFlow() = runTest {
         //When
@@ -148,6 +156,7 @@ class EStoreRepositoryImplTest {
             assertEquals(expectedProducts, products)
         }
     }
+
     @Test
     fun fetchProducts_returnsNonEmptyList() = runTest {
 
@@ -160,6 +169,7 @@ class EStoreRepositoryImplTest {
             assertEquals(expectedProducts.size, products.size)
         }
     }
+
     @Test
     fun fetchProducts_withValidResponseReturnsExpectedProductList() = runTest {
 
@@ -172,6 +182,7 @@ class EStoreRepositoryImplTest {
         assertEquals(expectedProducts[0].id, result[0].id)
         assertEquals(expectedProducts[0].title, result[0].title)
     }
+
     @Test
     fun fetchProducts_withEmptyResponseReturnsEmptyList() = runTest {
         remoteDataSource.emptyProducts = true
@@ -182,6 +193,7 @@ class EStoreRepositoryImplTest {
         // Then: Assert that the result is an empty list
         assertEquals(0, result.size)
     }
+
     @Test
     fun fetchProducts_withMultipleSubscribers_returnsSameData() = runTest {
         // When two collectors subscribe to the products flow
@@ -199,6 +211,7 @@ class EStoreRepositoryImplTest {
         // Then both collectors receive the same data
         assertEquals(collector1, collector2)
     }
+
     @Test
     fun fetchProducts_withUpdatesReturnsUpdatedProductList() = runTest {
         // When initial products are fetched
@@ -235,6 +248,7 @@ class EStoreRepositoryImplTest {
             assertEquals(expectedProducts.first(), response.product)
         }
     }
+
     @Test
     fun fetchProduct_nonExistingProductIdReturnsEmptyResponse() = runTest {
         val nonExistingProductId = 999L
@@ -250,6 +264,7 @@ class EStoreRepositoryImplTest {
 
         assertTrue(emittedValues.isEmpty())
     }
+
     @Test
     fun fetchProduct_withDelayedResponseReturnsCorrectProductAfterDelay() = runTest {
         val productId = expectedProducts[1].id
@@ -263,6 +278,7 @@ class EStoreRepositoryImplTest {
             assertEquals(expectedProducts[1], response.product)
         }
     }
+
     @Test
     fun fetchProduct_invalidProductIdReturnsErrorResponse() = runTest {
         val invalidProductId = -1L
@@ -280,11 +296,10 @@ class EStoreRepositoryImplTest {
     }
 
 
-    val  expectedAddresse = AddressMockModel.addresses.get(0)
 
 
     @Test
-    fun  fetchCustomerAddress_validCustomerIdAndAddressIdReturnsCorrectAddress() = runTest{
+    fun fetchCustomerAddress_validCustomerIdAndAddressIdReturnsCorrectAddress() = runTest {
         val addressId = 1L
         val customerId = 1L
 
@@ -292,13 +307,12 @@ class EStoreRepositoryImplTest {
         val resultFlow = repository.fetchCustomerAddress(customerId, addressId)
 
         //Then
-        resultFlow.collect{response ->
+        resultFlow.collect { response ->
             assertEquals(expectedAddresse, response.customer_address)
         }
 
 
     }
-
 
 
     @Test
@@ -309,7 +323,7 @@ class EStoreRepositoryImplTest {
         // When & Then
         assertThrows(Exception::class.java) {
             runTest {
-                repository.fetchCustomerAddress(customerId, invalidAddressId).collect{
+                repository.fetchCustomerAddress(customerId, invalidAddressId).collect {
                     throw Exception("Address not found")
                 }
             }
@@ -317,19 +331,20 @@ class EStoreRepositoryImplTest {
     }
 
     @Test
-    fun fetchCustomerAddress_invalidCustomerIdThrowsException() = runTest {
+    fun fetchCustomer_feaCustomerIdThrowsException() = runTest {
         val invalidCustomerId = 999L
         val addressId = 1L
 
         // When & Then
         assertThrows(Exception::class.java) {
             runTest {
-                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect{
+                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect {
                     throw Exception("Customer not found")
                 }
             }
         }
     }
+
 
     @Test
     fun fetchCustomerAddress_invalidCustomerIdAndValidAddressIdThrowsException() = runTest {
@@ -339,13 +354,45 @@ class EStoreRepositoryImplTest {
         // When & Then
         assertThrows(Exception::class.java) {
             runTest {
-                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect{
+                repository.fetchCustomerAddress(invalidCustomerId, addressId).collect {
                     throw Exception("Customer not found")
                 }
             }
         }
     }
+
+
+
+
+    @Test
+    fun fetchCustomer_validEmailReturnsCorrectCustomer() = runTest {
+        val customerEmail = expectedCustomer.email
+
+        //When
+        val resultFlow = customerEmail?.let { repository.fetchCustomerByEmail(it) }
+
+        //Then
+        assertEquals(expectedCustomer, resultFlow)
+
+    }
+
+
+    @Test
+    fun fetchCustomer_InvalidCustomerEmailThrowsException() = runTest {
+        val customerEmail = "mo@gmail.com"
+        // When & Then
+        assertThrows(Exception::class.java) {
+            runTest {
+                repository.fetchCustomerByEmail(customerEmail)
+                throw Exception("Customer not found")
+            }
+        }
+    }
+
+
 }
+
+
 
 
 

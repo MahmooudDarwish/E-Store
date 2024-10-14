@@ -19,8 +19,9 @@ class CustomerMockModel {
                 AddressMockModel.address7,
 
 
-            )
-            )
+            ))
+
+
            val customer2 = Customer(
             first_name = "Jane",
             last_name = "Smith",
@@ -33,8 +34,8 @@ class CustomerMockModel {
                 AddressMockModel.address2,
                 AddressMockModel.address8,
 
-            )
-            )
+            ))
+
             val customer3 = Customer(
             first_name = "Mohamed",
             last_name = "Abdelrehim",
@@ -126,9 +127,10 @@ class CustomerMockModel {
                 AddressMockModel.address9,
             )
             )
+            val customers = mutableListOf( customer1, customer2, customer3, customer4, customer5, customer6, customer7, customer8, customer9, customer10)
+
         }
 
-    val customers = mutableListOf( customer1, customer2, customer3, customer4, customer5, customer6, customer7, customer8, customer9, customer10)
 
     fun getCustomerById(id: Long): Customer? {
         return customers.find { it.id == id }

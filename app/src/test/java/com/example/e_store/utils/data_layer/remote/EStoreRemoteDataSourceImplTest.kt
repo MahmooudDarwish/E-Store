@@ -167,11 +167,16 @@ class EStoreRemoteDataSourceImplTest(
 
 
     override suspend fun fetchCustomerByEmail(email: String): Customer {
-        TODO("Not yet implemented")
+        delay(3000)
+        val customer = CustomerMockModel.customers.find { it.email == email }
+        return customer ?: throw Exception("Customer not found")
     }
 
     override suspend fun fetchAllCustomers(): Flow<CustomerResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            delay(100)
+            emit(CustomerResponse(CustomerMockModel.customers))
+        }
     }
 
 
