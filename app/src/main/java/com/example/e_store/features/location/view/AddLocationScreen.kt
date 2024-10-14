@@ -484,7 +484,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            if (!isMainAddress) {
+            if (!isMainAddress ) {
                 Text(
                     text = "Do you want to make this your main address?",
                     style = MaterialTheme.typography.subtitle1,

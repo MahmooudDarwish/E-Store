@@ -3,6 +3,7 @@ package com.example.e_store.features.location.view_model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.Address
@@ -12,10 +13,12 @@ import com.example.e_store.utils.shared_models.GeoNameLocation
 import com.example.e_store.utils.shared_models.NavigationHolder
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okio.Timeout
 
 class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
@@ -175,9 +178,22 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     }
 
     fun getCountries() {
+        _countries.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO) {
+            try {
+
+
             repository.getCountries().collect { countryList ->
                 _countries.value = DataState.Success(countryList)
+            }
+            }catch (e:Exception){
+                if (e is TimeoutCancellationException)
+                {
+                    _countries.value = DataState.Error(R.string.timeout_error)
+
+                }else {
+                    _countries.value = DataState.Error(R.string.unexpected_error)
+                }
             }
         }
     }
@@ -185,10 +201,20 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     fun getCities(countryCode: String) {
         _cities.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getCitiesByCountry(countryCode).collect { cityList ->
-                _cities.value = DataState.Success(cityList)
-                Log.d("getCities", "getCities: $cityList")
+            try {
+                repository.getCitiesByCountry(countryCode).collect { cityList ->
+                    _cities.value = DataState.Success(cityList)
+                    Log.d("getCities", "getCities: $cityList")
+                }
+            } catch (e:Exception){
+            if (e is TimeoutCancellationException)
+            {
+                _countries.value = DataState.Error(R.string.timeout_error)
+
+            }else {
+                _countries.value = DataState.Error(R.string.unexpected_error)
             }
+        }
         }
     }
 

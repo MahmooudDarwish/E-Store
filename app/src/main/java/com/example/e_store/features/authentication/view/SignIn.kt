@@ -81,7 +81,7 @@ fun SignInScreen(navController: NavHostController , viewModel: AuthenticationVie
             onClick = {
                 viewModel.signInAndCheckEmailVerification(context, onAuthSuccess = {
                     navController.navigate(Screen.Home.route){
-                        popUpTo(0){
+                        popUpTo(Screen.SignIn.route){
                             inclusive = true
                         }
                     }
