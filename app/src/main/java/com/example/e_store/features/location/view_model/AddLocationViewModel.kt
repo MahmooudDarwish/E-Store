@@ -178,6 +178,7 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     }
 
     fun getCountries() {
+        _countries.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
 
