@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,18 +44,20 @@ fun RoundedRectangleItem(
     product: Product,
     viewModel: FavouriteControllerViewModel,
     onClick: () -> Unit,
-    navController: NavHostController, // Add navController parameter for navigation
+    navController: NavHostController,
 ) {
     val context = LocalContext.current
     val draftOrderItems by viewModel.favourites.collectAsState()
     val isLoadingToggle by viewModel.isLoadingToggle.collectAsState()
     var showLoginDialog by remember { mutableStateOf(false) }
 
-    val isFavorite = remember(draftOrderItems) {
-        viewModel.checkIfItemIsInFavouriteDraftOrder(
-            productId = product.id,
-            variantId = product.variants.first().id
-        )
+    val isFavorite by remember(draftOrderItems, product) {
+        derivedStateOf {
+            viewModel.checkIfItemIsInFavouriteDraftOrder(
+                productId = product.id,
+                variantId = product.variants.first().id
+            )
+        }
     }
 
     Column(
@@ -115,6 +118,8 @@ fun RoundedRectangleItem(
                             }
 
                     }) {
+
+                        Log.d("DEBUGGG ", "isFavorite: $isFavorite")
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.Favorite,
                             contentDescription = null,
