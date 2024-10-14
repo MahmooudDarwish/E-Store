@@ -75,6 +75,7 @@ val coroutinesVersion = "1.6.4"
 
 dependencies {
 
+    implementation(libs.androidx.runner)
     // Unit testing
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.hamcrest:hamcrest:2.2")

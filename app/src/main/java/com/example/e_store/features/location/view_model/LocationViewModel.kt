@@ -81,7 +81,6 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
                         Log.d("LocationViewModel", "Locations fetched successfully")
                         Log.d("LocationViewModel", "Locations: $dataState")
 
-                        //  fetchAllLocations()
 
                     }
                 }
