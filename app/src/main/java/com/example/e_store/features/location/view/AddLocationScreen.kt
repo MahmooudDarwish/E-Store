@@ -607,7 +607,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                                         )
                                     )
                                 }
-                                navController.navigate(NavigationKeys.LOCATION_ROUTE)
+                                navController.popBackStack()
                             }
                         }
                     }
