@@ -125,6 +125,8 @@ Users can authenticate via:
 ## Project Management
 - **Trello Board Link:** [Trello Board](https://trello.com/b/lXZTQoQQ/e-store-app-team3)
   - Tracks progress, task assignments, and issue management.
+- **GitHup Project Link:** [GitHup Repo](https://github.com/MahmooudDarwish/E-Store)
+  - Code versions and tracking hosting
 
 ## Team Members
 
