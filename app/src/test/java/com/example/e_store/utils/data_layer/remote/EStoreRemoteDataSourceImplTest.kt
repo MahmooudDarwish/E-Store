@@ -3,6 +3,7 @@ package com.example.e_store.utils.data_layer.remote
 import com.example.e_store.utils.shared_models.*
 import com.example.e_store.utils.test_utils.AddressMockModel
 import com.example.e_store.utils.test_utils.BrandsMockModel
+import com.example.e_store.utils.test_utils.CustomerMockModel
 import com.example.e_store.utils.test_utils.ProductMockModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -101,19 +102,12 @@ class EStoreRemoteDataSourceImplTest(
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchAllCustomers(): Flow<CustomerResponse> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun createCustomer(customer: CustomerRequest) {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateCustomer(customerId: Long, customer: CustomerRequest) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun fetchCustomerByEmail(email: String): Customer {
         TODO("Not yet implemented")
     }
 
@@ -170,6 +164,15 @@ class EStoreRemoteDataSourceImplTest(
 
     }
 */
+
+
+    override suspend fun fetchCustomerByEmail(email: String): Customer {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun fetchAllCustomers(): Flow<CustomerResponse> {
+        TODO("Not yet implemented")
+    }
 
 
     override suspend fun fetchCustomerAddresses(customerId: Long): Flow<AddressResponse> {

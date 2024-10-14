@@ -103,7 +103,11 @@ fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationView
                 viewModel.isProgressing.value = true
                 viewModel.signUpUser(context, onAuthSuccess = {
                     viewModel.isProgressing.value = false
-                    navController.navigate(Screen.SignIn.route)
+                    navController.navigate(Screen.SignIn.route){
+                        popUpTo(Screen.SignUp.route){
+                            inclusive = true
+                        }
+                    }
                     Toast.makeText(
                         context,
                         getString(context, R.string.sign_up_successful),
