@@ -300,56 +300,85 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
                     onDismissRequest = { showCountryDialog = false },
                     title = { Text(stringResource(R.string.select_country)) },
                     text = {
-                        Column {
-                            // Search Field
-                            OutlinedTextField(
-                                value = searchCountryText,
-                                onValueChange = {
+                        when (countriesState) {
+                            is DataState.Loading -> {
+                                LottieWithText(
+                                    lottieRawRes = R.raw.loading,
+                                    displayText = "Loading Countries"
+                                )
+                            }
+                            is DataState.Success -> {
+                                Column {
+                                    // Search Field
+                                    OutlinedTextField(
+                                        value = searchCountryText,
+                                        onValueChange = {
 
-                                    searchCountryText = it
-                                },
-                                label = { Text(stringResource(R.string.search_country)) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                                            searchCountryText = it
+                                        },
+                                        label = { Text(stringResource(R.string.search_country)) },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
 
-                            // Update filtered list based on search input
-                            LaunchedEffect(searchCountryText, countriesState) {
-                                if (countriesState is DataState.Success) {
-                                    val countryList =
-                                        (countriesState as DataState.Success<List<CountryInfo>>).data
-                                    filteredCountryList = if (searchCountryText.isEmpty()) {
-                                        countryList
-                                    } else {
-                                        countryList.filter {
-                                            it.countryName.contains(
-                                                searchCountryText,
-                                                ignoreCase = true
-                                            )
+                                    // Update filtered list based on search input
+                                    LaunchedEffect(searchCountryText, countriesState) {
+                                        if (countriesState is DataState.Success) {
+                                            val countryList =
+                                                (countriesState as DataState.Success<List<CountryInfo>>).data
+                                            filteredCountryList = if (searchCountryText.isEmpty()) {
+                                                countryList
+                                            } else {
+                                                countryList.filter {
+                                                    it.countryName.contains(
+                                                        searchCountryText,
+                                                        ignoreCase = true
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // LazyColumn to display filtered countries
+                                    LazyColumn {
+                                        items(filteredCountryList) { country ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    selectedCountryName = country.countryName
+                                                    viewModel.selectCountry(country)
+                                                    viewModel.updateCountry(selectedCountryName)
+                                                    viewModel.selectCity(city = null)
+                                                    viewModel.updateCity(null)
+                                                    showCountryDialog = false
+                                                    searchCountryText = "" // Reset search text on selection
+                                                }
+                                            ) {
+                                                Text(country.countryName)
+                                            }
                                         }
                                     }
                                 }
                             }
+                            is DataState.Error -> {
+                                Column {
+                                    LottieWithText(
+                                        lottieRawRes = R.raw.no_data_found,
+                                        displayText = "No Countries Found"
+                                    )
 
-                            // LazyColumn to display filtered countries
-                            LazyColumn {
-                                items(filteredCountryList) { country ->
-                                    DropdownMenuItem(
+                                    EShopButton(
                                         onClick = {
-                                            selectedCountryName = country.countryName
-                                            viewModel.selectCountry(country)
-                                            viewModel.updateCountry(selectedCountryName)
-                                            viewModel.selectCity(city = null)
-                                            viewModel.updateCity(null)
-                                            showCountryDialog = false
-                                            searchCountryText = "" // Reset search text on selection
-                                        }
-                                    ) {
-                                        Text(country.countryName)
-                                    }
+                                            viewModel.getCountries()
+                                        },
+                                        text = "Retry",
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
                                 }
+
+
                             }
                         }
+
                     },
                     confirmButton = {
                         TextButton(onClick = { showCountryDialog = false }) {
@@ -433,7 +462,7 @@ fun AddLocationScreen(navController: NavController, viewModel: AddLocationViewMo
 
                                         EShopButton(
                                             onClick = {
-                                                viewModel.getCountries()
+                                                viewModel.getCities(viewModel.countryCode.value)
                                             },
                                             text = "Retry",
                                             modifier = Modifier.fillMaxWidth()
