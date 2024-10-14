@@ -18,15 +18,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getString
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.e_store.R
 import com.example.e_store.features.authentication.components.PasswordInputField
 import com.example.e_store.features.authentication.components.WelcomeLabel
 import com.example.e_store.utils.navigation.Screen
-import com.google.firebase.auth.FirebaseAuth
 import com.example.e_store.features.authentication.view_model.AuthenticationViewModel
-import com.example.e_store.features.authentication.view_model.AuthenticationViewModelFactory
 import com.example.e_store.utils.shared_components.AnimationImage
 import com.example.e_store.utils.shared_components.EShopButton
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator

@@ -1,20 +1,15 @@
 package com.example.e_store.utils.shared_components
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.e_store.R
-import com.example.e_store.utils.data_layer.EStoreRepositoryImpl
-import com.example.e_store.utils.data_layer.remote.EStoreRemoteDataSourceImpl
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
-import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
 
 @Composable
 fun ProductsStateHandler(
@@ -43,8 +38,6 @@ fun ProductsStateHandler(
                     lottieRawRes = R.raw.no_data_found
                 )
             } else {
-
-
                 ProductsGrid(
                     navController = navController,
                     route = route,

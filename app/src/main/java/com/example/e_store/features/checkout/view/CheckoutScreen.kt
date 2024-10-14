@@ -43,7 +43,6 @@ import com.example.e_store.utils.shared_models.Address
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.DraftOrderIDHolder
-import com.example.e_store.utils.shared_models.NavigationHolder
 import kotlinx.coroutines.delay
 
 @Composable
@@ -198,16 +197,16 @@ fun CheckoutScreen(viewModel: CheckoutViewModel, navController: NavHostControlle
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                TextButton(onClick = {
-                                    NavigationHolder.id = addressDetails?.id
-                                    navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
-                                }) {
-                                    Text(
-                                        text = "Update Current Address",
-                                        fontSize = 18.sp,
-                                        color = PrimaryColor
-                                    )
-                                }
+//                                TextButton(onClick = {
+//                                    NavigationHolder.id = addressDetails?.id
+//                                    navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
+//                                }) {
+//                                    Text(
+//                                        text = "Update Current Address",
+//                                        fontSize = 18.sp,
+//                                        color = PrimaryColor
+//                                    )
+//                                }
                                 TextButton(onClick = {
                                     navController.navigate(NavigationKeys.LOCATION_ROUTE)
                                 }) {

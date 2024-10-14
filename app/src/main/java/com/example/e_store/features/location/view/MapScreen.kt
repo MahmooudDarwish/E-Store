@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -107,21 +108,23 @@ private fun openGPSSSettings(context: Context) {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-
 fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     val context = LocalContext.current
 
     val isPhoneExist by viewModel.isPhoneExist.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
 
-    var showPhoneNumberDialog by remember { mutableStateOf(false) }
-    var inputValue by remember { mutableStateOf(UserSession.phone) }
+    var showPhoneNumberDialog by rememberSaveable { mutableStateOf(false) }
+    var inputValue by rememberSaveable { mutableStateOf(UserSession.phone) }
 
     var isMapInitialized by remember { mutableStateOf(false) }
 
-
+        Log.d("MapScreen", "MapScreen Composable called before ")
     Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
-    var query by remember { mutableStateOf(context.getString(R.string.search)) }
+    Log.d("MapScreen", "MapScreen Composable called after ")
+
+    var query by rememberSaveable { mutableStateOf(context.getString(R.string.search)) }
 
     var currentLocation by remember { mutableStateOf<Location?>(null) }
 
@@ -131,12 +134,13 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     val markerState = rememberMarkerState(position = LatLng(0.0, 0.0))
 
+
     // Google Map state
     val startLocation = LatLng(40.9971, 29.1007)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition(
             startLocation,
-            20f,
+            5f,
             0f,
             0f
         )
@@ -148,6 +152,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
+
 
 
     LaunchedEffect(Unit) {
@@ -168,6 +173,11 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
         }
     }
 
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
 
@@ -721,3 +731,4 @@ fun PhoneNumberInputDialog(
         )
     }
 }
+

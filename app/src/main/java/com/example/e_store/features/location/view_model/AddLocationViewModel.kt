@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okio.Timeout
+import retrofit2.HttpException
+import java.io.IOException
 
 class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
@@ -93,6 +94,7 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
     fun updateCity(newCity: String?) {
         _city.value = newCity
     }
+
     fun updateCountryCode(newCountryCode: String) {
         _countryCode.value = newCountryCode
     }
@@ -109,28 +111,70 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
             address = address
         )
         viewModelScope.launch {
-            Log.d("shopifyCustomerID", UserSession.shopifyCustomerID.toString())
-            UserSession.shopifyCustomerID?.let {
-                repository.createCustomerAddress(
-                    it,
-                    addressToSave
-                )
+            try {
+                Log.d("shopifyCustomerID", UserSession.shopifyCustomerID.toString())
+                UserSession.shopifyCustomerID?.let {
+                    repository.createCustomerAddress(
+                        it,
+                        addressToSave
+                    )
+                }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("HomeViewModel", "Error 429: Too many requests.")
+                    }
+
+                    422 -> {
+                        Log.e("HomeViewModel", "Error 422: Unprocessable entity.")
+                    }
+
+                    else -> {
+                        Log.e("HomeViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("HomeViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Exception: ${e.message}")
             }
+
         }
     }
 
     fun fetchCustomerAddresses() {
         viewModelScope.launch {
-            UserSession.shopifyCustomerID?.let {
-                repository.fetchCustomerAddresses(it).collect { addresses ->
-                    _address.value = addresses.addresses
-                    Log.d("AddLocationViewModel", "fetchCustomerAddresses: ${_address.value}")
-                    Log.d(
-                        "AddLocationViewModel",
-                        "fetchCustomerAddresses: ${UserSession.shopifyCustomerID}"
-                    )
+            try {
+                UserSession.shopifyCustomerID?.let {
+                    repository.fetchCustomerAddresses(it).collect { addresses ->
+                        _address.value = addresses.addresses
+                        Log.d("AddLocationViewModel", "fetchCustomerAddresses: ${_address.value}")
+                        Log.d(
+                            "AddLocationViewModel",
+                            "fetchCustomerAddresses: ${UserSession.shopifyCustomerID}"
+                        )
+                    }
                 }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("HomeViewModel", "Error 429: Too many requests.")
+                    }
+
+                    422 -> {
+                        Log.e("HomeViewModel", "Error 422: Unprocessable entity.")
+                    }
+
+                    else -> {
+                        Log.e("HomeViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("HomeViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Exception: ${e.message}")
             }
+
         }
     }
 
@@ -166,14 +210,35 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
 
     fun updateDefaultLocation(address: Address) {
         viewModelScope.launch(Dispatchers.IO) {
-            UserSession.shopifyCustomerID?.let {
-                NavigationHolder.id?.let { it1 ->
-                    repository.updateCustomerAddress(
-                        it,
-                        it1, AddNewAddress(address)
-                    )
+            try{
+                UserSession.shopifyCustomerID?.let {
+                    NavigationHolder.id?.let { it1 ->
+                        repository.updateCustomerAddress(
+                            it,
+                            it1, AddNewAddress(address)
+                        )
+                    }
                 }
+            }catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("HomeViewModel", "Error 429: Too many requests.")
+                    }
+
+                    422 -> {
+                        Log.e("HomeViewModel", "Error 422: Unprocessable entity.")
+                    }
+
+                    else -> {
+                        Log.e("HomeViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("HomeViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Exception: ${e.message}")
             }
+
         }
     }
 
@@ -181,17 +246,14 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
         _countries.value = DataState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-
-
-            repository.getCountries().collect { countryList ->
-                _countries.value = DataState.Success(countryList)
-            }
-            }catch (e:Exception){
-                if (e is TimeoutCancellationException)
-                {
+                repository.getCountries().collect { countryList ->
+                    _countries.value = DataState.Success(countryList)
+                }
+            } catch (e: Exception) {
+                if (e is TimeoutCancellationException) {
                     _countries.value = DataState.Error(R.string.timeout_error)
 
-                }else {
+                } else {
                     _countries.value = DataState.Error(R.string.unexpected_error)
                 }
             }
@@ -206,21 +268,20 @@ class AddLocationViewModel(val repository: EStoreRepository) : ViewModel() {
                     _cities.value = DataState.Success(cityList)
                     Log.d("getCities", "getCities: $cityList")
                 }
-            } catch (e:Exception){
-            if (e is TimeoutCancellationException)
-            {
-                _countries.value = DataState.Error(R.string.timeout_error)
+            } catch (e: Exception) {
+                if (e is TimeoutCancellationException) {
+                    _countries.value = DataState.Error(R.string.timeout_error)
 
-            }else {
-                _countries.value = DataState.Error(R.string.unexpected_error)
+                } else {
+                    _countries.value = DataState.Error(R.string.unexpected_error)
+                }
             }
-        }
         }
     }
 
     fun selectCountry(country: CountryInfo) {
         _selectedCountry.value = country
-        _countryCode.value= country.countryCode
+        _countryCode.value = country.countryCode
         Log.d("country_code", "LocationScreen: ${country.countryCode}")
 
         getCities(country.countryCode)

@@ -1,8 +1,6 @@
 package com.example.e_store.features.authentication.view_model
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
@@ -18,8 +16,9 @@ import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class AuthenticationViewModel(
     private val auth: FirebaseAuth,
@@ -403,8 +402,26 @@ class AuthenticationViewModel(
 
     private fun createShopifyCustomer(customer: CustomerRequest) {
         viewModelScope.launch {
-            Log.d("AuthenticationViewModel", "createShopifyCustomer: $customer")
-            repository.createCustomer(customer)
+            try {
+                Log.d("AuthenticationViewModel", "createShopifyCustomer: $customer")
+                repository.createCustomer(customer)
+            }catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("MapViewModel", "Error 429: Too many requests.")
+                    }
+                    422 -> {
+                        Log.e("MapViewModel", "Error 422: Unprocessable entity.")
+                    }
+                    else -> {
+                        Log.e("MapViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("MapViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+            Log.e("MapViewModel", "Exception: ${e.message}")
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 package com.example.e_store.utils.shared_components
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -33,7 +31,6 @@ import coil.compose.AsyncImage
 import com.example.e_store.R
 import com.example.e_store.ui.theme.PrimaryColor
 import com.example.e_store.utils.navigation.Screen
-import com.example.e_store.utils.shared_models.DraftOrderDetails
 import com.example.e_store.utils.shared_models.LineItem
 import com.example.e_store.utils.shared_models.Product
 import com.example.e_store.utils.shared_models.ProductDetails
@@ -51,7 +48,7 @@ fun RoundedRectangleItem(
     val context = LocalContext.current
     val draftOrderItems by viewModel.favourites.collectAsState()
     val isLoadingToggle by viewModel.isLoadingToggle.collectAsState()
-    var showLoginDialog by remember { mutableStateOf(false) } // Add state for showing login dialog
+    var showLoginDialog by remember { mutableStateOf(false) }
 
     val isFavorite = remember(draftOrderItems) {
         viewModel.checkIfItemIsInFavouriteDraftOrder(
@@ -77,7 +74,7 @@ fun RoundedRectangleItem(
             when (isLoadingToggle) {
                 true -> {
                     if (UserSession.isGuest) {
-                        showLoginDialog = true // Show login dialog when the user is a guest
+                        showLoginDialog = true
                     } else {
                         IconButton(onClick = {
                             Toast.makeText(context, "Please Wait...", Toast.LENGTH_SHORT).show()
@@ -184,7 +181,7 @@ fun createDraftOrderItems(
         title = ProductDetails.title,
         price = price,
         quantity = quantity,
-        variant_id = variantId.toString(),
+        variant_id = variantId,
         properties = properties
     )
 

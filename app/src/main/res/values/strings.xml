@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">E-Store</string>
+
     <string name="network_error">Network error. Please check your connection.</string>
     <string name="server_error">Server error. Please try again later.</string>
     <string name="timeout_error">Request timed out. Please try again.</string>
-    <string name="unexpected_error">An unexpected error occurred.</string>
+    <string name="unexpected_error">An unexpected error occurred. Please try again later</string>
 
     <string name="splash_title">Splash</string>
     <string name="home_title">Home</string>

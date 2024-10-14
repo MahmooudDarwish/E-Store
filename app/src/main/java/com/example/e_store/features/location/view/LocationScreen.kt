@@ -106,7 +106,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                     NavigationHolder.country = locationToDelete!!.country
                     NavigationHolder.default = locationToDelete!!.default!!
 
-                    NavigationHolder.country_code= locationToDelete!!.country_code
+                    NavigationHolder.country_code = locationToDelete!!.country_code
                     Log.d("country_code", "dddd : ${locationToDelete!!.country_code}")
 
 
@@ -177,10 +177,11 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
 
         is DataState.Success -> {
             val addressResponse = (locations as DataState.Success<AddressResponse?>).data
+            isLoading.value = false
+
             addressResponse?.let {
                 Log.d("AddressResponse", it.toString())
                 addressDetails.value = it
-                isLoading.value = false
             }
         }
 
@@ -192,35 +193,39 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
             isLoading.value = false
         }
     }
+    Log.d("LocationScreen", "isLoading.value: ${isLoading.value}")
 
-    if (!isLoading.value) {
-        addressDetails.value?.let { details ->
-            Column (
-            ){
-                sharedHeader(navController, headerText = stringResource(id = R.string.location))
-                Spacer(modifier = Modifier.height(16.dp))
 
-                Scaffold(
-                    containerColor = Color.White,
-                    floatingActionButton = {
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-                            exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
-                        ) {
-                            FloatingActionButton(
-                                onClick = { navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE) }
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = "Add Location")
-                            }
-                        }
-                    }
-                ) { padding ->
 
+    Scaffold(
+        containerColor = Color.White,
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+            ) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE) }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Location")
+                }
+            }
+        }
+    ) { padding ->
+        Column {
+            sharedHeader(
+                headerText = stringResource(R.string.location),
+                navController = navController
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (!isLoading.value) {
+                addressDetails.value?.let { details ->
                     if (details.addresses.isNotEmpty()) {
                         LazyColumn(
                             contentPadding = padding,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .padding(bottom = 60.dp)
                         ) {
 
@@ -243,7 +248,7 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                                         NavigationHolder.phone = location.phone
                                         NavigationHolder.firstName = location.first_name
                                         NavigationHolder.country = location.country
-                                        NavigationHolder.country_code= location.country_code
+                                        NavigationHolder.country_code = location.country_code
 
                                         navController.navigate(NavigationKeys.ADD_LOCATION_ROUTE)
                                     },
@@ -260,23 +265,22 @@ fun LocationScreen(navController: NavController, viewModel: LocationViewModel) {
                             }
                         }
                     } else {
-                        Column (
-                            modifier =  Modifier
-                                .fillMaxSize()
-                                .background( Color.White)
-                        ) {
-                            // Display the no data message with Lottie animation
-                            LottieWithText(
-                                displayText = stringResource(R.string.no_locations_found),
-                                lottieRawRes = R.raw.no_data_found
-
-                            )
-                        }
+                        LottieWithText(
+                            displayText = stringResource(R.string.no_locations_found),
+                            lottieRawRes = R.raw.no_data_found)
                     }
-                }
+                } ?: LottieWithText(
+                    displayText = stringResource(R.string.no_locations_found),
+                    lottieRawRes = R.raw.no_data_found
+
+                )
+            } else {
+                EShopLoadingIndicator()
             }
+
         }
     }
+
 }
 
 @Composable
@@ -284,7 +288,7 @@ fun LocationItem(
     location: Address,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
-    onMakeDefault: () -> Unit
+    onMakeDefault: () -> Unit,
 ) {
     ElevationCard(
         modifier = Modifier

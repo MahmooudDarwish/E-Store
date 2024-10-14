@@ -56,7 +56,7 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
                     joinAll(brandsJob, forUProductsJob, discountCodesJob)
                 }
-                } catch (ex: Exception) {
+            } catch (ex: Exception) {
                 Log.e("TAG", "Error refreshing data: ${ex.message}")
             } finally {
                 _isRefreshing.value = false
@@ -135,12 +135,33 @@ class HomeViewModel(private val repository: EStoreRepository) : ViewModel() {
 
     fun fetchShopifyCustomer(email: String) {
         viewModelScope.launch {
-            repository.fetchCustomerByEmail(email).let {
-                _customer.value = it
-                Log.i("HomeViewModel", "get all customer : $it")
-                    UserSession.shopifyCustomerID = it.id
-                Log.i("HomeViewModel", "get all customer : ${UserSession.shopifyCustomerID}")
+            try {
 
+
+                repository.fetchCustomerByEmail(email).let {
+                    _customer.value = it
+                    Log.i("HomeViewModel", "get all customer : $it")
+                    UserSession.shopifyCustomerID = it.id
+                    Log.i("HomeViewModel", "get all customer : ${UserSession.shopifyCustomerID}")
+                }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("HomeViewModel", "Error 429: Too many requests.")
+                    }
+
+                    422 -> {
+                        Log.e("HomeViewModel", "Error 422: Unprocessable entity.")
+                    }
+
+                    else -> {
+                        Log.e("HomeViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("HomeViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Exception: ${e.message}")
             }
         }
     }

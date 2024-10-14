@@ -1,24 +1,21 @@
 package com.example.e_store.features.location.view_model
 
-import android.location.Address
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.e_store.R
 import com.example.e_store.utils.data_layer.EStoreRepository
 import com.example.e_store.utils.shared_models.AddNewAddress
 import com.example.e_store.utils.shared_models.AddressResponse
-import com.example.e_store.utils.shared_models.AppliedDiscount
 import com.example.e_store.utils.shared_models.DataState
 import com.example.e_store.utils.shared_models.DeletionState
-import com.example.e_store.utils.shared_models.NavigationHolder
 import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
     // Simulate a list of saved locations
@@ -71,7 +68,38 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
         }
     */
 
+    private fun fetchShopifyCustomer(email: String) {
+        viewModelScope.launch {
+            try {
+                repository.fetchCustomerByEmail(email).let {
+                    UserSession.shopifyCustomerID = it.id
+                }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    429 -> {
+                        Log.e("HomeViewModel", "Error 429: Too many requests.")
+                    }
+
+                    422 -> {
+                        Log.e("HomeViewModel", "Error 422: Unprocessable entity.")
+                    }
+
+                    else -> {
+                        Log.e("HomeViewModel", "HttpException: ${e.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("HomeViewModel", "IOException: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Exception: ${e.message}")
+            }
+        }
+    }
+
     fun fetchAllLocations() {
+        if (UserSession.shopifyCustomerID == null) {
+            fetchShopifyCustomer(email = UserSession.email!!)
+        }
         viewModelScope.launch {
             try {
                 UserSession.shopifyCustomerID?.let {
@@ -81,9 +109,12 @@ class LocationViewModel(val repository: EStoreRepository) : ViewModel() {
                         Log.d("LocationViewModel", "Locations fetched successfully")
                         Log.d("LocationViewModel", "Locations: $dataState")
 
-
                     }
+                } ?: run {
+                    _locations.value = DataState.Error(R.string.default_location)
+                    Log.e("LocationViewModel", "Error fetching locations")
                 }
+
             } catch (ex: Exception) {
                 _locations.value = DataState.Error(R.string.unexpected_error)
                 Log.e("LocationViewModel", "Error fetching locations", ex)

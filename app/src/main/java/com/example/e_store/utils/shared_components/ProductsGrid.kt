@@ -30,7 +30,6 @@ fun ProductsGrid(
     var draftOrderItems by remember { mutableStateOf<List<DraftOrderDetails>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        // Delay for animation
         delay(300)
         isVisible = true
 
@@ -39,12 +38,10 @@ fun ProductsGrid(
         viewModel.draftOrderItems.collect { dataState ->
             when (dataState) {
                 is DataState.Success -> {
-
                     draftOrderItems = dataState.data.draft_orders
                 }
 
                 else -> {
-                    // Handle other states (Loading, Error)
                 }
             }
         }
@@ -66,11 +63,10 @@ fun ProductsGrid(
                 ElevationCard(
                     modifier = Modifier.padding(bottom = 10.dp)
                 ) {
-
                     RoundedRectangleItem(
                         product = product,
                         viewModel = viewModel,
-                        navController =  navController,
+                        navController = navController,
                         onClick = {
                             initializeProductDetails(product)
                             navController.navigate(route)

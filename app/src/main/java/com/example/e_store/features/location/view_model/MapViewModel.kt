@@ -10,11 +10,6 @@ import com.example.e_store.utils.shared_models.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -29,7 +24,7 @@ class MapViewModel ( val repository : EStoreRepository) : ViewModel() {
     private  val  _isPhoneExist = MutableStateFlow(false)
     val isPhoneExist = _isPhoneExist.asStateFlow()
 
-    private   val _address = MutableStateFlow<List<Address?>>(emptyList())
+    private val _address = MutableStateFlow<List<Address?>>(emptyList())
     val address=_address.asStateFlow()
 
 

@@ -30,7 +30,6 @@ import com.example.e_store.utils.shared_components.AnimationImage
 import com.example.e_store.utils.shared_components.EShopButton
 import com.example.e_store.utils.shared_components.EShopLoadingIndicator
 import com.example.e_store.utils.shared_components.EShopTextButton
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun SignUpScreen(navController: NavHostController, viewModel: AuthenticationViewModel) {
