@@ -35,8 +35,8 @@ This is a comprehensive mobile commerce (m-commerce) application that enables us
 - **Shopping Cart:** Add/remove items to/from the cart, adjust quantities, and proceed to checkout.
 - **Checkout Process:** Provide a seamless checkout process with multiple payment options.
 - **Address Management:** Manage shipping addresses using the Google Places or Here API for accurate location services.
-- **User Authentication:** Sign up, login, and authenticate users with Firebase (Email/Password or Social Media).
-- **Order History:** View past orders and track current ones.
+- **User Authentication:** Sign up, login, and authenticate users with Firebase.
+- **Order History:** View past orders.
 - **Payment Options:** Cash on Delivery (with restrictions) and Online Payment. Users can apply discount codes during checkout.
 
 ## Technical Details
@@ -50,7 +50,6 @@ The app follows the **MVVM (Model-View-ViewModel)** architectural pattern to ens
 ### Libraries & Tools
 - **Retrofit:** For API communication with Shopify and other services.
 - **Firebase:** For authentication (Email/Password, Social Login) and email verification.
-- **WorkManager:** For handling background tasks (like sending confirmation emails, updating currency rates).
 - **Coil:** For loading product images.
 - **Navigation Component:** To manage navigation between screens.
 - **JUnit:** For unit testing.
@@ -125,7 +124,7 @@ Users can authenticate via:
 - **Trello Board Link:** [Trello Board](https://trello.com/b/lXZTQoQQ/e-store-app-team3)
   - Tracks progress, task assignments, and issue management.
 - **GitHup Project Link:** [GitHup Repo](https://github.com/MahmooudDarwish/E-Store)
-  - Code versions and tracking hosting
+  - Code versions hosting
 
 ## Team Members
 
