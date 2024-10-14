@@ -117,7 +117,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
 
 
-    val mapsComposeVersion = "6.1.0"
+    val mapsComposeVersion = "6.1.2"
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
     // Google Maps Compose utility library
     implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")

@@ -120,7 +120,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     var isMapInitialized by remember { mutableStateOf(false) }
 
-        Log.d("MapScreen", "MapScreen Composable called before ")
+    Log.d("MapScreen", "MapScreen Composable called before ")
     Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
     Log.d("MapScreen", "MapScreen Composable called after ")
 
@@ -571,6 +571,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     }
     if (showGPSPermissionDialog) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { showGPSPermissionDialog = false },
             title = { Text(stringResource(R.string.location_permission_required)) },
             text = { Text(stringResource(R.string.this_app_requires_location_permissions_to_function_correctly_please_enable_gps_in_settings)) },
@@ -583,7 +584,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPermissionDialog = false }) {
+                TextButton(onClick = { showGPSPermissionDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -592,6 +593,7 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     if (showPermissionDialog) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { showPermissionDialog = false },
             title = { Text(stringResource(R.string.location_permission_required)) },
             text = { Text(stringResource(R.string.this_app_requires_location_permissions_to_function_correctly_please_enable_them_in_settings)) },
@@ -635,9 +637,14 @@ fun getCurrentLocation(
     } else {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
+                Log.d("MapScreen", "Location is not null")
+
+                Log.d("MapScreen", "Location is $location")
+
                 onLocationReceived(location ?: Location("").apply {
-                    longitude = 0.0
-                    latitude = 0.0
+                    Log.d("MapScreen", "Location is null")
+                    longitude = location?.longitude ?: 0.0
+                    latitude = location?.latitude ?: 0.0
                 })
             }
             .addOnFailureListener {
