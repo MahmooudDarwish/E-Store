@@ -9,6 +9,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
@@ -121,7 +122,14 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     var isMapInitialized by remember { mutableStateOf(false) }
 
     Log.d("MapScreen", "MapScreen Composable called before ")
-    Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
+    LaunchedEffect(Unit) {
+        try {
+            Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Too many requests. Please try again later.", Toast.LENGTH_LONG).show()
+        }
+    }
+
     Log.d("MapScreen", "MapScreen Composable called after ")
 
     var query by rememberSaveable { mutableStateOf(context.getString(R.string.search)) }
