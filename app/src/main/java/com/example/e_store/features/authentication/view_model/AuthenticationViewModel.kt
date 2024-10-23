@@ -16,6 +16,7 @@ import com.example.e_store.utils.shared_models.CustomerRequest
 import com.example.e_store.utils.shared_models.UserSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -230,6 +231,9 @@ class AuthenticationViewModel(
                                 onAuthSuccess = onAuthSuccess
                             )
                         }
+                        viewModelScope.launch {
+                        delay(1000)
+                            }
                         sendEmailVerificationAndCreateShopifyCustomer(context)
                     } else {
                         onError(
@@ -281,7 +285,7 @@ class AuthenticationViewModel(
 
                 Log.d("AuthenticationViewModel", "Email verification sent successfully")
 
-
+              
                 createShopifyCustomer(
                     CustomerRequest(
                         Customer(

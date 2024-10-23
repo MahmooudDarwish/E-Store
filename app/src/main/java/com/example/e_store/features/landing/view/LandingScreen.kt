@@ -1,11 +1,17 @@
 package com.example.e_store.features.landing.view
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -37,6 +43,10 @@ import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModel
 import com.example.e_store.utils.shared_view_model.FavouriteControllerViewModelFactory
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LandingScreen : ComponentActivity() {
 
@@ -74,7 +84,10 @@ class LandingScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FirebaseApp.initializeApp(this)
+
+        lifecycleScope.launch {
+            retryFirestoreWithExponentialBackoff(this@LandingScreen)
+        }
         setContent {
             MaterialTheme {
                 Surface {
@@ -124,3 +137,45 @@ class LandingScreen : ComponentActivity() {
         }
     }
 }
+
+@Suppress("DEPRECATION")
+private fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    } else {
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+}
+
+
+suspend fun retryFirestoreWithExponentialBackoff(context: Context, retries: Int = 2, onFailure: (() -> Unit)? = null) {
+    val delayTime = 1000L * retries  // Increase delay with each retry
+    delay(delayTime)
+
+    Log.d("LandingScreen", "Retrying Firestore request, attempt: $retries")
+
+    if (isNetworkAvailable(context)) {
+        try {
+            Log.d("Firestore Init", "Initializing Firestore")
+            if (FirebaseApp.getApps(context).isEmpty()) {
+                FirebaseApp.initializeApp(context)
+            }
+        } catch (e: Exception) {
+            if (retries < 5) {  // Limit retries to 5 attempts
+                Log.e("Firestore Init", "Error initializing Firestore: ${e.message}")
+                retryFirestoreWithExponentialBackoff(context, retries + 1, onFailure)
+            } else {
+                Log.e("Firestore Init", "Max retries reached. Could not initialize Firestore.")
+                onFailure?.invoke()  // Notify the UI on failure
+            }
+        }
+    } else {
+        Log.e("Firestore Init", "No network available.")
+        onFailure?.invoke()  // Notify the UI if there's no network
+    }
+}
+
