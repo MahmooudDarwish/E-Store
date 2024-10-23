@@ -9,7 +9,10 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -69,6 +72,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.example.e_store.BuildConfig
+import com.google.firebase.FirebaseApp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 private fun checkLocationPermissions(context: Context): Boolean {
@@ -84,6 +90,7 @@ private fun checkLocationPermissions(context: Context): Boolean {
     return fineLocationGranted && coarseLocationGranted
 
 }
+
 
 private fun GPSEnabled(context: Context): Boolean {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -114,15 +121,17 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
     val isPhoneExist by viewModel.isPhoneExist.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
+    // Remember a coroutine scope for launching coroutines inside composable
+    val coroutineScope = rememberCoroutineScope()
+
+
+
 
     var showPhoneNumberDialog by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf(UserSession.phone) }
 
     var isMapInitialized by remember { mutableStateOf(false) }
 
-    Log.d("MapScreen", "MapScreen Composable called before ")
-    Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
-    Log.d("MapScreen", "MapScreen Composable called after ")
 
     var query by rememberSaveable { mutableStateOf(context.getString(R.string.search)) }
 
@@ -134,6 +143,21 @@ fun MapScreen(navController: NavController, viewModel: MapViewModel) {
 
     val markerState = rememberMarkerState(position = LatLng(0.0, 0.0))
 
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                retryPlacesWithExponentialBackoff(context) {
+                    // Your API call here
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    "Too many requests. Please try again later.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     // Google Map state
     val startLocation = LatLng(40.9971, 29.1007)
@@ -738,3 +762,59 @@ fun PhoneNumberInputDialog(
         )
     }
 }
+
+
+
+
+
+@Suppress("DEPRECATION")
+private fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    } else {
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+}
+
+
+suspend fun retryPlacesWithExponentialBackoff(
+    context: Context,
+    retries: Int = 2,
+    onFailure: (() -> Unit)? = null
+) {
+    val delayTime = 1000L * retries  // Increase delay with each retry
+    delay(delayTime)
+
+
+    Log.d("MapScreen", "Retrying MapScreen request, attempt: ${retries+1}")
+
+    if (isNetworkAvailable(context)) {
+        try {
+            Log.d("MapScreen", "Initializing MapScreen")
+            if (!Places.isInitialized()) {
+                Log.d("MapScreen", "Initializing Places")
+                Places.initialize(context, BuildConfig.GOOGLE_MAPS_API_KEY)
+            }
+        } catch (e: Exception) {
+            Log.e("MapScreen", "Error initializing Places: ${e.message}")
+
+            if (retries < 5) {  // Limit retries to 5 attempts
+                Log.d("MapScreen", "Retrying... Attempt #${retries + 1}")
+                retryPlacesWithExponentialBackoff(context, retries + 1, onFailure)
+            } else {
+                Log.e("MapScreen", "Max retries reached. Operation failed.")
+                onFailure?.invoke()  // Notify the UI on failure
+            }
+        }
+    } else {
+        Log.w("MapScreen", "Network is not available. Cannot proceed.")
+        onFailure?.invoke()  // Notify the UI if there's no network
+    }
+}
+
+
