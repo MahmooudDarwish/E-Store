@@ -27,7 +27,7 @@ import com.example.e_store.features.favourites.view_model.FavouritesViewModelFac
 import com.example.e_store.features.checkout.viewModel.CheckoutViewModelFactory
 import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
 import com.example.e_store.features.location.view_model.LocationViewModelFactory
-import com.example.e_store.features.location.view_model.MapViewModelFactory
+import com.example.e_store.features.location.map.view_model.MapViewModelFactory
 import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
 import com.example.e_store.features.search.view_model.SearchViewModelFactory

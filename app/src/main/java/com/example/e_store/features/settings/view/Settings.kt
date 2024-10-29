@@ -58,10 +58,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     navController: NavController
 ) {
-
-
     val currencyResponse by viewModel.currencyResponse.collectAsState()
-
 
     when (currencyResponse) {
         is DataState.Success -> {
@@ -75,6 +72,7 @@ fun SettingsScreen(
 
         is DataState.Error -> {
             val error = (currencyResponse as DataState.Error).message
+            Toast.makeText(LocalContext.current, error, Toast.LENGTH_SHORT).show()
         }
 
         is DataState.Loading -> {
@@ -84,9 +82,7 @@ fun SettingsScreen(
 
     Log.d("SettingsScreenResponse", "SettingsScreen: $currencyResponse")
 
-
     LaunchedEffect(Unit) {
-
         viewModel.fetchCurrency()
     }
 

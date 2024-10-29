@@ -26,6 +26,7 @@ class SettingsViewModel(private val repository: EStoreRepository) : ViewModel() 
     fun fetchCurrency() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                Log.d("CurrencyViewModel", "Fetching currency data")
                 repository.fetchConversionRates().collect { response ->
                     _currencyResponse.value = response.let { DataState.Success(it) }
                     UserSession.conversionRates = response.conversion_rates

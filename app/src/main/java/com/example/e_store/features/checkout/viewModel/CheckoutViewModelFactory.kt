@@ -4,7 +4,6 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.e_store.utils.data_layer.EStoreRepository
-import com.google.android.gms.location.FusedLocationProviderClient
 
 class CheckoutViewModelFactory (
     private val repo: EStoreRepository

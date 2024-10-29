@@ -27,7 +27,7 @@ import com.example.e_store.features.home.view_model.HomeViewModelFactory
 import com.example.e_store.features.landing.components.SplashLottie
 import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
 import com.example.e_store.features.location.view_model.LocationViewModelFactory
-import com.example.e_store.features.location.view_model.MapViewModelFactory
+import com.example.e_store.features.location.map.view_model.MapViewModelFactory
 import com.example.e_store.features.main_home.view.MainHomeScreen
 import com.example.e_store.features.orders.view_model.OrdersViewModelFactory
 import com.example.e_store.features.payment.view_model.PaymentViewModelFactory
@@ -47,12 +47,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import java.util.Locale
+import  com.example.e_store.features.settings.view.SettingsScreen
 class LandingScreen : ComponentActivity() {
 
     private val repo by lazy {
         EStoreRepositoryImpl.getInstance(
-            EStoreRemoteDataSourceImpl.getInstance(),
+            EStoreRemoteDataSourceImpl.getInstance( this),
         )
     }
 
@@ -72,9 +73,10 @@ class LandingScreen : ComponentActivity() {
             repo
         )
     }
+    private val geocoder by lazy { android.location.Geocoder(this, Locale.getDefault()) }
     private val checkoutViewModelFactory by lazy { CheckoutViewModelFactory(repo) }
 
-    private val mapViewModelFactory by lazy { MapViewModelFactory(repo) }
+    private val mapViewModelFactory by lazy { MapViewModelFactory(repo,geocoder) }
     private val addLocationFactory by lazy { AddLocationViewModelFactory(repo) }
     private val locationViewModelFactory by lazy { LocationViewModelFactory(repo) }
     private val paymentViewModelFactory by lazy { PaymentViewModelFactory(repo) }
@@ -91,6 +93,7 @@ class LandingScreen : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface {
+
 
 
                     val navController = rememberNavController()
