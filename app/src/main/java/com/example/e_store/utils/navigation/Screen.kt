@@ -42,14 +42,14 @@ import com.example.e_store.features.favourites.view.FavouritesScreen
 import com.example.e_store.features.favourites.view_model.FavouritesViewModel
 import com.example.e_store.features.favourites.view_model.FavouritesViewModelFactory
 import com.example.e_store.features.location.view.AddLocationScreen
-import com.example.e_store.features.location.view.MapScreen
+import com.example.e_store.features.location.map.view.MapScreen
 import com.example.e_store.features.location.view.LocationScreen
 import com.example.e_store.features.location.view_model.AddLocationViewModel
 import com.example.e_store.features.location.view_model.AddLocationViewModelFactory
 import com.example.e_store.features.location.view_model.LocationViewModel
 import com.example.e_store.features.location.view_model.LocationViewModelFactory
-import com.example.e_store.features.location.view_model.MapViewModel
-import com.example.e_store.features.location.view_model.MapViewModelFactory
+import com.example.e_store.features.location.map.view_model.MapViewModel
+import com.example.e_store.features.location.map.view_model.MapViewModelFactory
 import com.example.e_store.features.payment.view.PaymentScreen
 import com.example.e_store.features.payment.view_model.PaymentViewModel
 import com.example.e_store.features.payment.view_model.PaymentViewModelFactory

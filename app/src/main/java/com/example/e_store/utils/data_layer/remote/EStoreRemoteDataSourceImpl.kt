@@ -1,5 +1,6 @@
 package com.example.e_store.utils.data_layer.remote
 
+import android.content.Context
 import android.util.Log
 import com.example.e_store.utils.constants.APIKeys
 import com.example.e_store.utils.data_layer.remote.exchange_rate.ExchangeRateApi
@@ -33,9 +34,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
-class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource {
+class EStoreRemoteDataSourceImpl private constructor(context: Context) : EStoreRemoteDataSource {
 
-    private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.api
+    private val apiService: ShopifyAPIServices = ShopifyRetrofitHelper.getApi(context)
+
+
     private val exchangeRateApiService: ExchangeRateApi = ExchangeRateRetrofitHelper.api
     private val geoNamesApiService: GeoNamesApi = GeoNamesRetrofitHelper.api
 
@@ -46,9 +49,9 @@ class EStoreRemoteDataSourceImpl private constructor() : EStoreRemoteDataSource 
         @Volatile
         private var instance: EStoreRemoteDataSourceImpl? = null
 
-        fun getInstance(): EStoreRemoteDataSourceImpl {
+        fun getInstance(context: Context): EStoreRemoteDataSourceImpl {
             return instance ?: synchronized(this) {
-                instance ?: EStoreRemoteDataSourceImpl().also { instance = it }
+                instance ?: EStoreRemoteDataSourceImpl(context).also { instance = it }
             }
         }
     }

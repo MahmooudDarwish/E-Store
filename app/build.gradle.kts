@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-
 }
 
 android {
@@ -76,6 +74,7 @@ val coroutinesVersion = "1.6.4"
 dependencies {
 
     implementation(libs.androidx.runner)
+    implementation(libs.places)
     // Unit testing
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.hamcrest:hamcrest:2.2")
@@ -91,9 +90,12 @@ dependencies {
     androidTestImplementation("androidx.arch.core:core-testing:$archTestingVersion")
 
 
+    //googel maps
+    implementation("com.google.maps.android:maps-compose:6.1.0")
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+
     //Exopplayer for GIF
     implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha")
-
 
     //Coil for images
     implementation("io.coil-kt:coil-compose:2.0.0")
@@ -111,21 +113,13 @@ dependencies {
 
 
     // Google Maps Compose library
-    implementation ("com.google.android.gms:play-services-maps:19.0.0")
-    implementation ("com.google.android.gms:play-services-location:21.3.0")
 
-    implementation("com.google.android.libraries.places:places:3.5.0")
-    implementation ("com.google.android.gms:play-services-base:18.4.0")
+
+
 
     implementation(libs.firebase.crashlytics.buildtools)
 
 
-    val mapsComposeVersion = "6.1.2"
-    implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
-    // Google Maps Compose utility library
-    implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
-    // Google Maps Compose widgets library
-    implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
