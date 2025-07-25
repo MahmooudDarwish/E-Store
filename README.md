@@ -4,6 +4,7 @@ This is a comprehensive mobile commerce (m-commerce) application that enables us
 
 ## Table of Contents
 - [Features](#features)
+- [Features](#screenshots)
 - [Technical Details](#technical-details)
   - [Architectural Pattern](#architectural-pattern)
   - [Libraries & Tools](#libraries--tools)
@@ -38,6 +39,18 @@ This is a comprehensive mobile commerce (m-commerce) application that enables us
 - **User Authentication:** Sign up, login, and authenticate users with Firebase.
 - **Order History:** View past orders.
 - **Payment Options:** Cash on Delivery (with restrictions) and Online Payment. Users can apply discount codes during checkout.
+
+## Screenshots
+
+
+![home 1](https://github.com/user-attachments/assets/877cc944-9719-4b29-99a8-f340fcae82f6) ![Home 2](https://github.com/user-attachments/assets/abe36aa7-61a3-44b7-9922-6563ba9e9420) ![Categories](https://github.com/user-attachments/assets/d827c9ca-2b7a-489f-b0e8-2e53fd7fa281)
+![Filters](https://github.com/user-attachments/assets/86512b61-3738-4251-8fe6-582515ad4978) ![Brand details ](https://github.com/user-attachments/assets/f4457899-9c48-4ffb-b4c7-7b05035a3083) ![Guset need login](https://github.com/user-attachments/assets/58194e35-427f-4e1d-81ce-d08d1acd0b95)
+![Guest Profile](https://github.com/user-attachments/assets/00a1892f-c467-4545-89db-09c663e4959f) ![Sign up](https://github.com/user-attachments/assets/b13b8d9a-e017-43a4-8294-c573a785b3ac) ![singin](https://github.com/user-attachments/assets/3fbc6e93-1576-459a-a8bc-b92e27b6eec1)
+![Currency Changer](https://github.com/user-attachments/assets/c72c1245-7c84-4e7a-84b3-230b94938b4b) ![Item details](https://github.com/user-attachments/assets/75887201-47a3-46b6-b4ef-2a097b6e8f19) ![Item details_2](https://github.com/user-attachments/assets/807c0629-e6d0-455b-99ef-96279f19f22f)
+![favorites](https://github.com/user-attachments/assets/a1fa6058-5302-482d-99b0-c423840e1e02) ![Location](https://github.com/user-attachments/assets/90185842-4d22-4375-a4bc-4fca83972fa6) ![Cart ](https://github.com/user-attachments/assets/9f972bad-68bb-4ec5-b71e-29e21ffdda24)
+![Checkout](https://github.com/user-attachments/assets/1b76852b-9b47-4094-8936-3a3b0760b98d) ![payment](https://github.com/user-attachments/assets/2ce669dc-ae10-488c-b27f-c4386e218705) ![success payment](https://github.com/user-attachments/assets/668b9edf-10fa-4621-82f9-44d442eb60cf)
+
+
 
 ## Technical Details
 
